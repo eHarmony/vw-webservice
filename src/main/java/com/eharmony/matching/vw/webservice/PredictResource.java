@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.core.VWPredictor;
+import com.eharmony.matching.vw.webservice.util.StringIterable;
 
 /**
  * Root resource (exposed at "predict" path)
@@ -63,15 +64,7 @@ public class PredictResource {
 	
 	private Iterable<String> getIterableFromExampleString(String vwExamples) throws IOException
 	{
-		//for now, sticking everything in a list but a buffered reader iterable is probably a better way to go.
-		BufferedReader reader = new BufferedReader(new StringReader(vwExamples));
-		
-		List<String> allExamplesList = new ArrayList<String>();
-		
-		for (String line = reader.readLine(); line != null; line = reader.readLine())
-			allExamplesList.add(line);
-		
-		return allExamplesList;
+		return new StringIterable(vwExamples);
 	}
 	
     /**
