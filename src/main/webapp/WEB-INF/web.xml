@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This web.xml file is not required when using Servlet 3.0 container,
+     see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html -->
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+    
+    
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    
+    <servlet>
+        <servlet-name>vw-webservice</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>com.eharmony.matching.vw.webservice</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+        
+        <!-- if you happen to start using the servlet 3.0 spec with some async features, you might need to turn this flag on.
+        it took me a while to find this out when i was playing with Jersey's ChunkedOutput, so i'm leaving it in here
+        in case it's needed in the future. 
+        for now i've reverted back to using servlet 2.5 tho, since i'm not using any async-related stuff. -->
+        
+        <!-- <async-supported>true</async-supported>  -->
+        
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>vw-webservice</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+</web-app>
