@@ -4,11 +4,16 @@
 package com.eharmony.matching.vw.webservice.core;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -28,6 +33,10 @@ public class TCPIPVWPredictor implements VWPredictor {
 	private int port;
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(TCPIPVWPredictor.class);
+	
+	//TODO: consider using an application-wide thread pool.
+	//This threadpool gets created per instance of TCPIPVWPredictor.
+	private ExecutorService threadPoolExecutorService = Executors.newCachedThreadPool();
 	
 	@Autowired
 	public TCPIPVWPredictor(@Value("${vw.hostName}") String vwHostName, 
@@ -53,85 +62,183 @@ public class TCPIPVWPredictor implements VWPredictor {
 		
 		if (vwExamples == null)
 			throw new IllegalArgumentException("Cannot provide a null iterator of examples!");
-
-		List<String> toReturn = new ArrayList<String>();
-		
-		if (vwExamples.iterator().hasNext() == false) //if no examples, don't bother creating the socket connection.
-			return toReturn;
-		
-		Socket socket = null;
-		PrintWriter vwWriter = null;
-		BufferedReader vwReader = null;
 		
 		try {
 			
 			LOGGER.info("Connecting to VW...");
 			
-			socket = new Socket(hostNameString, port);
+			final Socket socket = new Socket(hostNameString, port);
 			
-			vwWriter = new PrintWriter(socket.getOutputStream(), true);
+			//submit examples in a background thread.
+			threadPoolExecutorService.submit(new VWExampleSubmitter(socket, vwExamples));
 			
-			vwReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			
-			for (String example : vwExamples)
-			{
-				if (StringUtils.isBlank(example))
-					continue;
-				
-				String toSubmit = example.trim() + System.getProperty("line.separator"); 
-				
-				LOGGER.info("Submitting example to VW: " + toSubmit);
-				
-				vwWriter.write(toSubmit); 	//need to explicitly delineate examples with a newline,
-											//as stated in the VW documentation.
-
-			}
-			
-			vwWriter.flush();
-			socket.shutdownOutput(); 	//indicate to VW that all data has been sent.
-										//cannot call vwWriter.close() because that ends up closing the socket as well.
-
-			String readStringFromVW = null;
-			while ((readStringFromVW = vwReader.readLine()) != null)
-			{
-				LOGGER.info("VW returned: " + readStringFromVW);
-				
-				toReturn.add(readStringFromVW);
-
-			}
-			
-			LOGGER.info("VW finished returning output, all done here...");
+			return new VWPredictionIterable(socket);	
 
 		} catch (Exception e) {
 			
 			LOGGER.error("Exception during prediction! Exception message: " + e.getMessage(), e);
 		}
-		finally {
-			if (vwReader != null)
-			{
-				try {
-					vwReader.close();
-				} catch (Exception e2) {
-					LOGGER.warn("Exception closing VW reader! Exception message: " + e2.getMessage(), e2);
-				}
-			}
-			
-			if (vwWriter != null)
-				try {
-					vwWriter.close();
-				} catch (Exception e2) {
-					LOGGER.warn("Exception closing VW writer! Exception message: " + e2.getMessage(), e2);
-				}
-			
-			if (socket != null && socket.isClosed() == false)
-				try {
-					socket.close();
-				} catch (Exception e2) {
-					LOGGER.warn("Exception closing socket connection to VW! Exception message: " + e2.getMessage(), e2);
-				}
+
+		return null; //empty iterable
+	}
+	
+	/*
+	 * Submits examples to VW.
+	 */
+	private static class VWExampleSubmitter implements Runnable
+	{
+		private Socket socket;
+		private Iterable<String> vwExamples;
+		
+		private static final Logger LOGGER = LoggerFactory.getLogger(VWExampleSubmitter.class);
+		
+		public VWExampleSubmitter(Socket socket, Iterable<String> vwExamples)
+		{
+			this.socket = socket;
+			this.vwExamples = vwExamples;
 		}
 		
-		return toReturn;
+		@Override
+		public void run() {
+			
+			PrintWriter vwWriter;
+			try {
+				vwWriter = new PrintWriter(socket.getOutputStream(), true);
+				
+				for (String example : vwExamples)
+				{
+					if (StringUtils.isBlank(example))
+						continue; //skip null/blank examples.
+					
+					String toSubmit = example.trim() + System.getProperty("line.separator"); 
+					
+					LOGGER.info("Submitting example to VW: " + toSubmit);
+					
+					vwWriter.write(toSubmit); 	//need to explicitly delineate examples with a newline,
+												//as stated in the VW documentation.
+
+				}
+				
+				vwWriter.flush();
+				socket.shutdownOutput(); 	//indicate to VW that all data has been sent.
+											//cannot call vwWriter.close() because that ends up closing the socket as well.
+				
+				LOGGER.info("All examples submitted to VW!");
+				
+			} catch (IOException e) {
+				
+				LOGGER.error("Exception in VWExampleSubmitter: " + e.getMessage(), e);
+			}
+			
+			//the prediction iterator will shut down the socket.
+			//can't call vwWriter.close() here because that will shut the socket down, but we can't do that
+			//at this point because the prediction reader might still be reading from it.
+			
+		}
+		
+	}
+	
+	private static class VWPredictionIterable implements Iterable<String>
+	{
+		private Socket socket;
+		
+		private static final Logger LOGGER = LoggerFactory.getLogger(VWExampleSubmitter.class);
+		
+		public VWPredictionIterable(Socket socket)
+		{
+			this.socket = socket;
+		}
+		
+		@Override
+		public Iterator<String> iterator() {
+			
+			try {
+				return new VWPredictionIterator(socket);
+			} catch (IOException e) {
+				LOGGER.error("Error in VWPredictionIterable: " + e.getMessage(), e);
+			}
+			
+			return new ArrayList<String>().iterator();
+		}
+		
+	}
+	
+	/*
+	 * Reads predictions from VW in a separate thread.
+	 */
+	private static class VWPredictionIterator implements Iterator<String>
+	{
+		private static final Logger LOGGER = LoggerFactory.getLogger(VWPredictionIterator.class);
+		
+		private Socket socket;
+		
+		private BufferedReader vwReader;
+		
+		private String nextLineToReturn = null;
+		
+		public VWPredictionIterator(Socket socket) throws IOException
+		{
+			this.socket = socket;
+			
+			vwReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			
+			advance();
+		}
+
+		@Override
+		public boolean hasNext() {
+
+			return nextLineToReturn != null;
+		}
+
+		@Override
+		public String next() {
+			String toReturn = nextLineToReturn;
+			
+			advance();
+			
+			return toReturn;
+		}
+
+		@Override
+		public void remove() {
+			
+			throw new UnsupportedOperationException("VWPredictionIterator doesn't support the 'remove' operation!");
+			
+		}
+
+		private void advance()
+		{
+			boolean closeReader = false;
+			try {
+				nextLineToReturn = vwReader.readLine();
+				
+				closeReader = nextLineToReturn == null;
+				
+			} catch (Exception e) {
+				LOGGER.error("Error in VWPredictionIterator: " + e.getMessage(), e);
+				closeReader = true;
+			}
+			finally
+			{
+				if (closeReader)
+				{
+					try {
+						vwReader.close();
+					} catch (Exception e2) {
+						LOGGER.warn("Failed to close the reader in VWPredictionIterator: " + e2.getMessage(), e2);
+					}
+					
+					if (socket.isClosed() == false)
+						try {
+							socket.close();
+						} catch (Exception e2) {
+							LOGGER.warn("Failed to close the socket in VWPredictionIterator: " + e2.getMessage(), e2);
+						}
+
+				}
+			}
+		}
 	}
 
 }
