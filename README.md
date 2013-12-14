@@ -61,9 +61,11 @@ The output of the last command will tell you which file Jetty is logging to, you
 
 --------------
 
+Testing the web service:
+
 You can try to submit individual examples to the web service using curl. Example:
 
-~> curl -H "Content-Type:text/plain" --data-binary @/path/to/examples.txt http://lp-prod1.dc1.eharmony.com:8080/vw-webservice/predict -v
+~> curl -H "Content-Type:text/plain" --data-binary @/path/to/examples.txt http://boxRunningJetty:8080/vw-webservice/predict -v
 
 Note that your examples.txt must have this format:
 
@@ -79,6 +81,9 @@ vwExamples=1 | w_2=German pre1_2=g c_0=A_fw=y c_0=A c_2=Aa suf2_2=an pre2_2=ge c
 
 You can look at the file ner.train.withVwExamplesMarkerPrePended.gz under src/test/resources for a big list of examples.
 
+Useful tip:
+
+When you submit examples to the web service, you should tail the Jetty log file (see Step 5) to see what the web service is doing.
 
 
 
