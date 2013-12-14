@@ -13,8 +13,9 @@ On your local machine, grab the code for the VW web service:
 git clone git@github.corp.eharmony.com:matching/vw-webservice.git
 In the folder where you executed the above, you should now see a "vw-webservice" folder.
 Step 3:
-On your local machine, navigate to the "vw-webservice" folder you set up from Step 2. Then create the package:
-../vw-webservice> mvn package
+On your local machine, navigate to the "vw-webservice" folder you set up from Step 2. Then create the WAR (Web Application Resource) package:
+~>cd /path/to/vw-webservice
+/path/to/vw-webservice> mvn package
 In the output, you should see see the location where the WAR (Web Application Resource) file has been created:
 …
 …
@@ -29,12 +30,12 @@ In the output, you should see see the location where the WAR (Web Application Re
 [INFO] Final Memory: 21M/81M
 [INFO] ------------------------------------------------------------------------
 Step 4:
-Copy the generate .war file to the jetty-6.1.20/webapps folder.
+Copy the generated .war file to the jetty-6.1.20/webapps folder.
 If you're running Jetty on the same box where you built the vw-webservice.war file, you can do this manually. Otherwise, you can use 'scp' to copy the WAR file
 to the box where Jetty is running (specifically, the /webapps folder under the jetty-6.1.20 folder).
 ~>scp /Users/vrahimtoola/Desktop/Git/GitHubCorpDotCom/vw-webservice/target/vw-webservice.war  boxthatIsRunningJetty:/path/to/jetty-6.1.20/webapps
 Step 5:
-Restart the Jetty instance (wherever you have Jetty running).
+Restart the Jetty instance (wherever you will be running Jetty).
 ~> cd /path/to/jetty-6.1.20
 ~>./bin/jetty.sh stop
 ~>./bin/jetty.sh start
