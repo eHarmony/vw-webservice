@@ -7,16 +7,25 @@ Step 1:
 On the box where you wish to run the web service, install Jettty 6.1.20. From your command line, do this:
 
 ~>wget http://dist.codehaus.org/jetty/jetty-6.1.20/jetty-6.1.20.zip ~>unzip jetty-6.1.20.zip
+
 In the folder where you executed the above commands, you should now have a "jetty-6.1.20" folder.
+
 Step 2:
+
 On your local machine, grab the code for the VW web service:
+
 git clone git@github.corp.eharmony.com:matching/vw-webservice.git
+
 In the folder where you executed the above, you should now see a "vw-webservice" folder.
+
 Step 3:
+
 On your local machine, navigate to the "vw-webservice" folder you set up from Step 2. Then create the WAR (Web Application Resource) package:
+
 ~>cd /path/to/vw-webservice
-/path/to/vw-webservice> mvn package
-In the output, you should see see the location where the WAR (Web Application Resource) file has been created:
+~/path/to/vw-webservice> mvn package
+
+In the maven output, you should see see the location where the WAR (Web Application Resource) file has been created:
 …
 …
 …
@@ -29,21 +38,34 @@ In the output, you should see see the location where the WAR (Web Application Re
 [INFO] Finished at: Fri Dec 13 17:19:17 PST 2013
 [INFO] Final Memory: 21M/81M
 [INFO] ------------------------------------------------------------------------
+
 Step 4:
+
 Copy the generated .war file to the jetty-6.1.20/webapps folder.
+
 If you're running Jetty on the same box where you built the vw-webservice.war file, you can do this manually. Otherwise, you can use 'scp' to copy the WAR file
 to the box where Jetty is running (specifically, the /webapps folder under the jetty-6.1.20 folder).
+
 ~>scp /Users/vrahimtoola/Desktop/Git/GitHubCorpDotCom/vw-webservice/target/vw-webservice.war  boxthatIsRunningJetty:/path/to/jetty-6.1.20/webapps
+
 Step 5:
+
 Restart the Jetty instance (wherever you will be running Jetty).
+
 ~> cd /path/to/jetty-6.1.20
 ~>./bin/jetty.sh stop
 ~>./bin/jetty.sh start
+
 The output of the last command will tell you which file Jetty is logging to, you can tail that file to read the output messages being produced by the VW web service.
+
 --------------
+
 You can try to submit individual examples to the web service using curl. Example:
-curl -H "Content-Type:text/plain" --data-binary @/path/to/examples.txt http://lp-prod1.dc1.eharmony.com:8080/vw-webservice/predict -v
-Note that examples.txt must have this format:
+
+~>curl -H "Content-Type:text/plain" --data-binary @/path/to/examples.txt http://lp-prod1.dc1.eharmony.com:8080/vw-webservice/predict -v
+
+Note that your examples.txt must have this format:
+
 vwExamples=first Example
 secondExample
 thirdExample
