@@ -126,9 +126,10 @@ vwExamples=1 | w_2=German pre1_2=g c_0=A_fw=y c_0=A c_2=Aa suf2_2=an pre2_2=ge c
 ToDo
 ----
 
-* text/plain -> text/vowpalwabbit
-* can we get rid of "vwExamples=" prefix in body?
+* get rid of "vwExamples=" prefix in body
+* text/plain -> text/vw
+* include vowpal wabbit as a submodule?
+* mvn test (use examples.txt)
+* automate setup and installation
+* JSON support
 * protocol buffer support
-* vowpal wabbit as a submodule?
-* include examples.txt and use to test
-* automate setup
