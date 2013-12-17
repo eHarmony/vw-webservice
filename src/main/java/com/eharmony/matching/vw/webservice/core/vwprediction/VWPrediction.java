@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core;
+package com.eharmony.matching.vw.webservice.core.vwprediction;
 
 import java.io.IOException;
 import java.io.OutputStream;

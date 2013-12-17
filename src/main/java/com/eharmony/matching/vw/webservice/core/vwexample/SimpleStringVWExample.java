@@ -1,13 +1,12 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core;
+package com.eharmony.matching.vw.webservice.core.vwexample;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 import com.google.common.base.Charsets;
 
@@ -15,14 +14,16 @@ import com.google.common.base.Charsets;
  * @author vrahimtoola A VW example that's represented as a simple string, ie,
  *         without it being possible to access it's individual components
  *         separately.
+ * 
+ *         Note that since VW examples are meant to be plain text, I'm using the
+ *         UTF8 charset. See the corresponding messagebodyreader.
  */
 public class SimpleStringVWExample implements VWExample {
 
 	private final String vwExampleString;
 
-	private final byte[] newlineBytes;
-
-	private final Charset theCharset;
+	private static final byte[] newlineBytes = System.getProperty(
+			"line.separator").getBytes(Charsets.UTF_8);
 
 	/*
 	 * Constructs a VW example using the exact String representation of it.
@@ -30,16 +31,8 @@ public class SimpleStringVWExample implements VWExample {
 	 * @param theString The VW example. May be empty, but cannot be null.
 	 */
 	public SimpleStringVWExample(String theString) {
-		this(theString, Charsets.UTF_8);
-	}
-
-	public SimpleStringVWExample(String theString, Charset charset) {
-		checkNotNull(theString);
-		checkNotNull(charset);
-
+		checkNotNull(theString, "Null string provided as example!");
 		vwExampleString = theString;
-		newlineBytes = System.getProperty("line.separator").getBytes(charset);
-		theCharset = charset;
 	}
 
 	/*
@@ -51,7 +44,7 @@ public class SimpleStringVWExample implements VWExample {
 	 */
 	@Override
 	public void write(OutputStream outputStream) throws IOException {
-		outputStream.write(vwExampleString.getBytes(theCharset));
+		outputStream.write(vwExampleString.getBytes(Charsets.UTF_8));
 		outputStream.write(newlineBytes);
 	}
 
