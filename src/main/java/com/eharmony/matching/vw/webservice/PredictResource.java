@@ -3,7 +3,6 @@ package com.eharmony.matching.vw.webservice;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
-import java.util.ServiceLoader;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -14,7 +13,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
-import javax.ws.rs.ext.MessageBodyReader;
 
 import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.slf4j.Logger;
@@ -68,7 +66,7 @@ public class PredictResource {
 				
 				for (String prediction : predictionsIterable)
 				{
-					LOGGER.info("Writing output: " + prediction.getBytes(charset));
+					LOGGER.info("Writing output: {}", prediction.getBytes(charset));
 					
 					output.write(prediction.getBytes(charset));
 					output.write(newlineBytes);
@@ -91,25 +89,6 @@ public class PredictResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String doGet() {
     	
-    	ServiceLoader<MessageBodyReader> tempLoader = ServiceLoader.load(MessageBodyReader.class);
-    	
-    	String loadedServices = "";
-    	
-    	if (tempLoader != null)
-    	{
-    		for (MessageBodyReader<String> mbBodyReader : tempLoader)
-    		{
-    			LOGGER.info("*** Loaded service: " + mbBodyReader.getClass());
-    		}
-    		
-    		loadedServices = "loader services";
-    	}
-    	else {
-			
-    		LOGGER.info("**** failed to load services!");
-    		loadedServices = "no services loaded";
-		}
-    	
-        return "Hello from the VW Predict web service! - " + loadedServices; //TODO: spit out usage instructions here, perhaps?
+        return "Hello from the VW Predict web service!"; //TODO: spit out usage instructions here, perhaps?
     }
 }
