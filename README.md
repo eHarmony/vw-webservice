@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/eHarmony/vw-webservice.png)](https://travis-ci.org/eHarmony/vw-webservice)
+
 Vowpal Wabbit Webservice
 =============
 
