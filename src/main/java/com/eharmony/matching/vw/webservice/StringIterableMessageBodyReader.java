@@ -12,7 +12,6 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -22,7 +21,6 @@ import javax.ws.rs.ext.Provider;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 /**
  * @author vrahimtoola
@@ -58,8 +56,7 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 	public boolean isReadable(Class<?> type, Type genericType,
 			Annotation[] annotations, MediaType mediaType) {
 
-		//TODO: look at string formatting options built in to SLF4J
-		LOGGER.info("Called with media type: " + mediaType);
+		LOGGER.info("Called with media type: {}", mediaType);
 		
 		return mediaType.equals(MediaType.TEXT_PLAIN_TYPE) &&
 			 type == Iterable.class; //TODO: add check for generic type
@@ -79,6 +76,9 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 			MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
 			throws IOException, WebApplicationException {
 
+		//TODO:
+		//if a content-length has been provided, then use that to read entire string in one go.
+		
 		Charset charset = ReaderWriter.getCharset(mediaType);
 		
 		final InputStreamReader inputStreamReader = new InputStreamReader(entityStream, charset);
@@ -100,6 +100,7 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 	
 	//TODO look at guava's abstract iterator
 	//and the test that comes with guava
+	//TODO just read lines (ie, called BufferedReader's readLine)
 	private static class StringIterator implements Iterator<String>
 	{
 		/*

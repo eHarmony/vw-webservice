@@ -10,10 +10,8 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -76,7 +74,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 
 		} catch (Exception e) {
 			
-			LOGGER.error("Exception during prediction! Exception message: " + e.getMessage(), e);
+			LOGGER.error("Exception during prediction! Exception message: {}", e.getMessage(), e);
 		}
 
 		return null; //empty iterable
@@ -115,7 +113,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 					//this line is inefficient
 					String toSubmit = example.trim() + System.getProperty("line.separator"); 
 					
-					LOGGER.info("Submitting example to VW: " + toSubmit);
+					LOGGER.info("Submitting example to VW: {}", toSubmit);
 					
 					vwWriter.write(toSubmit); 	//need to explicitly delineate examples with a newline,
 												//as stated in the VW documentation.
@@ -131,7 +129,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 				
 			} catch (IOException e) {
 				
-				LOGGER.error("Exception in VWExampleSubmitter: " + e.getMessage(), e);
+				LOGGER.error("Exception in VWExampleSubmitter: {}", e.getMessage(), e);
 			}
 			
 			//the prediction iterator will shut down the socket.
@@ -159,7 +157,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 			try {
 				return new VWPredictionIterator(socket);
 			} catch (IOException e) {
-				LOGGER.error("Error in VWPredictionIterable: " + e.getMessage(), e);
+				LOGGER.error("Error in VWPredictionIterable: {}", e.getMessage(), e);
 			}
 			
 			return new ArrayList<String>().iterator();
@@ -220,7 +218,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 				closeReader = nextLineToReturn == null;
 				
 			} catch (Exception e) {
-				LOGGER.error("Error in VWPredictionIterator: " + e.getMessage(), e);
+				LOGGER.error("Error in VWPredictionIterator: {}", e.getMessage(), e);
 				closeReader = true;
 			}
 			finally
@@ -230,14 +228,14 @@ public class TCPIPVWPredictor implements VWPredictor {
 					try {
 						vwReader.close();
 					} catch (Exception e2) {
-						LOGGER.warn("Failed to close the reader in VWPredictionIterator: " + e2.getMessage(), e2);
+						LOGGER.warn("Failed to close the reader in VWPredictionIterator: {}", e2.getMessage(), e2);
 					}
 					
 					if (socket.isClosed() == false)
 						try {
 							socket.close();
 						} catch (Exception e2) {
-							LOGGER.warn("Failed to close the socket in VWPredictionIterator: " + e2.getMessage(), e2);
+							LOGGER.warn("Failed to close the socket in VWPredictionIterator: {}", e2.getMessage(), e2);
 						}
 
 				}
