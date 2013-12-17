@@ -1,15 +1,15 @@
-VW Webservice
+Vowpal Wabbit Webservice
 =============
 
-This project implements a simple web service that wraps vowpal wabbit daemon
-and below you will find a description and installation instructions.
+This is a simple web service that wraps vowpal wabbit daemon.
+Below you will find a description and installation instructions.
 
 Dependencies
 ------------
 
 * Maven 2.2.1
 * Java
-* Jetty
+* Jetty (6.2.10)
 * vowpal wabbit
 
 The current web service was developed against and tested on Jetty 6.2.10, so
@@ -106,7 +106,7 @@ You can submit individual examples to the web service using curl:
 
 ```
 curl -H "Content-Type:text/plain" \
-        --data-binary @/path/to/examples.txt \
+        --data-binary @examples.txt \
         http://host.running.jetty.com:8080/vw-webservice/predict \
         -v
 ```
@@ -128,6 +128,7 @@ ToDo
 ----
 
 * get rid of "vwExamples=" prefix in body
+* pass through empty lines (they have special meaning in vw input)
 * text/plain -> text/vw
 * include vowpal wabbit as a submodule?
 * mvn test (use examples.txt)
