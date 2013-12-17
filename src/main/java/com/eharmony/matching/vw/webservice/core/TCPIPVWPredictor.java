@@ -103,6 +103,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 			
 			PrintWriter vwWriter;
 			try {
+				//TODO: consider BufferedWriter
 				vwWriter = new PrintWriter(socket.getOutputStream(), true);
 				
 				for (String example : vwExamples)
@@ -110,6 +111,8 @@ public class TCPIPVWPredictor implements VWPredictor {
 					if (StringUtils.isBlank(example))
 						continue; //skip null/blank examples.
 					
+					//TODO: BufferedWriter should have a writeLine method...
+					//this line is inefficient
 					String toSubmit = example.trim() + System.getProperty("line.separator"); 
 					
 					LOGGER.info("Submitting example to VW: " + toSubmit);
@@ -119,6 +122,7 @@ public class TCPIPVWPredictor implements VWPredictor {
 
 				}
 				
+				//TODO: these should go in a finally block
 				vwWriter.flush();
 				socket.shutdownOutput(); 	//indicate to VW that all data has been sent.
 											//cannot call vwWriter.close() because that ends up closing the socket as well.

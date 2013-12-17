@@ -49,6 +49,8 @@ public class PredictResource {
 	@Produces(MediaType.TEXT_PLAIN)
 	public Response doPredict(final Iterable<String> vwExamples) throws IOException
 	{
+		//TODO: look into coda hale metrics library, consider JMX 
+		
 		StreamingOutput output = new StreamingOutput() {
 			
 			@Override

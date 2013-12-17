@@ -9,6 +9,9 @@ package com.eharmony.matching.vw.webservice.core;
  */
 public interface VWPredictor {
 
+	//TODO: look at guava's Function interface
+	//change String generic type to something more type safe.
+	
 	/*
 	 * Submits the examples to be evaluated, to VW.
 	 * @param examples An iterable containing the VW examples. Must not be null (but can be empty). Null/empty examples returned by the iterable will be skipped.
