@@ -129,6 +129,10 @@ public class StringIterableMessageBodyReaderTest {
 			
 			if (dumpExamples && numExamples % 21 == 0) //print every 21st example
 			{
+				//TODO: get rid of system.out.println !!
+				
+				//TODO: get a jenkin's build going, turn on code coverage + findbugs etc etc
+				
 				System.out.println("expected example: " + expectedExample);
 				System.out.println("read example    : " + example);
 				System.out.println();

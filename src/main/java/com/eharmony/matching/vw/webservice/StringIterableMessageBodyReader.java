@@ -47,6 +47,7 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 	
 	public StringIterableMessageBodyReader(int maxExampleLength)
 	{
+		//TODO: look at guava pre conditions
 		if (maxExampleLength < 0)
 			throw new IllegalArgumentException("The max example length must be non-negative!");
 		
@@ -57,6 +58,7 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 	public boolean isReadable(Class<?> type, Type genericType,
 			Annotation[] annotations, MediaType mediaType) {
 
+		//TODO: look at string formatting options built in to SLF4J
 		LOGGER.info("Called with media type: " + mediaType);
 		
 		return mediaType.equals(MediaType.TEXT_PLAIN_TYPE) &&
@@ -68,6 +70,8 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 	 * @see javax.ws.rs.ext.MessageBodyReader#readFrom(java.lang.Class, java.lang.reflect.Type, java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap, java.io.InputStream)
 	 *
 	 * Expects data to arrive as url-encoded strings.
+	 * 
+	 * TODO: look at specific mediatypes eg text/vw
 	 */
 	@Override
 	public Iterable<String> readFrom(Class<Iterable<String>> type,
@@ -94,6 +98,8 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 		};
 	}
 	
+	//TODO look at guava's abstract iterator
+	//and the test that comes with guava
 	private static class StringIterator implements Iterator<String>
 	{
 		/*
@@ -241,6 +247,8 @@ public class StringIterableMessageBodyReader implements MessageBodyReader<Iterab
 						
 					case Examples:
 
+						//TODO:
+						
 						//if we read an extra char from the previous example, place it
 						//into the stringbuilder for this example that we are reading now.
 						if (readExtraCharFromPreviousExample)
