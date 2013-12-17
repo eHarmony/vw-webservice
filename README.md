@@ -130,8 +130,9 @@ ToDo
 ----
 
 * get rid of "vwExamples=" prefix in body
-* pass through empty lines (they have special meaning in vw input)
 * text/plain -> text/vw
+* upgrade to Jetty 9
+* Announce
 * include vowpal wabbit as a submodule?
 * mvn test (use examples.txt)
 * automate setup and installation
