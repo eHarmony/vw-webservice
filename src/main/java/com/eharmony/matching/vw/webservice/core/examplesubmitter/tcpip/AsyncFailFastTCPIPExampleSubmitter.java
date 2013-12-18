@@ -143,6 +143,7 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 
 		} catch (Exception e1) {
 
+			LOGGER.error("Exception communicating with VW: {}", e1.getMessage());
 			return new ErrorPredictionFetcher(e1.getMessage());
 		}
 

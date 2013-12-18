@@ -42,11 +42,13 @@ public class PredictResource {
 	}
 
 	@POST
-	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0 })
+	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN })
 	@Produces({ /* PredictionMediaTypes.PLAINTEXT_1_0 */MediaType.TEXT_PLAIN })
 	public void doPredict(ExamplesIterable examplesIterable,
 			@Suspended final AsyncResponse asyncResponse) throws IOException {
 
+		requestHandlerFactory.getRequestHandler().handleRequest(
+				examplesIterable, asyncResponse);
 	}
 
 	/**
