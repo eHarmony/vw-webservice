@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFactory;
 
 /**
  * Root resource (exposed at "predict" path)
@@ -28,18 +27,18 @@ import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitte
 @Path("/predict")
 public class PredictResource {
 
-	private final ExampleSubmitterFactory exampleSubmitterFactory;
+	private final RequestHandlerFactory requestHandlerFactory;
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(PredictResource.class);
 
 	@Autowired
-	public PredictResource(ExampleSubmitterFactory exampleSubmitterFactory) {
+	public PredictResource(RequestHandlerFactory requestHandlerFactory) {
 
-		checkNotNull(exampleSubmitterFactory,
-				"Null example submitter factory provided!");
+		checkNotNull(requestHandlerFactory,
+				"A request handler factory must be provided!");
 
-		this.exampleSubmitterFactory = exampleSubmitterFactory;
+		this.requestHandlerFactory = requestHandlerFactory;
 	}
 
 	@POST
