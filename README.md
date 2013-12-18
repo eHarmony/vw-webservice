@@ -124,10 +124,14 @@ ToDo
 ----
 
 * text/plain -> text/vw
-* upgrade to Jetty 9
 * Announce
 * include vowpal wabbit as a submodule?
 * mvn test (use examples.txt)
 * automate setup and installation
 * JSON support
 * protocol buffer support
+* flesh out the spring application context and get rid of spring annotations from the actual source code
+* move all property configuration to some place outside the .war file, right now it's packaged inside it effectively making them hard coded
+* add codahale metrics gathering
+* !!! LOTS MORE TESTS !!!
+* go through all the TODO comments in the source code and make changes where necessary
