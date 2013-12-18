@@ -14,14 +14,14 @@ import com.google.common.base.Charsets;
  * @author vrahimtoola A VW prediction represented as a simple string (UTF8
  *         encoded).
  */
-public class SimpleStringVWPrediction implements VWPrediction {
+public class StringPrediction implements Prediction {
 
 	private final String vwPrediction;
 
 	private static final byte[] newlineBytes = System.getProperty(
 			"line.separator").getBytes(Charsets.UTF_8);
 
-	public SimpleStringVWPrediction(String theString) {
+	public StringPrediction(String theString) {
 		checkNotNull(theString, "Null prediction provided!");
 		vwPrediction = theString;
 	}
@@ -36,6 +36,12 @@ public class SimpleStringVWPrediction implements VWPrediction {
 	public void write(OutputStream outputStream) throws IOException {
 		outputStream.write(vwPrediction.getBytes(Charsets.UTF_8));
 		outputStream.write(newlineBytes);
+	}
+
+	@Override
+	public String getVWStringRepresentation() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,26 +1,25 @@
 package com.eharmony.matching.vw.webservice;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.charset.Charset;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.StreamingOutput;
 
-import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.eharmony.matching.vw.webservice.core.VWPredictor;
+import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
+import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFactory;
 
 /**
  * Root resource (exposed at "predict" path)
@@ -29,66 +28,40 @@ import com.eharmony.matching.vw.webservice.core.VWPredictor;
 @Path("/predict")
 public class PredictResource {
 
-	private VWPredictor vwPredictor;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(StringIterableMessageBodyReader.class);
-	
+	private final ExampleSubmitterFactory exampleSubmitterFactory;
+
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(PredictResource.class);
+
 	@Autowired
-	public PredictResource(VWPredictor vwPredictor)
-	{
-		if (vwPredictor == null)
-			throw new IllegalArgumentException("A VWPredictor must be provided!");
-		
-		this.vwPredictor = vwPredictor;
+	public PredictResource(ExampleSubmitterFactory exampleSubmitterFactory) {
+
+		checkNotNull(exampleSubmitterFactory,
+				"Null example submitter factory provided!");
+
+		this.exampleSubmitterFactory = exampleSubmitterFactory;
 	}
 
 	@POST
-	@Consumes(MediaType.TEXT_PLAIN)
-	@Produces(MediaType.TEXT_PLAIN)
-	public Response doPredict(final Iterable<String> vwExamples) throws IOException
-	{
-		//TODO: look into coda hale metrics library, consider JMX 
-		
-		StreamingOutput output = new StreamingOutput() {
-			
-			@Override
-			public void write(OutputStream output) throws IOException,
-					WebApplicationException {
+	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0 })
+	@Produces({ /* PredictionMediaTypes.PLAINTEXT_1_0 */MediaType.TEXT_PLAIN })
+	public void doPredict(ExamplesIterable examplesIterable,
+			@Suspended final AsyncResponse asyncResponse) throws IOException {
 
-				Iterable<String> predictionsIterable = vwPredictor.predict(vwExamples);
-				
-				if (predictionsIterable == null)
-					throw new WebApplicationException("A null predictions iterable was returned!");
-				
-				Charset charset = ReaderWriter.getCharset(MediaType.TEXT_PLAIN_TYPE);
-				
-				byte[] newlineBytes = System.getProperty("line.separator").getBytes(charset);
-				
-				for (String prediction : predictionsIterable)
-				{
-					LOGGER.info("Writing output: {}", prediction.getBytes(charset));
-					
-					output.write(prediction.getBytes(charset));
-					output.write(newlineBytes);
-				}
-				
-				output.flush();	
-			}
-		};
-		
-		return Response.ok(output).build();
 	}
-	
-    /**
-     * Method handling HTTP GET requests. The returned object will be sent
-     * to the client as "text/plain" media type.
-     *
-     * @return String that will be returned as a text/plain response.
-     */
-    @GET
-    @Produces(MediaType.TEXT_PLAIN)
-    public String doGet() {
-    	
-        return "Hello from the VW Predict web service!"; //TODO: spit out usage instructions here, perhaps?
-    }
+
+	/**
+	 * Method handling HTTP GET requests. The returned object will be sent to
+	 * the client as "text/plain" media type.
+	 * 
+	 * @return String that will be returned as a text/plain response.
+	 */
+	@GET
+	@Produces(MediaType.TEXT_PLAIN)
+	public String doGet() {
+
+		return "Hello from the VW Predict web service!"; // TODO: spit out usage
+															// instructions
+															// here, perhaps?
+	}
 }
