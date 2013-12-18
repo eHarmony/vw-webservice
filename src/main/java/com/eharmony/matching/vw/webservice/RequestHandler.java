@@ -97,7 +97,7 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 				});
 			}
 
-		});
+		}).start();
 	}
 
 	@Override

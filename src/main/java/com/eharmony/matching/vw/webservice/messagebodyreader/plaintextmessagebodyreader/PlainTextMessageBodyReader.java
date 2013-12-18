@@ -42,9 +42,10 @@ public class PlainTextMessageBodyReader implements
 	public boolean isReadable(Class<?> type, Type genericType,
 			Annotation[] annotations, MediaType mediaType) {
 
-		LOGGER.info("Called with media type: {}", mediaType);
+		LOGGER.info("Called with media type: {}", mediaType.toString());
 
-		return mediaType.equals(ExampleMediaTypes.PLAINTEXT_1_0)
+		return (mediaType.toString().equals(MediaType.TEXT_PLAIN) || mediaType
+				.toString().equals(ExampleMediaTypes.PLAINTEXT_1_0))
 				&& type == ExamplesIterable.class;
 	}
 
