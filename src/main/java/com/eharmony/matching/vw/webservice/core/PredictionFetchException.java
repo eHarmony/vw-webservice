@@ -9,21 +9,21 @@ package com.eharmony.matching.vw.webservice.core;
  *         Exception thrown when something bad happens when reading predictions
  *         from VW.
  */
-public class VWPredictionFetchException extends Exception {
+public class PredictionFetchException extends Exception {
 
-	public VWPredictionFetchException() {
+	public PredictionFetchException() {
 		super();
 	}
 
-	public VWPredictionFetchException(String message) {
+	public PredictionFetchException(String message) {
 		super(message);
 	}
 
-	public VWPredictionFetchException(Throwable cause) {
+	public PredictionFetchException(Throwable cause) {
 		super(cause);
 	}
 
-	public VWPredictionFetchException(String message, Throwable cause) {
+	public PredictionFetchException(String message, Throwable cause) {
 		super(message, cause);
 	}
 }

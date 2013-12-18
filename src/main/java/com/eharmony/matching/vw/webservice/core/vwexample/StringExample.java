@@ -18,7 +18,7 @@ import com.google.common.base.Charsets;
  *         Note that since VW examples are meant to be plain text, I'm using the
  *         UTF8 charset. See the corresponding messagebodyreader.
  */
-public class SimpleStringVWExample implements VWExample {
+public class StringExample implements Example {
 
 	private final String vwExampleString;
 
@@ -30,7 +30,7 @@ public class SimpleStringVWExample implements VWExample {
 	 * 
 	 * @param theString The VW example. May be empty, but cannot be null.
 	 */
-	public SimpleStringVWExample(String theString) {
+	public StringExample(String theString) {
 		checkNotNull(theString, "Null string provided as example!");
 		vwExampleString = theString;
 	}
@@ -46,6 +46,11 @@ public class SimpleStringVWExample implements VWExample {
 	public void write(OutputStream outputStream) throws IOException {
 		outputStream.write(vwExampleString.getBytes(Charsets.UTF_8));
 		outputStream.write(newlineBytes);
+	}
+
+	@Override
+	public String getVWStringRepresentation() {
+		return vwExampleString;
 	}
 
 }
