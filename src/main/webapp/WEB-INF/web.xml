@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- This web.xml file is not required when using Servlet 3.0 container,
      see implementation details http://jersey.java.net/nonav/documentation/latest/jax-rs.html -->
-<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     
-    <!-- The context loader listener will by default look under web-inf/ for "applicationContext.xml",
-    so i'm just going with that for now. -->
+    <!-- used by the ContextLoaderListener to pick up the Spring config. -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext.xml</param-value>
+	</context-param>
+
     <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class> 	
     </listener>
     
     <servlet>
@@ -15,15 +19,12 @@
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>com.eharmony.matching.vw.webservice</param-value>
+            
         </init-param>
         <load-on-startup>1</load-on-startup>
         
-        <!-- if you happen to start using the servlet 3.0 spec with some async features, you might need to turn this flag on.
-        it took me a while to find this out when i was playing with Jersey's ChunkedOutput, so i'm leaving it in here
-        in case it's needed in the future. 
-        for now i've reverted back to using servlet 2.5 tho, since i'm not using any async-related stuff. -->
-        
-        <!-- <async-supported>true</async-supported>  -->
+		<!-- need to enable this when using async features of the servlet 3.0 spec -->      
+        <async-supported>true</async-supported> 
         
     </servlet>
     <servlet-mapping>

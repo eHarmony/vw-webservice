@@ -141,6 +141,13 @@
  			<scope>runtime</scope>
  		</dependency>
  		
+ 		<!-- google guava -->
+ 		<dependency>
+		    <groupId>com.google.guava</groupId>
+		    <artifactId>guava</artifactId>
+		    <version>15.0</version>
+		</dependency>
+ 		
     </dependencies>
     <properties>
         <jersey.version>2.4.1</jersey.version>
