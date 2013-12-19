@@ -145,3 +145,4 @@ ToDo
 * Java client
 * Bechmarks
 * Speed optimizations
+* Document extension points
