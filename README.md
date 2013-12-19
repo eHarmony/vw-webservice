@@ -123,15 +123,25 @@ For instance:
 ToDo
 ----
 
-* text/plain -> text/vw
-* Announce
+* update README w/ Jetty 9
+* document application/x-vw-text
 * include vowpal wabbit as a submodule?
+* !!! LOTS MORE TESTS !!!
+* simpler examples.txt
+* move examples.txt to test/resources
+* license MIT?
+* Announce ------------------------------------------
+* add compression support
 * mvn test (use examples.txt)
 * automate setup and installation
 * JSON support
-* protocol buffer support
+* protocol buffer support (JSON may be free)
 * flesh out the spring application context and get rid of spring annotations from the actual source code
 * move all property configuration to some place outside the .war file, right now it's packaged inside it effectively making them hard coded
 * add codahale metrics gathering
-* !!! LOTS MORE TESTS !!!
 * go through all the TODO comments in the source code and make changes where necessary
+* CometD support
+* Javascript client
+* Java client
+* Bechmarks
+* Speed optimizations
