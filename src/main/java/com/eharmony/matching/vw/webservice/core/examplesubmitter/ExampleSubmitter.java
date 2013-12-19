@@ -3,8 +3,6 @@
  */
 package com.eharmony.matching.vw.webservice.core.examplesubmitter;
 
-import java.util.EnumSet;
-
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
@@ -52,12 +50,5 @@ public interface ExampleSubmitter {
 			ExampleSubmissionExceptionCallback exceptionCallback,
 			PredictionFetchCompleteCallback predictionFetchCompleteCallback,
 			PredictionFetchExceptionCallback predictionFetchExceptionCallback);
-
-	/*
-	 * Returns the options in effect, on this example submitter.
-	 * 
-	 * @returns The options in effect, on this example submitter.
-	 */
-	EnumSet<ExampleSubmitterOptions> getExampleSubmissionOptions();
 
 }

@@ -3,9 +3,7 @@
  */
 package com.eharmony.matching.vw.webservice.core.examplesubmitter;
 
-import java.util.EnumSet;
-
-import com.eharmony.matching.vw.webservice.core.vwexample.Example;
+import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 
 /**
  * @author vrahimtoola Returns and ExampleSubmitter.
@@ -23,6 +21,5 @@ public interface ExampleSubmitterFactory {
 	 * exampleSubmitter's getExampleSubmissionOptions() method can be used to
 	 * see which options it will in fact honor.
 	 */
-	ExampleSubmitter getExampleSubmitter(Iterable<Example> theExamples,
-			EnumSet<ExampleSubmitterOptions> options);
+	ExampleSubmitter getExampleSubmitter(ExamplesIterable theExamples);
 }

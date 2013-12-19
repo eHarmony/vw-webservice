@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -20,7 +19,6 @@ import com.eharmony.matching.vw.webservice.core.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionExceptionCallback;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterOptions;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.ErrorPredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
@@ -165,10 +163,5 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 
 	}
 
-	@Override
-	public EnumSet<ExampleSubmitterOptions> getExampleSubmissionOptions() {
-		// TODO return the example submitter options in effect.
-		return null;
-	}
 
 }

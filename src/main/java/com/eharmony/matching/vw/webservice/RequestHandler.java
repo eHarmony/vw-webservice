@@ -8,7 +8,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.util.EnumSet;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
@@ -24,7 +23,6 @@ import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissi
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionExceptionCallback;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFactory;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterOptions;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
@@ -56,18 +54,9 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 	public void handleRequest(ExamplesIterable examplesIterable,
 			final AsyncResponse asyncResponse) {
 
-		// TODO: examine the examples iterable and pick an appropriate example
-		// submitter, decide if you want to call asyncResponse.resume in this
-		// thread or another thread.
-
-		// for now, just using the async fail fast submitter.
-		EnumSet<ExampleSubmitterOptions> exampleSubmitterOptions = EnumSet.of(
-				ExampleSubmitterOptions.Async,
-				ExampleSubmitterOptions.FailOnFirstBadExample);
-
 		// get the example submitter
 		ExampleSubmitter exampleSubmitter = exampleSubmitterFactory
-				.getExampleSubmitter(examplesIterable, exampleSubmitterOptions);
+				.getExampleSubmitter(examplesIterable);
 
 	final PredictionsIterable predictionsIterable = exampleSubmitter
 				.submitExamples(this, this, this, this, this);

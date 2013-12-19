@@ -6,7 +6,6 @@ package com.eharmony.matching.vw.webservice.core.examplesubmitter.tcpip;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.EnumSet;
 import java.util.concurrent.ExecutorService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -14,10 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFactory;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterOptions;
-import com.eharmony.matching.vw.webservice.core.vwexample.Example;
 
 /**
  * @author vrahimtoola A factory that returns example submitters that submit
@@ -58,8 +56,7 @@ public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 	 * java.util.EnumSet)
 	 */
 	@Override
-	public ExampleSubmitter getExampleSubmitter(Iterable<Example> theExamples,
-			EnumSet<ExampleSubmitterOptions> options) {
+	public ExampleSubmitter getExampleSubmitter(ExamplesIterable theExamples) {
 
 		// TODO: return a proper example submitter based on the provided
 		// options.
