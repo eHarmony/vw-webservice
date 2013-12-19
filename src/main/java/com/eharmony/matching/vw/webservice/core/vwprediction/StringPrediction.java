@@ -40,8 +40,7 @@ public class StringPrediction implements Prediction {
 
 	@Override
 	public String getVWStringRepresentation() {
-		// TODO Auto-generated method stub
-		return null;
+	return vwPrediction;
 	}
 
 }

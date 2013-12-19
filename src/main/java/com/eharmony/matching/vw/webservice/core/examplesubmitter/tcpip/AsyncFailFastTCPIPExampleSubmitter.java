@@ -22,11 +22,11 @@ import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissi
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterOptions;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.ErrorPredictionFetcher;
+import com.eharmony.matching.vw.webservice.core.predictionfetcher.ErrorPredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetcher;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.tcpip.TCPIPPredictionFetcher;
+import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
+import com.eharmony.matching.vw.webservice.core.predictionfetcher.tcpip.TCPIPPredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.vwexample.Example;
 
 /**
@@ -55,7 +55,7 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 	}
 
 	@Override
-	public PredictionFetcher submitExamples(
+	public PredictionsIterable submitExamples(
 			final ExamplesSubmittedCallback submissionCallback,
 			final ExampleSubmissionCompleteCallback submissionCompleteCallback,
 			final ExampleSubmissionExceptionCallback exceptionCallback,
@@ -76,6 +76,7 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 
 					List<Example> submittedExamples = new ArrayList<Example>();
 
+					// TODO: consider if using a long here is safe.
 					long numExamplesSubmitted = 0;
 
 					try {
@@ -88,17 +89,32 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 
 							example.write(outputStream);
 
-							submittedExamples.add(example);
-
-							if (submissionCallback != null
-									&& numExamplesSubmitted % 5 == 0) {
-								submissionCallback.onExamplesSubmitted(
-										exampleSubmitter, submittedExamples);
-
-								submittedExamples.clear();
-							}
-
 							numExamplesSubmitted++;
+
+							if (submissionCallback != null) {
+
+								submittedExamples.add(example);
+
+								if (numExamplesSubmitted % 5 == 0) { //TODO: make this number (ie, 5) configurable
+									submissionCallback
+											.onExamplesSubmitted(
+													exampleSubmitter,
+													submittedExamples);
+
+									submittedExamples.clear();
+								}
+							}
+						}
+
+						// fire off the event for any remainging submitted
+						// examples
+						if (submissionCallback != null
+								&& submittedExamples.size() > 0)
+						{
+							submissionCallback.onExamplesSubmitted(
+									exampleSubmitter, submittedExamples);
+							
+							submittedExamples.clear();
 						}
 
 						LOGGER.info("All examples submitted to VW!");
@@ -137,14 +153,14 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 
 			});
 
-			return new TCPIPPredictionFetcher(socket,
+			return new TCPIPPredictionsIterable(socket,
 					predictionFetchCompleteCallback,
 					predictionFetchExceptionCallback);
 
 		} catch (Exception e1) {
 
 			LOGGER.error("Exception communicating with VW: {}", e1.getMessage());
-			return new ErrorPredictionFetcher(e1.getMessage());
+			return new ErrorPredictionsIterable(e1.getMessage());
 		}
 
 	}

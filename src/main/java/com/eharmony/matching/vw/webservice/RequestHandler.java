@@ -28,7 +28,7 @@ import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitte
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetcher;
+import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.vwexample.Example;
 import com.eharmony.matching.vw.webservice.core.vwprediction.Prediction;
 
@@ -69,7 +69,7 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 		ExampleSubmitter exampleSubmitter = exampleSubmitterFactory
 				.getExampleSubmitter(examplesIterable, exampleSubmitterOptions);
 
-		final PredictionFetcher predictionFetcher = exampleSubmitter
+	final PredictionsIterable predictionsIterable = exampleSubmitter
 				.submitExamples(this, this, this, this, this);
 
 		// TODO: determine if asyncResponse.resume should be called in this
@@ -80,16 +80,13 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 			@Override
 			public void run() {
 
-				final Iterable<Prediction> predictions = predictionFetcher
-						.fetchPredictions();
-
 				asyncResponse.resume(new StreamingOutput() {
 
 					@Override
 					public void write(OutputStream output) throws IOException,
 							WebApplicationException {
 
-						for (Prediction prediction : predictions) {
+			for (Prediction prediction : predictionsIterable) {
 							prediction.write(output);
 						}
 
@@ -101,7 +98,7 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 	}
 
 	@Override
-	public void onPredictionFetchException(PredictionFetcher predictionFetcher,
+	public void onPredictionFetchException(PredictionsIterable predictionFetcher,
 			PredictionFetchException theException) {
 
 		LOGGER.error("Prediction fetch exception: {}",
@@ -110,7 +107,7 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 	}
 
 	@Override
-	public void onAllPredictionsFetched(PredictionFetcher predictionFetcher,
+	public void onAllPredictionsFetched(PredictionsIterable predictionFetcher,
 			BigInteger numPredictions) {
 
 		LOGGER.info("All predictions fetched!");

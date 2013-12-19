@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.eharmony.matching.vw.webservice.core.PredictionFetchException;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetcher;
+import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.vwprediction.Prediction;
 import com.eharmony.matching.vw.webservice.core.vwprediction.StringPrediction;
 
@@ -30,11 +30,11 @@ import com.eharmony.matching.vw.webservice.core.vwprediction.StringPrediction;
  *         test what happens if the prediction fetcher closes the socket before
  *         all examples have been submitted.
  */
-public class TCPIPPredictionFetcher implements PredictionFetcher,
-		Iterable<Prediction>, Iterator<Prediction> {
+public class TCPIPPredictionsIterable implements PredictionsIterable,
+	Iterator<Prediction> {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(TCPIPPredictionFetcher.class);
+			.getLogger(TCPIPPredictionsIterable.class);
 
 	private final Socket socket;
 	private final BufferedReader reader;
@@ -44,7 +44,7 @@ public class TCPIPPredictionFetcher implements PredictionFetcher,
 	private String nextLineToReturn = null;
 	private long numTotalPredictions = 0;
 
-	public TCPIPPredictionFetcher(Socket socket,
+	public TCPIPPredictionsIterable(Socket socket,
 			PredictionFetchCompleteCallback predictionFetchCompleteCallback,
 			PredictionFetchExceptionCallback predictionFetchExceptionCallback)
 			throws IOException {
@@ -54,12 +54,6 @@ public class TCPIPPredictionFetcher implements PredictionFetcher,
 		this.predictionFetchExceptionCallback = predictionFetchExceptionCallback;
 		this.predictionFetchCompleteCallback = predictionFetchCompleteCallback;
 		this.socket = socket;
-	}
-
-	@Override
-	public Iterable<Prediction> fetchPredictions() {
-
-		return this;
 	}
 
 	@Override
