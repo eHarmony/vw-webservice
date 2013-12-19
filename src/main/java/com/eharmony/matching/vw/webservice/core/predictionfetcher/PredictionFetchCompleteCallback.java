@@ -18,6 +18,6 @@ public interface PredictionFetchCompleteCallback {
 	 * 
 	 * @param numPredictions The total number of predictions fetched from VW.
 	 */
-	void onAllPredictionsFetched(PredictionFetcher predictionFetcher,
+	void onAllPredictionsFetched(PredictionsIterable predictionFetcher,
 			BigInteger numPredictions);
 }

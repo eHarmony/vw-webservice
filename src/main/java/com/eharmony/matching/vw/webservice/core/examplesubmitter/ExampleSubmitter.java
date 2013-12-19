@@ -7,7 +7,7 @@ import java.util.EnumSet;
 
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetcher;
+import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
 
 /**
  * @author vrahimtoola Submits examples to VW.
@@ -46,7 +46,7 @@ public interface ExampleSubmitter {
 	 * over TCP-IP, you get the predictions back over the same socket
 	 * connection, etc etc.
 	 */
-	PredictionFetcher submitExamples(
+	PredictionsIterable submitExamples(
 			ExamplesSubmittedCallback submissionCallback,
 			ExampleSubmissionCompleteCallback submissionCompleteCallback,
 			ExampleSubmissionExceptionCallback exceptionCallback,

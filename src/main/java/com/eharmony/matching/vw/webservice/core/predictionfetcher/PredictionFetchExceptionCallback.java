@@ -20,6 +20,6 @@ public interface PredictionFetchExceptionCallback {
 	 * 
 	 * @param theException The exception that occurred.
 	 */
-	void onPredictionFetchException(PredictionFetcher predictionFetcher,
+	void onPredictionFetchException(PredictionsIterable predictionFetcher,
 			PredictionFetchException theException);
 }

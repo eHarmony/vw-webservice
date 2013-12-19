@@ -16,31 +16,14 @@ import com.eharmony.matching.vw.webservice.core.vwprediction.StringPrediction;
  * @author vrahimtoola Returns a single StringPrediction describing the error
  *         that occurred.
  */
-public class ErrorPredictionFetcher implements PredictionFetcher {
+public class ErrorPredictionsIterable implements PredictionsIterable {
 
 	private final String errorMessage;
 
-	public ErrorPredictionFetcher(String errorMessage) {
+	public ErrorPredictionsIterable(String errorMessage) {
 		checkArgument(StringUtils.isBlank(errorMessage) == false);
 
 		this.errorMessage = errorMessage;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetcher
-	 * #fetchPredictions()
-	 */
-	@Override
-	public Iterable<Prediction> fetchPredictions() {
-		return new Iterable<Prediction>() {
-			@Override
-			public Iterator<Prediction> iterator() {
-				return new SimpleIterator(errorMessage);
-			}
-		};
 	}
 
 	private static class SimpleIterator implements Iterator<Prediction> {
@@ -75,4 +58,9 @@ public class ErrorPredictionFetcher implements PredictionFetcher {
 		}
 
 	}
+
+    @Override
+    public Iterator<Prediction> iterator() {
+	return new SimpleIterator(errorMessage);
+    }
 }
