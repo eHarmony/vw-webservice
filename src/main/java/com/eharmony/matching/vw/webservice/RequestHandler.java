@@ -93,6 +93,8 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 	private void submitAsynchronously(final ExampleSubmitter exampleSubmitter,
 			final AsyncResponse asyncResponse) {
 
+		// TODO: what happens if there is an exception when submitting
+		// examples/fetching predictions? Could get lost in this other thread...
 		new Thread(new Runnable() {
 
 			@Override

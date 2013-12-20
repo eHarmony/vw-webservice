@@ -68,13 +68,13 @@ cd vw-webservice
 mvn package
 ```
 
-In the output, you should see see the location where the WAR (Web Application Resource) file has been created:
+In the output, you should see the location where the WAR (Web Application Resource) file has been created:
 ```
 …
 …
 …
 [INFO] Webapp assembled in[172 msecs]
-[INFO] Building war: /Users/vrahimtoola/Desktop/Git/GitHubCorpDotCom/vw-webservice/target/vw-webservice.war
+[INFO] Building war: /Users/someUser/Desktop/Git/GitHubCorpDotCom/vw-webservice/target/vw-webservice.war
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ------------------------------------------------------------------------
@@ -89,7 +89,8 @@ Now you can deploy the war file:
 
 ```
 # the maven build (assuming you're using the default directories) will have spit out the WAR file to the 'target' subdirectory
-cp target/vw-webservice.war jetty-9.1.0/webapps/
+# if you're running the Jetty instance on your local machine, copy the WAR over to the 'webapps' directory of Jetty
+cp target/vw-webservice.war /path/to/jetty-9.1.0/webapps/
 
 # alternatively, you can scp the war file to the box where you are running your jetty instance:
 # scp target/vw-webservice.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
@@ -114,7 +115,8 @@ curl -H "Content-Type:text/plain" \
         -v
 ```
 
-For instance:
+Examples must adhere to the documented VW example format. Some sample examples are:
+
 ```
 1 | w_2=German pre1_2=g c_0=A_fw=y c_0=A c_2=Aa suf2_2=an pre2_2=ge c_2=Aa_fw=n w_-1=<s> suf3_0=u suf1_0=u suf2_1=ts pre3_1=rej c_1=a w_1=rejects suf2_0=eu pre2_1=re suf3_1=cts suf3_2=man w_0=EU pre1_1=r pre1_0=e c_1=a_fw=n w_-2=<s> pre3_2=ger l_2=german l_0=eu pre3_0=eu pre2_0=eu suf1_1=s l_1=rejects suf1_2=n
 2 | pre3_2=cal c_0=a c_2=a_fw=n c_1=Aa suf1_2=l suf1_-1=u pre1_1=g suf3_0=cts pre1_-1=e suf1_1=n c_-1=A_fw=y suf3_-1=u pre3_0=rej suf3_1=man pre3_1=ger suf2_0=ts pre2_-1=eu pre2_2=ca pre1_2=c l_1=german w_-1=EU pre1_0=r pre2_1=ge w_2=call suf2_2=ll c_2=a pre3_-1=eu l_2=call c_1=Aa_fw=n suf1_0=s suf3_2=all w_-2=<s> l_-1=eu suf2_-1=eu w_1=German suf2_1=an c_-1=A l_0=rejects c_0=a_fw=n pre2_0=re w_0=rejects
@@ -128,7 +130,6 @@ ToDo
 * include vowpal wabbit as a submodule?
 * !!! LOTS MORE TESTS !!!
 * simpler examples.txt
-* move examples.txt to test/resources
 * license MIT?
 * Announce ------------------------------------------
 * add compression support
@@ -143,6 +144,6 @@ ToDo
 * CometD support
 * Javascript client
 * Java client
-* Bechmarks
+* Benchmarks
 * Speed optimizations
 * Document extension points
