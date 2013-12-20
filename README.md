@@ -124,7 +124,6 @@ For instance:
 ToDo
 ----
 
-* update README w/ Jetty 9
 * document application/x-vw-text
 * include vowpal wabbit as a submodule?
 * !!! LOTS MORE TESTS !!!
