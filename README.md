@@ -11,7 +11,7 @@ Dependencies
 
 * Maven 2.2.1
 * Java
-* Jetty (9.1.10)
+* Jetty 9.1.10
 * Vowpal Wabbit
 
 The current web service was developed against and tested on Jetty 9.1.0, so
@@ -33,6 +33,8 @@ make
 # for example loading a pretrained model
 vowpalwabbit/vw --daemon
 ```
+
+Note that by default, the VW daemon runs on port 26542 but you can specify the port you want it to run on. Refer to the VW documentation for the exact command line argument to use to do this.
 
 Maven 2.2.1
 -----------
@@ -65,23 +67,33 @@ VW webservice
 ```
 git clone git@github.com:eHarmony/vw-webservice.git
 cd vw-webservice
+```
+
+Under src/main/resources you should find a file called 'vw-webservice.properties'. Open up this file and place the proper values for the vw host and port where you started the VW daemon. 
+
+Note that this properties file will shortly be removed to some external location as a matter of best practice.
+
+Now you can build the web service:
+
+```
 mvn package
 ```
 
 In the output, you should see the location where the WAR (Web Application Resource) file has been created:
+
 ```
-…
-…
-…
+...
+...
+...
 [INFO] Webapp assembled in[172 msecs]
-[INFO] Building war: /Users/someUser/Desktop/Git/GitHubCorpDotCom/vw-webservice/target/vw-webservice.war
+[INFO] Building war: /path/to/vw-webservice/target/vw-webservice.war
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ------------------------------------------------------------------------
 [INFO] Total time: 23 seconds
-[INFO] Finished at: Fri Dec 13 17:19:17 PST 2013
-[INFO] Final Memory: 21M/81M
-[INFO] ------------------------------------------------------------------------
+...
+...
+...
 ```
 
 
@@ -90,7 +102,7 @@ Now you can deploy the war file:
 ```
 # the maven build (assuming you're using the default directories) will have spit out the WAR file to the 'target' subdirectory
 # if you're running the Jetty instance on your local machine, copy the WAR over to the 'webapps' directory of Jetty
-cp target/vw-webservice.war /path/to/jetty-9.1.0/webapps/
+cp /path/to/vw-webservice/target/vw-webservice.war /path/to/jetty-9.1.0/webapps/
 
 # alternatively, you can scp the war file to the box where you are running your jetty instance:
 # scp target/vw-webservice.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
