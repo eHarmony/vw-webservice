@@ -16,12 +16,16 @@ import com.eharmony.matching.vw.webservice.core.vwexample.Example;
  */
 public class ExamplesIterableImpl implements ExamplesIterable {
 
-	private Map<String, String> attributesMap;
+	private final Map<String, String> attributesMap;
 	private final Iterator<Example> exampleIterator;
+	private final int numberOfExamples;
 
-	public ExamplesIterableImpl(Map<String, String> theMapOfAttributes,
+	public ExamplesIterableImpl(int numberOfExamples,
+			Map<String, String> theMapOfAttributes,
 			Iterator<Example> exampleIterator) {
 		checkNotNull(exampleIterator);
+
+		this.numberOfExamples = numberOfExamples;
 
 		if (theMapOfAttributes == null)
 			attributesMap = new HashMap<String, String>();
@@ -40,6 +44,11 @@ public class ExamplesIterableImpl implements ExamplesIterable {
 	@Override
 	public String getAttribute(String attributeKey) {
 		return attributesMap.get(attributeKey);
+	}
+
+	@Override
+	public int getNumberOfExamples() {
+		return this.numberOfExamples;
 	}
 
 }

@@ -58,32 +58,52 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 		ExampleSubmitter exampleSubmitter = exampleSubmitterFactory
 				.getExampleSubmitter(examplesIterable);
 
-	final PredictionsIterable predictionsIterable = exampleSubmitter
+		if (exampleSubmitter.getExampleSubmitterFeatures().isAsync() == false)
+			submitSynchronously(exampleSubmitter, asyncResponse);
+		else {
+			submitAsynchronously(exampleSubmitter, asyncResponse);
+		}
+
+	}
+
+	private void submitSynchronously(ExampleSubmitter exampleSubmitter,
+			AsyncResponse asyncResponse) {
+
+		final PredictionsIterable predictionsIterable = exampleSubmitter
 				.submitExamples(this, this, this, this, this);
 
-		// TODO: determine if asyncResponse.resume should be called in this
-		// thread or a separate thread.
-		// for now calling this in a separate thread.
+		boolean resumedOk = asyncResponse.resume(new StreamingOutput() {
+
+			@Override
+			public void write(OutputStream output) throws IOException,
+					WebApplicationException {
+
+				for (Prediction prediction : predictionsIterable) {
+					prediction.write(output);
+				}
+
+			}
+		});
+
+		if (!resumedOk)
+			LOGGER.error("Failed to successfully resume sending data!");
+
+	}
+
+	private void submitAsynchronously(final ExampleSubmitter exampleSubmitter,
+			final AsyncResponse asyncResponse) {
+
 		new Thread(new Runnable() {
 
 			@Override
 			public void run() {
 
-				asyncResponse.resume(new StreamingOutput() {
+				submitSynchronously(exampleSubmitter, asyncResponse);
 
-					@Override
-					public void write(OutputStream output) throws IOException,
-							WebApplicationException {
-
-			for (Prediction prediction : predictionsIterable) {
-							prediction.write(output);
-						}
-
-					}
-				});
 			}
 
 		}).start();
+
 	}
 
 	@Override

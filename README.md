@@ -11,12 +11,12 @@ Dependencies
 
 * Maven 2.2.1
 * Java
-* Jetty (6.2.10)
-* vowpal wabbit
+* Jetty (9.1.10)
+* Vowpal Wabbit
 
-The current web service was developed against and tested on Jetty 6.2.10, so
-these instructions are for Jetty. You will also need to have Maven 2.2.1
-installed in order to build the source code.
+The current web service was developed against and tested on Jetty 9.1.0, so
+these instructions are for that version of Jetty. You will also need to have Maven 2.2.1
+installed in order to build the source code. Maven 3 seems to have some trouble building the source, so for now it's Maven 2.2.1.
 
 Installation
 ------------
@@ -50,12 +50,14 @@ mvn -version
 Jetty
 -----
 
-On the box where you wish to run the web service, install Jettty 6.1.20 by running:
+On the box where you wish to run the web service, install Jettty 9.1.0.
 
-```
-wget http://dist.codehaus.org/jetty/jetty-6.1.20/jetty-6.1.20.zip 
-unzip jetty-6.1.20.zip
-```
+You can download this from the Jetty website. For the rest of this README, it will be assumed that you have it installed at the location:
+
+~/jetty-9.1.0
+
+(but of course you can install it anywhere you like).
+
 
 VW webservice
 -------------
@@ -81,25 +83,24 @@ In the output, you should see see the location where the WAR (Web Application Re
 [INFO] Final Memory: 21M/81M
 [INFO] ------------------------------------------------------------------------
 ```
-The output of the last command will tell you which file Jetty is logging to, you can tail that file to read the output messages being produced by the VW web service.
+
 
 Now you can deploy the war file:
 
 ```
-# install the war file so that jetty can see it
-cp target/vw-webservice.war jetty-6.1.20/webapps/
-# alternatively scp war file to a box where you are running your jetty:
-# scp target/vw-webservice.war  box.running.jetty.com:/path/to/jetty-6.1.20/webapps/
+# the maven build (assuming you're using the default directories) will have spit out the WAR file to the 'target' subdirectory
+cp target/vw-webservice.war jetty-9.1.0/webapps/
+
+# alternatively, you can scp the war file to the box where you are running your jetty instance:
+# scp target/vw-webservice.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
 
 # Restart the Jetty instance (wherever you have Jetty running).
-cd /path/to/jetty-6.1.20
-./bin/jetty.sh stop
-./bin/jetty.sh start
+cd /path/to/jetty-9.1.0
+java -jar start.jar
+
 ```
 
-The output of the last command will tell you which file Jetty is logging to.
-You can ``tail -f`` that file to read the output messages being produced by the VW web
-service.
+The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice which will log to the console.
 
 Usage
 -----

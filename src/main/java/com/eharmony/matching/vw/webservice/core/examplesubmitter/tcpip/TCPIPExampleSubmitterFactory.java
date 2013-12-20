@@ -59,7 +59,7 @@ public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 	public ExampleSubmitter getExampleSubmitter(ExamplesIterable theExamples) {
 
 		// TODO: return a proper example submitter based on the provided
-		// options.
+		// examples iterable by examining its attributes.
 
 		// returning the TCP IP async submitter for now.
 		return new AsyncFailFastTCPIPExampleSubmitter(vwHost, vwPort,

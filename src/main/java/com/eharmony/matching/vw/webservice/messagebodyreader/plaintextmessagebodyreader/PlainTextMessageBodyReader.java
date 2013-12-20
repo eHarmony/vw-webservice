@@ -78,8 +78,9 @@ public class PlainTextMessageBodyReader implements
 		StringExampleIterator theIterator = new StringExampleIterator(
 				entityStream, charset);
 
-		// TODO: provide appropriate hints in the passed in map.
-		return new ExamplesIterableImpl(null, theIterator);
+		// TODO: provide the proper number of examples here
+		// setting this to Integer.MAX_VALUE for now to force streaming
+		return new ExamplesIterableImpl(Integer.MAX_VALUE, null, theIterator);
 	}
 
 }

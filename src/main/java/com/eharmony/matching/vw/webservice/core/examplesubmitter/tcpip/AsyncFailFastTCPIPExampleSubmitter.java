@@ -19,6 +19,8 @@ import com.eharmony.matching.vw.webservice.core.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionExceptionCallback;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
+import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFeatures;
+import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFeaturesImpl;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.ErrorPredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
@@ -161,6 +163,12 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 			return new ErrorPredictionsIterable(e1.getMessage());
 		}
 
+	}
+
+    @Override
+	public ExampleSubmitterFeatures getExampleSubmitterFeatures() {
+
+	return new ExampleSubmitterFeaturesImpl(true, null);
 	}
 
 

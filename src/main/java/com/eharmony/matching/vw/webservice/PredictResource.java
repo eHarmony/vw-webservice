@@ -64,5 +64,7 @@ public class PredictResource {
 		return "Hello from the VW Predict web service!"; // TODO: spit out usage
 															// instructions
 															// here, perhaps?
+	// TODO: alternatively, return an actual form that lets you
+	// submit/upload examples
 	}
 }
