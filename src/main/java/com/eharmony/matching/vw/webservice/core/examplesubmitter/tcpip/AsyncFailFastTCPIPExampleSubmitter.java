@@ -3,8 +3,10 @@
  */
 package com.eharmony.matching.vw.webservice.core.examplesubmitter.tcpip;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ import com.eharmony.matching.vw.webservice.core.vwexample.Example;
  *         Making this package-private for now.
  */
 class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
+
+	private static final String NEWLINE = System.getProperty("line.separator");
 
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(AsyncFailFastTCPIPExampleSubmitter.class);
@@ -85,9 +89,14 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 
 						LOGGER.info("Starting to submit examples to VW...");
 
+						BufferedWriter writer = new BufferedWriter(
+								new OutputStreamWriter(outputStream));
+
 						for (Example example : examples) {
 
-							example.write(outputStream);
+							// example.write(outputStream);
+							writer.write(example.getVWStringRepresentation());
+							writer.write(NEWLINE);
 
 							numExamplesSubmitted++;
 
