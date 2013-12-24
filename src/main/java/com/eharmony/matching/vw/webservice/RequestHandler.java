@@ -11,6 +11,7 @@ import java.math.BigInteger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
@@ -55,8 +56,7 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 			final AsyncResponse asyncResponse) {
 
 		// get the example submitter
-		ExampleSubmitter exampleSubmitter = exampleSubmitterFactory
-				.getExampleSubmitter(examplesIterable);
+		ExampleSubmitter exampleSubmitter = exampleSubmitterFactory.getExampleSubmitter(examplesIterable);
 
 		if (exampleSubmitter.getExampleSubmitterFeatures().isAsync() == false)
 			submitSynchronously(exampleSubmitter, asyncResponse);
@@ -66,11 +66,10 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 
 	}
 
-	private void submitSynchronously(ExampleSubmitter exampleSubmitter,
+	private void submitSynchronously(final ExampleSubmitter exampleSubmitter,
 			AsyncResponse asyncResponse) {
 
-		final PredictionsIterable predictionsIterable = exampleSubmitter
-				.submitExamples(this, this, this, this, this);
+		final RequestHandler requestHandler = this;
 
 		boolean resumedOk = asyncResponse.resume(new StreamingOutput() {
 
@@ -78,9 +77,29 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 			public void write(OutputStream output) throws IOException,
 					WebApplicationException {
 
-				for (Prediction prediction : predictionsIterable) {
-					prediction.write(output);
+				PredictionsIterable predictionsIterable;
+
+				try {
+
+					// note: depending on the example submitter in use,
+					// the call to submitExamples could spawn off a separate
+					// thread to submit examples to VW.
+					predictionsIterable = exampleSubmitter.submitExamples(requestHandler,
+							requestHandler,
+							requestHandler,
+							requestHandler,
+							requestHandler);
+
+					for (Prediction prediction : predictionsIterable) {
+						prediction.write(output);
+					}
+
 				}
+				catch (ExampleSubmissionException e) {
+
+					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+				}
+
 
 			}
 		});
@@ -93,8 +112,6 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 	private void submitAsynchronously(final ExampleSubmitter exampleSubmitter,
 			final AsyncResponse asyncResponse) {
 
-		// TODO: what happens if there is an exception when submitting
-		// examples/fetching predictions? Could get lost in this other thread...
 		new Thread(new Runnable() {
 
 			@Override

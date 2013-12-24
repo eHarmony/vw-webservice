@@ -24,7 +24,6 @@ import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitte
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFeatures;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFeaturesImpl;
 import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.ErrorPredictionsIterable;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
@@ -45,16 +44,14 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 			.getLogger(AsyncFailFastTCPIPExampleSubmitter.class);
 
 	private final ExecutorService executorService;
-	private final String vwHost;
-	private final int vwPort;
+	private final TCPIPSocketFactory socketFactory;
 	private final Iterable<Example> examples;
 
-	public AsyncFailFastTCPIPExampleSubmitter(String vwHost, int vwPort,
+	public AsyncFailFastTCPIPExampleSubmitter(TCPIPSocketFactory socketFactory,
 			ExecutorService executorService, Iterable<Example> examples) {
 
 		this.executorService = executorService;
-		this.vwHost = vwHost;
-		this.vwPort = vwPort;
+		this.socketFactory = socketFactory;
 		this.examples = examples;
 	}
 
@@ -64,12 +61,12 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 			final ExampleSubmissionCompleteCallback submissionCompleteCallback,
 			final ExampleSubmissionExceptionCallback exceptionCallback,
 			PredictionFetchCompleteCallback predictionFetchCompleteCallback,
-			PredictionFetchExceptionCallback predictionFetchExceptionCallback) {
+			PredictionFetchExceptionCallback predictionFetchExceptionCallback) throws ExampleSubmissionException {
 
 		final ExampleSubmitter exampleSubmitter = this;
 
 		try {
-			final Socket socket = new Socket(vwHost, vwPort);
+			final Socket socket = socketFactory.getSocket();
 
 			executorService.submit(new Callable<Void>() {
 
@@ -169,7 +166,8 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
 		} catch (Exception e1) {
 
 			LOGGER.error("Exception communicating with VW: {}", e1.getMessage());
-			return new ErrorPredictionsIterable(e1.getMessage());
+
+			throw new ExampleSubmissionException(e1);
 		}
 
 	}
@@ -177,7 +175,7 @@ class AsyncFailFastTCPIPExampleSubmitter implements ExampleSubmitter {
     @Override
 	public ExampleSubmitterFeatures getExampleSubmitterFeatures() {
 
-	return new ExampleSubmitterFeaturesImpl(true, null);
+		return new ExampleSubmitterFeaturesImpl(true, null);
 	}
 
 

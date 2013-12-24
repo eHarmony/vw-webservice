@@ -3,12 +3,10 @@
  */
 package com.eharmony.matching.vw.webservice.core.examplesubmitter.tcpip;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.ExecutorService;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,8 +22,7 @@ import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitte
 @Component
 public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 
-	private final String vwHost;
-	private final int vwPort;
+	private final TCPIPSocketFactory socketFactory;
 
 	/*
 	 * An application wide thread pool service.
@@ -33,18 +30,14 @@ public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 	private final ExecutorService executorService;
 
 	@Autowired
-	public TCPIPExampleSubmitterFactory(@Value("${vw.hostName}") String vwHost,
-			@Value("${vw.port}") int vwPort,
+	public TCPIPExampleSubmitterFactory(TCPIPSocketFactory socketFactory,
 			@Value("#{executorService}") ExecutorService executorService) {
 
-		checkArgument(StringUtils.isBlank(vwHost) == false,
-				"The hostname for VW must be provided!");
-		checkArgument(vwPort > 0, "Invalid port specified for VW!");
+		checkNotNull(socketFactory, "A null socket factory cannot be provided!");
 		checkNotNull(executorService,
 				"A null executor service cannot be provided!");
 
-		this.vwHost = vwHost;
-		this.vwPort = vwPort;
+		this.socketFactory = socketFactory;
 		this.executorService = executorService;
 	}
 
@@ -62,7 +55,7 @@ public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 		// examples iterable by examining its attributes.
 
 		// returning the TCP IP async submitter for now.
-		return new AsyncFailFastTCPIPExampleSubmitter(vwHost, vwPort,
+		return new AsyncFailFastTCPIPExampleSubmitter(socketFactory,
 				executorService, theExamples);
 	}
 

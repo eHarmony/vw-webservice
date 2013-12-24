@@ -3,6 +3,7 @@
  */
 package com.eharmony.matching.vw.webservice.core.examplesubmitter;
 
+import com.eharmony.matching.vw.webservice.core.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
 import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
@@ -49,7 +50,8 @@ public interface ExampleSubmitter {
 			ExampleSubmissionCompleteCallback submissionCompleteCallback,
 			ExampleSubmissionExceptionCallback exceptionCallback,
 			PredictionFetchCompleteCallback predictionFetchCompleteCallback,
-			PredictionFetchExceptionCallback predictionFetchExceptionCallback);
+			PredictionFetchExceptionCallback predictionFetchExceptionCallback)
+			throws ExampleSubmissionException;
 
     /*
 	 * Returns features describing this example submitter. The returned object
