@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core.vwprediction;
+package com.eharmony.matching.vw.webservice.core.prediction;
 
 /**
  * @author vrahimtoola Creates a Prediction from a string. VW returns

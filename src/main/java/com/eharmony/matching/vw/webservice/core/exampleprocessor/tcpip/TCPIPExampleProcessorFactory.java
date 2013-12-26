@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core.examplesubmitter.tcpip;
+package com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -12,15 +12,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFactory;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
 
 /**
- * @author vrahimtoola A factory that returns example submitters that submit
- *         examples to VW over a TCP-IP socket.
+ * @author vrahimtoola
+ * 
+ *         A factory that returns example processors that submit examples to VW
+ *         over a TCP-IP socket and read predictions back the same way.
  */
 @Component
-public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
+public class TCPIPExampleProcessorFactory implements ExampleProcessorFactory {
 
 	private final TCPIPSocketFactory socketFactory;
 
@@ -30,12 +32,11 @@ public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 	private final ExecutorService executorService;
 
 	@Autowired
-	public TCPIPExampleSubmitterFactory(TCPIPSocketFactory socketFactory,
+	public TCPIPExampleProcessorFactory(TCPIPSocketFactory socketFactory,
 			@Value("#{executorService}") ExecutorService executorService) {
 
 		checkNotNull(socketFactory, "A null socket factory cannot be provided!");
-		checkNotNull(executorService,
-				"A null executor service cannot be provided!");
+		checkNotNull(executorService, "A null executor service cannot be provided!");
 
 		this.socketFactory = socketFactory;
 		this.executorService = executorService;
@@ -44,19 +45,18 @@ public class TCPIPExampleSubmitterFactory implements ExampleSubmitterFactory {
 	/*
 	 * (non-Javadoc)
 	 * 
-	 * @see com.eharmony.matching.vw.webservice.core.examplesubmitter.
-	 * ExampleSubmitterFactory#getExampleSubmitter(java.lang.Iterable,
+	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
+	 * ExampleProcessorFactory#getExampleSubmitter(java.lang.Iterable,
 	 * java.util.EnumSet)
 	 */
 	@Override
-	public ExampleSubmitter getExampleSubmitter(ExamplesIterable theExamples) {
+	public ExampleProcessor getExampleProcessor(ExamplesIterable theExamples) {
 
 		// TODO: return a proper example submitter based on the provided
 		// examples iterable by examining its attributes.
 
 		// returning the TCP IP async submitter for now.
-		return new AsyncFailFastTCPIPExampleSubmitter(socketFactory,
-				executorService, theExamples);
+		return new AsyncFailFastTCPIPExampleProcessor(socketFactory, executorService, theExamples);
 	}
 
 }

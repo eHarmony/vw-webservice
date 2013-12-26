@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core.examplesubmitter.tcpip;
+package com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip;
 
 import java.io.IOException;
 import java.net.Socket;

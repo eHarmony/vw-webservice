@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core.vwprediction;
+package com.eharmony.matching.vw.webservice.core.prediction;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -11,15 +11,15 @@ import java.io.OutputStream;
 import com.google.common.base.Charsets;
 
 /**
- * @author vrahimtoola A VW prediction represented as a simple string (UTF8
- *         encoded).
+ * @author vrahimtoola
+ * 
+ *         A VW prediction represented as a simple string (UTF8 encoded).
  */
 public class StringPrediction implements Prediction {
 
 	private final String vwPrediction;
 
-	private static final byte[] newlineBytes = System.getProperty(
-			"line.separator").getBytes(Charsets.UTF_8);
+	private static final byte[] newlineBytes = System.getProperty("line.separator").getBytes(Charsets.UTF_8);
 
 	public StringPrediction(String theString) {
 		checkNotNull(theString, "Null prediction provided!");
@@ -40,7 +40,7 @@ public class StringPrediction implements Prediction {
 
 	@Override
 	public String getVWStringRepresentation() {
-	return vwPrediction;
+		return vwPrediction;
 	}
 
 }

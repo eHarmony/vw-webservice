@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.eharmony.matching.vw.webservice.core.vwexample.Example;
+import com.eharmony.matching.vw.webservice.core.example.Example;
 
 /**
- * @author vrahimtoola An implementation of ExamplesIterable.
+ * @author vrahimtoola
+ * 
+ *         An implementation of ExamplesIterable.
  */
 public class ExamplesIterableImpl implements ExamplesIterable {
 
@@ -23,6 +25,7 @@ public class ExamplesIterableImpl implements ExamplesIterable {
 	public ExamplesIterableImpl(int numberOfExamples,
 			Map<String, String> theMapOfAttributes,
 			Iterator<Example> exampleIterator) {
+
 		checkNotNull(exampleIterator);
 
 		this.numberOfExamples = numberOfExamples;

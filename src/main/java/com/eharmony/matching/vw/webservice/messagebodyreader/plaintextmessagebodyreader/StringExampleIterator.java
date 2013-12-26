@@ -13,22 +13,19 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.eharmony.matching.vw.webservice.core.vwexample.Example;
-import com.eharmony.matching.vw.webservice.core.vwexample.StringExample;
+import com.eharmony.matching.vw.webservice.core.ExampleReadException;
+import com.eharmony.matching.vw.webservice.core.example.Example;
+import com.eharmony.matching.vw.webservice.core.example.StringExample;
 
 /**
- * @author vrahimtoola Reads 1 string at a time from some input stream.
+ * @author vrahimtoola
+ * 
+ *         Reads 1 string at a time from some input stream.
  * 
  *         TODO look at guava's abstract iterator and the test that comes with
  *         guava
  */
 public class StringExampleIterator implements Iterator<Example> {
-
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(StringExampleIterator.class);
 
 	/*
 	 * The reader.
@@ -59,13 +56,14 @@ public class StringExampleIterator implements Iterator<Example> {
 		String toReturn = nextExampleToReturn;
 
 		if (toReturn == null)
-			throw new NoSuchElementException(
-					"No element to return! Make sure to call 'hasNext()' and that it returns true before invoking this method!");
+			throw new NoSuchElementException("No element to return! Make sure to call 'hasNext()' and that it returns true before invoking this method!");
 
 		try {
 			advance();
-		} catch (IOException e) {
-			throw new RuntimeException("Exception reading examples! Message: "
+		}
+		catch (IOException e) {
+
+			throw new ExampleReadException("Exception reading examples! Message: "
 					+ e.getMessage(), e);
 		}
 
@@ -74,8 +72,7 @@ public class StringExampleIterator implements Iterator<Example> {
 
 	@Override
 	public void remove() {
-		throw new UnsupportedOperationException(
-				"The 'remove' operation is not supported!");
+		throw new UnsupportedOperationException("The 'remove' operation is not supported!");
 	}
 
 	private void advance() throws IOException {

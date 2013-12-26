@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core;
+package com.eharmony.matching.vw.webservice.core.exampleprocessor;
 
 /**
  * @author vrahimtoola
@@ -10,6 +10,11 @@ package com.eharmony.matching.vw.webservice.core;
  *         to VW, or before any examples have been submitted to VW.
  */
 public class ExampleSubmissionException extends Exception {
+
+	/**
+	 * The serial version UID.
+	 */
+	private static final long serialVersionUID = 5135330791227994409L;
 
 	public ExampleSubmissionException() {
 		super();

@@ -1,14 +1,15 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core.vwexample;
+package com.eharmony.matching.vw.webservice.core.example;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
- * @author vrahimtoola A VW example that's represented as a simple string, ie,
- *         without it being possible to access it's individual components
- *         separately.
+ * @author vrahimtoola
+ * 
+ *         A VW example that's represented as a simple string, ie, without it
+ *         being possible to access it's individual components separately.
  * 
  */
 public class StringExample implements Example {
@@ -30,4 +31,8 @@ public class StringExample implements Example {
 		return vwExampleString;
 	}
 
+	@Override
+	public String toString() {
+		return getVWStringRepresentation();
+	}
 }

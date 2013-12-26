@@ -3,33 +3,25 @@
  */
 package com.eharmony.matching.vw.webservice;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigInteger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eharmony.matching.vw.webservice.core.ExampleSubmissionException;
+import com.eharmony.matching.vw.webservice.core.ExampleReadException;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
-import com.eharmony.matching.vw.webservice.core.PredictionFetchException;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionCompleteCallback;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmissionExceptionCallback;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitter;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExampleSubmitterFactory;
-import com.eharmony.matching.vw.webservice.core.examplesubmitter.ExamplesSubmittedCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchCompleteCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionFetchExceptionCallback;
-import com.eharmony.matching.vw.webservice.core.predictionfetcher.PredictionsIterable;
-import com.eharmony.matching.vw.webservice.core.vwexample.Example;
-import com.eharmony.matching.vw.webservice.core.vwprediction.Prediction;
+import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionException;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchException;
+import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
 
 /**
  * @author vrahimtoola
@@ -37,69 +29,62 @@ import com.eharmony.matching.vw.webservice.core.vwprediction.Prediction;
  *         Handles an individual request to submit examples to VW and read back
  *         the predictions.
  */
-public class RequestHandler implements ExamplesSubmittedCallback,
-		ExampleSubmissionCompleteCallback, ExampleSubmissionExceptionCallback,
-		PredictionFetchCompleteCallback, PredictionFetchExceptionCallback {
+class RequestHandler implements ExampleProcessingEventHandler {
 
-	private final ExampleSubmitterFactory exampleSubmitterFactory;
+	private final ExampleProcessorFactory exampleProcessorFactory;
 
 	private final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
 
-	public RequestHandler(ExampleSubmitterFactory exampleSubmitterFactory) {
+	public RequestHandler(ExampleProcessorFactory exampleProcessorFactory) {
 
-		checkNotNull(exampleSubmitterFactory);
-
-		this.exampleSubmitterFactory = exampleSubmitterFactory;
+		this.exampleProcessorFactory = exampleProcessorFactory;
 	}
 
-	public void handleRequest(ExamplesIterable examplesIterable,
-			final AsyncResponse asyncResponse) {
+	public void handleRequest(ExamplesIterable examplesIterable, final AsyncResponse asyncResponse) {
 
 		// get the example submitter
-		ExampleSubmitter exampleSubmitter = exampleSubmitterFactory.getExampleSubmitter(examplesIterable);
+		ExampleProcessor exampleProcessor = exampleProcessorFactory.getExampleProcessor(examplesIterable);
 
-		if (exampleSubmitter.getExampleSubmitterFeatures().isAsync() == false)
-			submitSynchronously(exampleSubmitter, asyncResponse);
+		if (exampleProcessor.getExampleSubmitterFeatures().isAsync() == false)
+			submitSynchronously(exampleProcessor, asyncResponse);
 		else {
-			submitAsynchronously(exampleSubmitter, asyncResponse);
+			submitAsynchronously(exampleProcessor, asyncResponse);
 		}
 
 	}
 
-	private void submitSynchronously(final ExampleSubmitter exampleSubmitter,
-			AsyncResponse asyncResponse) {
+	private void submitSynchronously(final ExampleProcessor exampleProcessor, AsyncResponse asyncResponse) {
 
-		final RequestHandler requestHandler = this;
+		final ExampleProcessingEventHandler eventHandler = this;
 
 		boolean resumedOk = asyncResponse.resume(new StreamingOutput() {
 
 			@Override
-			public void write(OutputStream output) throws IOException,
-					WebApplicationException {
+			public void write(OutputStream output) throws IOException, WebApplicationException {
 
-				PredictionsIterable predictionsIterable;
-
+				// note: depending on the example submitter in use,
+				// the call to submitExamples could spawn off a separate
+				// thread to submit examples to VW.
+				Iterable<Prediction> predictions;
 				try {
+					predictions = exampleProcessor.submitExamples(eventHandler);
 
-					// note: depending on the example submitter in use,
-					// the call to submitExamples could spawn off a separate
-					// thread to submit examples to VW.
-					predictionsIterable = exampleSubmitter.submitExamples(requestHandler,
-							requestHandler,
-							requestHandler,
-							requestHandler,
-							requestHandler);
-
-					for (Prediction prediction : predictionsIterable) {
-						prediction.write(output);
+					for (Prediction p : predictions) {
+						p.write(output);
 					}
+
+					LOGGER.info("Submitted a total of {} examples", exampleProcessor.getTotalNumberOfExamplesSubmitted());
+					LOGGER.info("Skipped a total of {} examples", exampleProcessor.getTotalNumberOfExamplesSkipped());
+					LOGGER.info("Final example submission state: {}", exampleProcessor.getExampleSubmissionState());
+					LOGGER.info("Final prediction fetch state: {}", exampleProcessor.getPredictionFetchState());
 
 				}
 				catch (ExampleSubmissionException e) {
 
-					throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-				}
+					LOGGER.error("Exception when submitting examples! Message: {}", e.getMessage(), e);
 
+					output.write(("Exception when submitting examples! Message: " + e.getMessage()).getBytes());
+				}
 
 			}
 		});
@@ -109,8 +94,7 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 
 	}
 
-	private void submitAsynchronously(final ExampleSubmitter exampleSubmitter,
-			final AsyncResponse asyncResponse) {
+	private void submitAsynchronously(final ExampleProcessor exampleSubmitter, final AsyncResponse asyncResponse) {
 
 		new Thread(new Runnable() {
 
@@ -126,45 +110,44 @@ public class RequestHandler implements ExamplesSubmittedCallback,
 	}
 
 	@Override
-	public void onPredictionFetchException(PredictionsIterable predictionFetcher,
-			PredictionFetchException theException) {
+	public void onExampleReadException(ExampleProcessor processor, ExampleReadException theException) {
 
-		LOGGER.error("Prediction fetch exception: {}",
-				theException.getMessage());
+		LOGGER.error("Example read exception: {}", theException.getMessage(), theException);
 
 	}
 
 	@Override
-	public void onAllPredictionsFetched(PredictionsIterable predictionFetcher,
-			BigInteger numPredictions) {
+	public void onExampleFormatException(ExampleProcessor processor, ExampleFormatException theException) {
 
-		LOGGER.info("All predictions fetched!");
-
-	}
-
-	@Override
-	public void onExampleSubmissionException(ExampleSubmitter exampleSubmitter,
-			ExampleSubmissionException theException) {
-
-		LOGGER.warn("Example submission exception: {}",
-				theException.getMessage());
+		LOGGER.warn("Example format exception: {}", theException.getMessage(), theException);
 
 	}
 
 	@Override
-	public void onAllExamplesSubmitted(ExampleSubmitter exampleSubmitter,
-			BigInteger numberOfSubmittedExamples) {
+	public void onExampleSubmissionException(ExampleProcessor processor, ExampleSubmissionException theException) {
 
-		LOGGER.info("All examples submitted!");
+		LOGGER.error("Example submission exception: {}", theException.getMessage(), theException);
+
 	}
 
 	@Override
-	public void onExamplesSubmitted(ExampleSubmitter exampleSubmitter,
-			Iterable<Example> theExamples) {
+	public void onExampleSubmissionComplete(ExampleProcessor processor) {
 
-		for (Example e : theExamples) {
-			LOGGER.info("Submitted example: {}", e.getVWStringRepresentation());
-		}
+		LOGGER.info("Example submission complete!");
+
+	}
+
+	@Override
+	public void onPredictionFetchException(ExampleProcessor processor, PredictionFetchException theException) {
+
+		LOGGER.error("Prediction fetch exception: {}", theException.getMessage(), theException);
+
+	}
+
+	@Override
+	public void onPredictionFetchComplete(ExampleProcessor processor) {
+
+		LOGGER.info("Prediction fetch complete!");
 
 	}
 }

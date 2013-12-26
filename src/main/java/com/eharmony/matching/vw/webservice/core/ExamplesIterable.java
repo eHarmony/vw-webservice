@@ -3,11 +3,18 @@
  */
 package com.eharmony.matching.vw.webservice.core;
 
-import com.eharmony.matching.vw.webservice.core.vwexample.Example;
+import com.eharmony.matching.vw.webservice.core.example.Example;
 
 /**
- * @author vrahimtoola An iterable of examples to be submitted to VW. Also
- *         provides attributes that describe the type/quantity of examples.
+ * @author vrahimtoola
+ * 
+ *         An iterable of examples to be submitted to VW. Also provides
+ *         attributes that describe the type/quantity of examples.
+ * 
+ *         The 'next()' method of the iterator may throw an ExampleReadException
+ *         if there's an issue reading in examples for any reason. Clients
+ *         iterating over this iterable can catch that exception and handle is
+ *         accordingly.
  */
 public interface ExamplesIterable extends Iterable<Example> {
 

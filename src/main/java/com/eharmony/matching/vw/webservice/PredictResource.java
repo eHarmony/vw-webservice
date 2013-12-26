@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
 
 /**
  * Root resource (exposed at "predict" path)
@@ -27,28 +28,24 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 @Path("/predict")
 public class PredictResource {
 
-	private final RequestHandlerFactory requestHandlerFactory;
+	private final ExampleProcessorFactory exampleProcessorFactory;
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(PredictResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PredictResource.class);
 
 	@Autowired
-	public PredictResource(RequestHandlerFactory requestHandlerFactory) {
+	public PredictResource(ExampleProcessorFactory exampleProcessorFactory) {
 
-		checkNotNull(requestHandlerFactory,
-				"A request handler factory must be provided!");
+		checkNotNull(exampleProcessorFactory, "An example processor factory must be provided!");
 
-		this.requestHandlerFactory = requestHandlerFactory;
+		this.exampleProcessorFactory = exampleProcessorFactory;
 	}
 
 	@POST
 	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN })
 	@Produces({ /* PredictionMediaTypes.PLAINTEXT_1_0 */MediaType.TEXT_PLAIN })
-	public void doPredict(ExamplesIterable examplesIterable,
-			@Suspended final AsyncResponse asyncResponse) throws IOException {
+	public void doPredict(ExamplesIterable examplesIterable, @Suspended final AsyncResponse asyncResponse) throws IOException {
 
-		requestHandlerFactory.getRequestHandler().handleRequest(
-				examplesIterable, asyncResponse);
+		new RequestHandler(exampleProcessorFactory).handleRequest(examplesIterable, asyncResponse);
 	}
 
 	/**
@@ -64,7 +61,7 @@ public class PredictResource {
 		return "Hello from the VW Predict web service!"; // TODO: spit out usage
 															// instructions
 															// here, perhaps?
-	// TODO: alternatively, return an actual form that lets you
-	// submit/upload examples
+		// TODO: alternatively, return an actual form that lets you
+		// submit/upload examples
 	}
 }

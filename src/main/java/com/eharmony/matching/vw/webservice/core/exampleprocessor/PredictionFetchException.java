@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core;
+package com.eharmony.matching.vw.webservice.core.exampleprocessor;
 
 /**
  * @author vrahimtoola
@@ -10,6 +10,11 @@ package com.eharmony.matching.vw.webservice.core;
  *         from VW.
  */
 public class PredictionFetchException extends Exception {
+
+	/**
+	 * The serial version UID.
+	 */
+	private static final long serialVersionUID = -5193371328499134437L;
 
 	public PredictionFetchException() {
 		super();

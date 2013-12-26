@@ -1,13 +1,15 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.core.vwprediction;
+package com.eharmony.matching.vw.webservice.core.prediction;
 
 import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * @author vrahimtoola A prediction spit out by VW.
+ * @author vrahimtoola
+ * 
+ *         A prediction spit out by VW.
  */
 public interface Prediction {
 
