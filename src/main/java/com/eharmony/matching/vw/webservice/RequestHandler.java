@@ -67,6 +67,9 @@ class RequestHandler implements ExampleProcessingEventHandler {
 				// thread to submit examples to VW.
 				Iterable<Prediction> predictions;
 				try {
+
+					LOGGER.info("About to submit examples...");
+
 					predictions = exampleProcessor.submitExamples(eventHandler);
 
 					for (Prediction p : predictions) {

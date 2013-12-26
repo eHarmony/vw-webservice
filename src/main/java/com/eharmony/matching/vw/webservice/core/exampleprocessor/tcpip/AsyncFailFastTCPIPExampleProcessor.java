@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
 /**
  * @author vrahimtoola
  * 
- *         An asynchronous, fail fast example submitter to submit examples to VW
+ *         An asynchronous, fail fast example processor to submit examples to VW
  *         over a TCP IP socket.
  * 
  *         Making this package-private for now.
@@ -60,10 +61,12 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 	@Override
 	public Iterable<Prediction> submitExamples(final ExampleProcessingEventHandler callback) throws ExampleSubmissionException {
 
-		final ExampleProcessor exampleSubmitter = this;
+		final ExampleProcessor exampleProcessor = this;
 
 		try {
 			final Socket socket = socketFactory.getSocket();
+
+			final CountDownLatch countDownLatch = new CountDownLatch(1); //signal to the prediction fetcher.
 
 			executorService.submit(new Callable<Void>() {
 
@@ -82,6 +85,8 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
+						boolean signaledPredictionFetcher = false;
+
 						for (Example example : examples) {
 
 							String toWrite = null;
@@ -91,12 +96,20 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								writer.write(toWrite);
 								writer.write(NEWLINE);
 								incrementNumberOfExamplesSubmitted();
+
+								if (!signaledPredictionFetcher) {
+									countDownLatch.countDown();
+									signaledPredictionFetcher = true;
+								}
+
+								// LOGGER.info("Submitted example: {}",
+								// toWrite);
 							}
 							catch (ExampleFormatException e) {
 
 								incrementNumberOfExamplesSkipped();
 								if (callback != null)
-									callback.onExampleFormatException(exampleSubmitter, e);
+									callback.onExampleFormatException(exampleProcessor, e);
 
 							}
 
@@ -110,7 +123,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						setExampleSubmissionState(ExampleSubmissionState.ExampleReadFault);
 
 						if (callback != null)
-							callback.onExampleReadException(exampleSubmitter, e);
+							callback.onExampleReadException(exampleProcessor, e);
 
 						LOGGER.error("Exception in VWExampleSubmitter: {}", e.getMessage(), e);
 
@@ -121,7 +134,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
 
 						if (callback != null)
-							callback.onExampleSubmissionException(exampleSubmitter, new ExampleSubmissionException(e));
+							callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
 
 						LOGGER.error("Exception in VWExampleSubmitter: {}", e.getMessage(), e);
 
@@ -137,7 +150,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 							setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
 
 							if (callback != null)
-								callback.onExampleSubmissionException(exampleSubmitter, new ExampleSubmissionException(e2));
+								callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e2));
 
 							LOGGER.error("Exception in VWExampleSubmitter: {}", e2.getMessage(), e2);
 
@@ -148,7 +161,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 							setExampleSubmissionState(ExampleSubmissionState.Complete);
 
 						if (callback != null)
-							callback.onExampleSubmissionComplete(exampleSubmitter);
+							callback.onExampleSubmissionComplete(exampleProcessor);
 
 					}
 
@@ -157,7 +170,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 			});
 
-			final TCPIPPredictionsIterator theIterator = new TCPIPPredictionsIterator(exampleSubmitter, socket, callback);
+			final TCPIPPredictionsIterator theIterator = new TCPIPPredictionsIterator(exampleProcessor, socket, callback, countDownLatch);
 
 			setPredictionsIterator(theIterator);
 

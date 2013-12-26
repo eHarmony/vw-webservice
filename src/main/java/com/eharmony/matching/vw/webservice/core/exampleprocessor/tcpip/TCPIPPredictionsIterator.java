@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.Iterator;
+import java.util.concurrent.CountDownLatch;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,22 +38,46 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 	private final BufferedReader reader;
 	private final ExampleProcessingEventHandler callback;
 	private final ExampleProcessor exampleProcessor;
+	private final CountDownLatch countDownLatch;
 
 	private String nextLineToReturn = null;
 	private PredictionFetchState predictionFetchState = PredictionFetchState.OnGoing;
 
+	private boolean firstCallToHasNext = true;
+
 	public TCPIPPredictionsIterator(ExampleProcessor exampleProcessor,
-			Socket socket, ExampleProcessingEventHandler callback)
-			throws IOException {
+			Socket socket, ExampleProcessingEventHandler callback,
+			CountDownLatch countDownLatch) throws IOException {
 
 		this.exampleProcessor = exampleProcessor;
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.callback = callback;
 		this.socket = socket;
+		this.countDownLatch = countDownLatch;
 	}
 
 	@Override
 	public boolean hasNext() {
+
+		if (firstCallToHasNext) {
+
+			try {
+				countDownLatch.await();
+
+				advance(); // don't want to call this in the constructor because
+							// that could block.
+
+			}
+			catch (InterruptedException e) {
+
+				LOGGER.warn("Interrupted exception: {}", e.getMessage(), e);
+
+			}
+
+			firstCallToHasNext = false;
+
+		}
+
 		return nextLineToReturn != null;
 	}
 
@@ -77,6 +102,8 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 		try {
 
 			nextLineToReturn = reader.readLine();
+
+			LOGGER.info("Read prediction: {}", nextLineToReturn);
 
 			closeReader = nextLineToReturn == null;
 
