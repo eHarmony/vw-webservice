@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.util.tests;
+package com.eharmony.matching.vw.webservice.util;
 
 import junit.framework.Assert;
 

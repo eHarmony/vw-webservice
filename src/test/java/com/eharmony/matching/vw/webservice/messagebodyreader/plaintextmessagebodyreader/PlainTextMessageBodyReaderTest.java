@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebodyreader.tests;
+package com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebodyreader;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
