@@ -8,7 +8,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.concurrent.ExecutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
@@ -33,7 +32,8 @@ public class TCPIPExampleProcessorFactory implements ExampleProcessorFactory {
 
 	@Autowired
 	public TCPIPExampleProcessorFactory(TCPIPSocketFactory socketFactory,
-			@Value("#{executorService}") ExecutorService executorService) {
+	/* @Value("#{executorService}") */
+	ExecutorService executorService) {
 
 		checkNotNull(socketFactory, "A null socket factory cannot be provided!");
 		checkNotNull(executorService, "A null executor service cannot be provided!");

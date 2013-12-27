@@ -5,6 +5,7 @@ package com.eharmony.matching.vw.webservice;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
@@ -35,9 +36,13 @@ class RequestHandler implements ExampleProcessingEventHandler {
 
 	private final Logger LOGGER = LoggerFactory.getLogger(RequestHandler.class);
 
-	public RequestHandler(ExampleProcessorFactory exampleProcessorFactory) {
+	private final ExecutorService executorService;
+
+	public RequestHandler(ExecutorService executorService,
+			ExampleProcessorFactory exampleProcessorFactory) {
 
 		this.exampleProcessorFactory = exampleProcessorFactory;
+		this.executorService = executorService;
 	}
 
 	public void handleRequest(ExamplesIterable examplesIterable, final AsyncResponse asyncResponse) {
@@ -99,7 +104,7 @@ class RequestHandler implements ExampleProcessingEventHandler {
 
 	private void submitAsynchronously(final ExampleProcessor exampleSubmitter, final AsyncResponse asyncResponse) {
 
-		new Thread(new Runnable() {
+		executorService.submit(new Runnable() {
 
 			@Override
 			public void run() {
@@ -108,7 +113,7 @@ class RequestHandler implements ExampleProcessingEventHandler {
 
 			}
 
-		}).start();
+		});
 
 	}
 

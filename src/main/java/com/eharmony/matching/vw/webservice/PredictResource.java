@@ -3,6 +3,7 @@ package com.eharmony.matching.vw.webservice;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -30,14 +31,20 @@ public class PredictResource {
 
 	private final ExampleProcessorFactory exampleProcessorFactory;
 
+	private final ExecutorService executorService;
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(PredictResource.class);
 
 	@Autowired
-	public PredictResource(ExampleProcessorFactory exampleProcessorFactory) {
+	public PredictResource(ExecutorService executorService,
+			ExampleProcessorFactory exampleProcessorFactory) {
 
 		checkNotNull(exampleProcessorFactory, "An example processor factory must be provided!");
 
 		this.exampleProcessorFactory = exampleProcessorFactory;
+
+		this.executorService = executorService;
+
 	}
 
 	@POST
@@ -45,7 +52,7 @@ public class PredictResource {
 	@Produces({ /* PredictionMediaTypes.PLAINTEXT_1_0 */MediaType.TEXT_PLAIN })
 	public void doPredict(ExamplesIterable examplesIterable, @Suspended final AsyncResponse asyncResponse) throws IOException {
 
-		new RequestHandler(exampleProcessorFactory).handleRequest(examplesIterable, asyncResponse);
+		new RequestHandler(executorService, exampleProcessorFactory).handleRequest(examplesIterable, asyncResponse);
 	}
 
 	/**

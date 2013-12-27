@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -27,6 +28,7 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
  * @author vrahimtoola A message body reader that can read an Iterable<String>
  *         from the message body of an HTTP request.
  */
+@Consumes({ MediaType.TEXT_PLAIN, ExampleMediaTypes.PLAINTEXT_1_0 })
 @Provider
 public class PlainTextMessageBodyReader implements
 		MessageBodyReader<ExamplesIterable> {
@@ -35,17 +37,14 @@ public class PlainTextMessageBodyReader implements
 
 	}
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(PlainTextMessageBodyReader.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlainTextMessageBodyReader.class);
 
 	@Override
-	public boolean isReadable(Class<?> type, Type genericType,
-			Annotation[] annotations, MediaType mediaType) {
+	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
 
 		LOGGER.info("Called with media type: {}", mediaType.toString());
 
-		return (mediaType.toString().equals(MediaType.TEXT_PLAIN) || mediaType
-				.toString().equals(ExampleMediaTypes.PLAINTEXT_1_0))
+		return (mediaType.toString().equals(MediaType.TEXT_PLAIN) || mediaType.toString().equals(ExampleMediaTypes.PLAINTEXT_1_0))
 				&& type == ExamplesIterable.class;
 	}
 
@@ -62,21 +61,15 @@ public class PlainTextMessageBodyReader implements
 	 * TODO: look at specific mediatypes eg text/vw
 	 */
 	@Override
-	public ExamplesIterable readFrom(Class<ExamplesIterable> type,
-			Type genericType, Annotation[] annotations, MediaType mediaType,
-			MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
-			throws IOException, WebApplicationException {
+	public ExamplesIterable readFrom(Class<ExamplesIterable> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
 
 		// TODO:
 		// if a content-length has been provided, then use that to read entire
 		// string in one go.
 
-		// for now, always returning async example submitter.
-
 		Charset charset = ReaderWriter.getCharset(mediaType);
 
-		StringExampleIterator theIterator = new StringExampleIterator(
-				entityStream, charset);
+		StringExampleIterator theIterator = new StringExampleIterator(entityStream, charset);
 
 		// TODO: provide the proper number of examples here
 		// setting this to Integer.MAX_VALUE for now to force streaming
