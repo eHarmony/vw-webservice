@@ -79,6 +79,8 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 					BufferedWriter writer = null;
 
+					boolean signaledPredictionFetcher = false;
+
 					try {
 
 						outputStream = socket.getOutputStream();
@@ -86,8 +88,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						LOGGER.info("Starting to submit examples to VW...");
 
 						writer = new BufferedWriter(new OutputStreamWriter(outputStream));
-
-						boolean signaledPredictionFetcher = false;
 
 						for (Example example : examples) {
 
@@ -126,7 +126,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						if (callback != null)
 							callback.onExampleReadException(exampleProcessor, e);
 
-						LOGGER.error("Exception in VWExampleSubmitter: {}", e.getMessage(), e);
+						LOGGER.error("ExampleReadException in VWExampleSubmitter: {}", e.getMessage(), e);
 
 						faulted = true;
 					}
@@ -137,7 +137,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						if (callback != null)
 							callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
 
-						LOGGER.error("Exception in VWExampleSubmitter: {}", e.getMessage(), e);
+						LOGGER.error("Other Exception in VWExampleSubmitter: {}", e.getMessage(), e);
 
 						faulted = true;
 					}
@@ -153,7 +153,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 							if (callback != null)
 								callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
 
-							LOGGER.error("Exception in ExampleProcessor: {}", e.getMessage(), e);
+							LOGGER.error("IOException when closing example writer in ExampleProcessor: {}", e.getMessage(), e);
 
 							faulted = true;
 						}
@@ -170,10 +170,15 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								if (callback != null)
 									callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e2));
 
-								LOGGER.error("Exception in ExampleProcessor: {}", e2.getMessage(), e2);
+								LOGGER.error("IOException when shutting down socket output in ExampleProcessor: {}", e2.getMessage(), e2);
 
 								faulted = true;
 							}
+
+						// if the prediction fetcher is still waiting on us, let it go.
+						if (!signaledPredictionFetcher) {
+							countDownLatch.countDown();
+						}
 
 						if (faulted == false)
 							setExampleSubmissionState(ExampleSubmissionState.Complete);
