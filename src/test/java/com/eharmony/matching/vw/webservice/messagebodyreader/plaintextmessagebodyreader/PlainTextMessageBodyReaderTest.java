@@ -20,10 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebodyreader.PlainTextMessageBodyReader;
+import com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebodyreader.PlainTextExamplesMessageBodyReader;
 
 /**
- * @author vrahimtoola Tests the PlainTextMessageBodyReader.
+ * @author vrahimtoola Tests the PlainTextExamplesMessageBodyReader.
  */
 public class PlainTextMessageBodyReaderTest {
 
@@ -38,7 +38,7 @@ public class PlainTextMessageBodyReaderTest {
 			throws WebApplicationException, IOException {
 
 		for (String newLineToUse : new String[] { "\n", "\r", "\r\n" }) {
-			PlainTextMessageBodyReader toTest = new PlainTextMessageBodyReader();
+			PlainTextExamplesMessageBodyReader toTest = new PlainTextExamplesMessageBodyReader();
 
 			MediaType mediaType = MediaType.TEXT_PLAIN_TYPE;
 
@@ -114,13 +114,13 @@ public class PlainTextMessageBodyReaderTest {
 		BufferedReader testReader = new BufferedReader(new InputStreamReader(
 				gzipInputStream));
 
-		// the input stream that the PlainTextMessageBodyReader will
+		// the input stream that the PlainTextExamplesMessageBodyReader will
 		// use.
 		GZIPInputStream gzipInputStreamForTestSubject = new GZIPInputStream(
 				this.getClass().getClassLoader()
 						.getResourceAsStream("ner.train.gz"));
 
-		PlainTextMessageBodyReader toTest = new PlainTextMessageBodyReader();
+		PlainTextExamplesMessageBodyReader toTest = new PlainTextExamplesMessageBodyReader();
 
 		MediaType mediaType = MediaType.TEXT_PLAIN_TYPE;
 

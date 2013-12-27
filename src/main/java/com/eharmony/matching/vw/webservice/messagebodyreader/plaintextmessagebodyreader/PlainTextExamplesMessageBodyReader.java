@@ -30,14 +30,14 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
  */
 @Consumes({ MediaType.TEXT_PLAIN, ExampleMediaTypes.PLAINTEXT_1_0 })
 @Provider
-public class PlainTextMessageBodyReader implements
+public class PlainTextExamplesMessageBodyReader implements
 		MessageBodyReader<ExamplesIterable> {
 
-	public PlainTextMessageBodyReader() {
+	public PlainTextExamplesMessageBodyReader() {
 
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(PlainTextMessageBodyReader.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PlainTextExamplesMessageBodyReader.class);
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
