@@ -179,6 +179,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 		verify(socket, times(1)).getInputStream();
 		verify(socket, times(1)).getOutputStream();
 		verify(socket, times(1)).shutdownOutput();
+		verify(socket, times(1)).close();
 
 		//no exceptions should have been thrown
 		Assert.assertFalse(exampleReadExceptionThrown);
@@ -269,12 +270,9 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 
 		verify(socketFactory, times(1)).getSocket();
 		verify(socket, times(1)).getInputStream();
-
-		//these next two verify calls fail. i suspect the java compiler is doing some magic behind the scenes causing
-		//the call to iterator() or next() or hasNext() to happen before the calls to the socket methods.
-
-		//verify(socket, times(1)).getOutputStream();
-		//verify(socket, times(1)).shutdownOutput();
+		verify(socket, times(1)).getOutputStream();
+		verify(socket, times(1)).shutdownOutput();
+		verify(socket, times(1)).close();
 
 		Assert.assertTrue(exampleReadExceptionThrown);
 		Assert.assertFalse(exampleFormatExceptionThrown);
