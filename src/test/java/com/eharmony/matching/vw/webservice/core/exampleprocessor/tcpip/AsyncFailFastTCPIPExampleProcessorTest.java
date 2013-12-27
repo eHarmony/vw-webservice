@@ -25,6 +25,8 @@ import java.util.concurrent.Executors;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +97,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 	 * Just a simple test to verify that examples can be submitted and read as
 	 * expected.
 	 */
-	@Test
+	@Test(timeout = 5000)
 	public void simpleTest() throws IOException, ExampleSubmissionException, InterruptedException {
 
 		Iterable<Example> examples = getExamples("One", "Two", "Three");
@@ -214,7 +216,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 	/*
 	 * Tests that an ExampleReadException is handled as expected.
 	 */
-	@Test
+	@Test(timeout = 5000)
 	public void handlesExampleReadException() throws IOException, ExampleSubmissionException, InterruptedException {
 
 		Iterator iterator = mock(Iterator.class);
@@ -266,6 +268,8 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 			}
 		}
 
+		Assert.assertEquals(3, x);
+
 		countDownLatch.await(); //wait till example submission and prediction fetch are both done.
 
 		verify(socketFactory, times(1)).getSocket();
@@ -278,6 +282,198 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 		Assert.assertFalse(exampleFormatExceptionThrown);
 		Assert.assertFalse(exampleSubmissionExceptionThrown);
 		Assert.assertFalse(predictionFetchExceptionThrown);
+
+		//the completion call backs should have been fired
+		Assert.assertTrue(exampleSubmissionCompleteCalled);
+		Assert.assertTrue(predictionFetchCompleteCalled);
+
+	}
+
+	/*
+	 * Tests that example format exceptions are handled as expected.
+	 */
+	@Test(timeout = 5000)
+	public void handlesExampleFormatException() throws IOException, ExampleSubmissionException, InterruptedException {
+
+		StringExample errorExample = mock(StringExample.class);
+		when(errorExample.getVWStringRepresentation()).thenThrow(ExampleFormatException.class);
+
+		Iterator iterator = mock(Iterator.class);
+		when(iterator.hasNext()).thenReturn(true).thenReturn(true).thenReturn(true).thenReturn(false);
+		when(iterator.next()).thenReturn(new StringExample("One")).thenReturn(errorExample).thenReturn(new StringExample("Two"));
+
+		Iterable examples = mock(Iterable.class);
+		when(examples.iterator()).thenReturn(iterator);
+
+		InputStream predictionInputStream = getPredictionInputStream("1", "2", "3");
+
+		Socket socket = mock(Socket.class);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		when(socket.getOutputStream()).thenReturn(outputStream);
+		when(socket.getInputStream()).thenReturn(predictionInputStream);
+
+		TCPIPSocketFactory socketFactory = mock(TCPIPSocketFactory.class);
+		when(socketFactory.getSocket()).thenReturn(socket);
+
+		AsyncFailFastTCPIPExampleProcessor toTest = new AsyncFailFastTCPIPExampleProcessor(socketFactory, Executors.newCachedThreadPool(), examples);
+
+		expectedNumberOfSkippedExamples = 1;
+		expectedNumberOfSubmittedExamples = 2;
+		expectedStateOnExampleSubmissionComplete = ExampleSubmissionState.Complete;
+		expectedStateOnPredictionFetchComplete = PredictionFetchState.Complete;
+
+		Iterable<Prediction> predictions = toTest.submitExamples(this);
+
+		int x = 0;
+
+		for (Prediction p : predictions) {
+
+			switch (x++) {
+
+				case 0:
+					Assert.assertEquals("1", p.getVWStringRepresentation());
+					break;
+
+				case 1:
+					Assert.assertEquals("2", p.getVWStringRepresentation());
+					break;
+
+				case 2:
+					Assert.assertEquals("3", p.getVWStringRepresentation());
+					break;
+
+				default:
+					Assert.fail("Too many predictions!");
+			}
+		}
+
+		Assert.assertEquals(3, x);
+
+		countDownLatch.await(); //wait till example submission and prediction fetch are both done.
+
+		//check that all examples got there
+		BufferedReader bReader = new BufferedReader(new StringReader(new String(outputStream.toByteArray())));
+
+		x = 0;
+		String line = null;
+		while ((line = bReader.readLine()) != null) {
+
+			switch (x++) {
+
+				case 0:
+					Assert.assertEquals("One", line);
+					break;
+
+				case 1:
+					Assert.assertEquals("Two", line);
+					break;
+
+				default:
+					Assert.fail("Too many examples!");
+			}
+
+		}
+
+		Assert.assertEquals(2, x);
+
+		verify(socketFactory, times(1)).getSocket();
+		verify(socket, times(1)).getInputStream();
+		verify(socket, times(1)).getOutputStream();
+		verify(socket, times(1)).shutdownOutput();
+		verify(socket, times(1)).close();
+
+		Assert.assertFalse(exampleReadExceptionThrown);
+		Assert.assertTrue(exampleFormatExceptionThrown);
+		Assert.assertFalse(exampleSubmissionExceptionThrown);
+		Assert.assertFalse(predictionFetchExceptionThrown);
+
+		//the completion call backs should have been fired
+		Assert.assertTrue(exampleSubmissionCompleteCalled);
+		Assert.assertTrue(predictionFetchCompleteCalled);
+
+	}
+
+	/*
+	 * Tests that a prediction fetch exception is handled correctly.
+	 */
+	@Test(timeout = 5000)
+	public void handlePredictionFetchException() throws IOException, ExampleSubmissionException, InterruptedException {
+
+		Iterable<Example> examples = getExamples("One", "Two");
+
+		Socket socket = mock(Socket.class);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		when(socket.getOutputStream()).thenReturn(outputStream);
+
+		InputStream inputStream = mock(InputStream.class, new Answer<Object>() {
+
+			@Override
+			public Object answer(InvocationOnMock invocation) throws Throwable {
+				throw new IOException();
+			}
+
+		});
+
+		when(socket.getInputStream()).thenReturn(inputStream);
+
+		TCPIPSocketFactory socketFactory = mock(TCPIPSocketFactory.class);
+		when(socketFactory.getSocket()).thenReturn(socket);
+
+		AsyncFailFastTCPIPExampleProcessor toTest = new AsyncFailFastTCPIPExampleProcessor(socketFactory, Executors.newCachedThreadPool(), examples);
+
+		expectedNumberOfSkippedExamples = 0;
+		expectedNumberOfSubmittedExamples = 2;
+		expectedStateOnExampleSubmissionComplete = ExampleSubmissionState.Complete;
+		expectedStateOnPredictionFetchComplete = PredictionFetchState.PredictionFetchFault;
+
+		Iterable<Prediction> predictions = toTest.submitExamples(this);
+
+		int x = 0;
+
+		for (Prediction p : predictions) {
+
+			x++;
+		}
+
+		Assert.assertEquals(0, x);
+
+		countDownLatch.await(); //wait till example submission and prediction fetch are both done.
+
+		//check that all examples got there
+		BufferedReader bReader = new BufferedReader(new StringReader(new String(outputStream.toByteArray())));
+
+		x = 0;
+		String line = null;
+		while ((line = bReader.readLine()) != null) {
+
+			switch (x++) {
+
+				case 0:
+					Assert.assertEquals("One", line);
+					break;
+
+				case 1:
+					Assert.assertEquals("Two", line);
+					break;
+
+				default:
+					Assert.fail("Too many examples!");
+			}
+
+		}
+
+		Assert.assertEquals(2, x);
+
+		verify(socketFactory, times(1)).getSocket();
+		verify(socket, times(1)).getInputStream();
+		verify(socket, times(1)).getOutputStream();
+		verify(socket, times(1)).shutdownOutput();
+		verify(socket, times(1)).close();
+
+		Assert.assertFalse(exampleReadExceptionThrown);
+		Assert.assertFalse(exampleFormatExceptionThrown);
+		Assert.assertFalse(exampleSubmissionExceptionThrown);
+		Assert.assertTrue(predictionFetchExceptionThrown);
 
 		//the completion call backs should have been fired
 		Assert.assertTrue(exampleSubmissionCompleteCalled);

@@ -116,7 +116,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						if (callback != null)
 							callback.onExampleReadException(exampleProcessor, e);
 
-						LOGGER.error("ExampleReadException in VWExampleSubmitter: {}", e.getMessage(), e);
+						LOGGER.error("ExampleReadException in ExampleSubmitter: {}", e.getMessage(), e);
 
 						faulted = true;
 					}
@@ -127,7 +127,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						if (callback != null)
 							callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
 
-						LOGGER.error("Other Exception in VWExampleSubmitter: {}", e.getMessage(), e);
+						LOGGER.error("Other Exception in ExampleSubmitter: {}", e.getMessage(), e);
 
 						faulted = true;
 					}
