@@ -10,7 +10,6 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Iterator;
 import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
@@ -66,8 +65,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 		try {
 			final Socket socket = socketFactory.getSocket();
 
-			final CountDownLatch countDownLatch = new CountDownLatch(1); //signal to the prediction fetcher.
-
 			executorService.submit(new Callable<Void>() {
 
 				@Override
@@ -78,8 +75,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 					boolean faulted = false;
 
 					BufferedWriter writer = null;
-
-					boolean signaledPredictionFetcher = false;
 
 					try {
 
@@ -98,11 +93,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								writer.write(toWrite);
 								writer.write(NEWLINE);
 								incrementNumberOfExamplesSubmitted();
-
-								if (!signaledPredictionFetcher) {
-									countDownLatch.countDown();
-									signaledPredictionFetcher = true;
-								}
 
 								LOGGER.info("Submitted example: {}", toWrite);
 							}
@@ -175,11 +165,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								faulted = true;
 							}
 
-						// if the prediction fetcher is still waiting on us, let it go.
-						if (!signaledPredictionFetcher) {
-							countDownLatch.countDown();
-						}
-
 						if (faulted == false)
 							setExampleSubmissionState(ExampleSubmissionState.Complete);
 
@@ -193,7 +178,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 			});
 
-			final TCPIPPredictionsIterator theIterator = new TCPIPPredictionsIterator(exampleProcessor, socket, callback, countDownLatch);
+			final TCPIPPredictionsIterator theIterator = new TCPIPPredictionsIterator(exampleProcessor, socket, callback);
 
 			setPredictionsIterator(theIterator);
 
