@@ -77,13 +77,15 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 					boolean faulted = false;
 
+					BufferedWriter writer = null;
+
 					try {
 
 						outputStream = socket.getOutputStream();
 
 						LOGGER.info("Starting to submit examples to VW...");
 
-						BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+						writer = new BufferedWriter(new OutputStreamWriter(outputStream));
 
 						boolean signaledPredictionFetcher = false;
 
@@ -102,8 +104,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 									signaledPredictionFetcher = true;
 								}
 
-								// LOGGER.info("Submitted example: {}",
-								// toWrite);
+								LOGGER.info("Submitted example: {}", toWrite);
 							}
 							catch (ExampleFormatException e) {
 
@@ -142,20 +143,37 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 					}
 					finally {
 
-						try {
-							if (socket != null) socket.shutdownOutput();
+						if (writer != null) try {
+							writer.flush(); //make sure that anything buffered by the bufferedwriter is flushed to the underlying stream
 						}
-						catch (IOException e2) {
+						catch (IOException e) {
 
 							setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
 
 							if (callback != null)
-								callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e2));
+								callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
 
-							LOGGER.error("Exception in VWExampleSubmitter: {}", e2.getMessage(), e2);
+							LOGGER.error("Exception in ExampleProcessor: {}", e.getMessage(), e);
 
 							faulted = true;
 						}
+
+						if (socket != null)
+							try {
+
+								socket.shutdownOutput();
+							}
+							catch (IOException e2) {
+
+								setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
+
+								if (callback != null)
+									callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e2));
+
+								LOGGER.error("Exception in ExampleProcessor: {}", e2.getMessage(), e2);
+
+								faulted = true;
+							}
 
 						if (faulted == false)
 							setExampleSubmissionState(ExampleSubmissionState.Complete);
