@@ -25,10 +25,10 @@ import com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebod
 /**
  * @author vrahimtoola Tests the PlainTextExamplesMessageBodyReader.
  */
-public class PlainTextMessageBodyReaderTest {
+public class PlainTextExamplesMessageBodyReaderTest {
 
 	private static final Logger LOGGER = LoggerFactory
-			.getLogger(PlainTextMessageBodyReaderTest.class);
+			.getLogger(PlainTextExamplesMessageBodyReaderTest.class);
 
 	/*
 	 * Simple test of examples.
