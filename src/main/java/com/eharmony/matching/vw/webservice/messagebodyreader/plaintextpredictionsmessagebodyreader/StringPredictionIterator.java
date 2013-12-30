@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebodyreader;
+package com.eharmony.matching.vw.webservice.messagebodyreader.plaintextpredictionsmessagebodyreader;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -13,9 +13,8 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.core.example.StringExample;
+import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
+import com.eharmony.matching.vw.webservice.core.prediction.StringPrediction;
 
 /**
  * @author vrahimtoola
@@ -25,7 +24,7 @@ import com.eharmony.matching.vw.webservice.core.example.StringExample;
  *         TODO look at guava's abstract iterator and the test that comes with
  *         guava
  */
-public class StringExampleIterator implements Iterator<Example> {
+public class StringPredictionIterator implements Iterator<Prediction> {
 
 	/*
 	 * The reader.
@@ -35,9 +34,9 @@ public class StringExampleIterator implements Iterator<Example> {
 	/*
 	 * The example to be returned, when 'next()' is called.
 	 */
-	private String nextExampleToReturn = null;
+	private String nextPredictionToReturn = null;
 
-	public StringExampleIterator(InputStream inputStream, Charset charset)
+	public StringPredictionIterator(InputStream inputStream, Charset charset)
 			throws IOException {
 
 		checkNotNull(inputStream, "A null input stream was provided!");
@@ -47,13 +46,13 @@ public class StringExampleIterator implements Iterator<Example> {
 
 	@Override
 	public boolean hasNext() {
-		return nextExampleToReturn != null;
+		return nextPredictionToReturn != null;
 	}
 
 	@Override
-	public Example next() {
+	public Prediction next() {
 
-		String toReturn = nextExampleToReturn;
+		String toReturn = nextPredictionToReturn;
 
 		if (toReturn == null)
 			throw new NoSuchElementException("No element to return! Make sure to call 'hasNext()' and that it returns true before invoking this method!");
@@ -63,11 +62,12 @@ public class StringExampleIterator implements Iterator<Example> {
 		}
 		catch (IOException e) {
 
-			throw new ExampleReadException("Exception reading examples! Message: "
+			//TODO: consider throwing a custom exception here?
+			throw new RuntimeException("Exception reading predictions! Message: "
 					+ e.getMessage(), e);
 		}
 
-		return new StringExample(toReturn);
+		return new StringPrediction(toReturn);
 	}
 
 	@Override
@@ -77,7 +77,7 @@ public class StringExampleIterator implements Iterator<Example> {
 
 	private void advance() throws IOException {
 
-		nextExampleToReturn = reader.readLine();
+		nextPredictionToReturn = reader.readLine();
 	}
 
 }

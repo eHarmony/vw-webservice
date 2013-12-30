@@ -20,10 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.messagebodyreader.plaintextmessagebodyreader.PlainTextExamplesMessageBodyReader;
+import com.eharmony.matching.vw.webservice.messagebodyreader.plaintextexamplesmessagebodyreader.PlainTextExamplesMessageBodyReader;
 
 /**
- * @author vrahimtoola Tests the PlainTextExamplesMessageBodyReader.
+ * @author vrahimtoola Tests the PlainTextPredictionsMessageBodyReader.
  */
 public class PlainTextExamplesMessageBodyReaderTest {
 
@@ -114,7 +114,7 @@ public class PlainTextExamplesMessageBodyReaderTest {
 		BufferedReader testReader = new BufferedReader(new InputStreamReader(
 				gzipInputStream));
 
-		// the input stream that the PlainTextExamplesMessageBodyReader will
+		// the input stream that the PlainTextPredictionsMessageBodyReader will
 		// use.
 		GZIPInputStream gzipInputStreamForTestSubject = new GZIPInputStream(
 				this.getClass().getClassLoader()
