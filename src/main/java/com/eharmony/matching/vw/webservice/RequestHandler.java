@@ -9,6 +9,9 @@ import java.util.concurrent.ExecutorService;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.CompletionCallback;
+import javax.ws.rs.container.ConnectionCallback;
+import javax.ws.rs.container.TimeoutHandler;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.slf4j.Logger;
@@ -103,6 +106,39 @@ class RequestHandler implements ExampleProcessingEventHandler {
 	}
 
 	private void submitAsynchronously(final ExampleProcessor exampleSubmitter, final AsyncResponse asyncResponse) {
+
+		asyncResponse.setTimeoutHandler(new TimeoutHandler() {
+
+			@Override
+			public void handleTimeout(AsyncResponse asyncResponse) {
+
+				LOGGER.error("Time out!!! This is bad...");
+
+				asyncResponse.resume("");
+
+			}
+		});
+
+		asyncResponse.register(new CompletionCallback() {
+
+			@Override
+			public void onComplete(Throwable throwable) {
+
+				if (throwable != null)
+					LOGGER.error("Exception thrown in completion callback!");
+
+			}
+		});
+
+		asyncResponse.register(new ConnectionCallback() {
+
+			@Override
+			public void onDisconnect(AsyncResponse disconnected) {
+
+				LOGGER.error("Client disconnected!!");
+
+			}
+		});
 
 		executorService.submit(new Runnable() {
 

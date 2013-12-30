@@ -58,6 +58,8 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 		if (firstCallToHasNext) {
 
+			LOGGER.debug("First call to advance in TCP IP iterator!");
+
 			advance(); // don't want to call this in the constructor because
 						// that could block.
 
@@ -90,7 +92,7 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 			nextLineToReturn = reader.readLine();
 
-			LOGGER.info("Read prediction: {}", nextLineToReturn);
+			LOGGER.trace("Read prediction: {}", nextLineToReturn);
 
 			closeReader = nextLineToReturn == null;
 
@@ -113,7 +115,7 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 			if (closeReader) {
 				try {
-					reader.close();
+					if (socket.isClosed() == false) reader.close();
 				}
 				catch (Exception e2) {
 					LOGGER.warn("Failed to close the reader in VWPredictionIterator: {}", e2.getMessage(), e2);

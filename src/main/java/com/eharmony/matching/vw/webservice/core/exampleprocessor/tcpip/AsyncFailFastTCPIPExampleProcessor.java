@@ -94,7 +94,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								writer.write(NEWLINE);
 								incrementNumberOfExamplesSubmitted();
 
-								LOGGER.info("Submitted example: {}", toWrite);
+								LOGGER.trace("Submitted example: {}", toWrite);
 							}
 							catch (ExampleFormatException e) {
 
