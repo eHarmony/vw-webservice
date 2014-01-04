@@ -151,6 +151,8 @@ Comparing different ways of invoking VW to retrieve predictions
 
 Some basic benchmarking seems to indicate that as the number of examples increases and hardware memory improves, the web-service seems to perform roughly as well as a simple netcat to VW. Note that in the generation of these numbers, no performance tweaking was done to the web-service. VW was running in daemon mode with the '-b 10' switch, ie, it was brought up in the following manner: "vw -b 10 --daemon".
 
+A total of ~27 million examples was submitted in 10 separate runs (for each setup). 
+
 The LP box has ~1TB (ie, 1 Terabyte) of memory.
 
 ```
