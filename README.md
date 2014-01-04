@@ -146,6 +146,21 @@ Examples must adhere to the documented VW example format. Some sample examples a
 3 third| c_2=a_fw=n suf2_0=an pre1_0=g suf2_-1=ts c_-1=a c_-2=A c_0=Aa pre3_-1=rej pre1_-2=e suf3_-2=u suf3_0=man suf3_1=all l_-1=rejects w_0=German suf3_-1=cts pre1_-1=r suf2_1=ll l_-2=eu pre2_0=ge l_0=german pre3_-2=eu c_-2=A_fw=y c_1=a pre1_2=t l_2=to suf1_0=n pre3_1=cal pre2_2=to pre3_0=ger c_2=a c_-1=a_fw=n c_0=Aa_fw=n suf3_2=o suf2_2=to w_-1=rejects c_1=a_fw=n pre1_1=c suf2_-2=eu suf1_2=o pre3_2=to w_2=to suf1_1=l pre2_1=ca pre2_-1=re w_1=call suf1_-1=s pre2_-2=eu w_-2=EU l_1=call suf1_-2=u
 ```
 
+Comparing different ways of invoking VW to retrieve predictions
+----
+
+Some basic benchmarking seems to indicate that as the number of examples increases and hardware memory improves, the web-service seems to perform roughly as well as a simple netcat to VW. Note that in the generation of these numbers, no performance tweaking was done to the web-service. VW was running in daemon mode with the '-b 10' switch, ie, it was brought up in the following manner: "vw -b 10 --daemon".
+
+The LP box has ~1TB (ie, 1 Terabyte) of memory.
+
+```
+netcat on LP, VW on LP - median time was 239.7 seconds
+webservice on LP, VW on LP - median time was 244.4 seconds.
+```
+
+The percentage difference in median times was ~2%, so the web service seemed to be performing quite nicely.
+
+
 ToDo
 ----
 
