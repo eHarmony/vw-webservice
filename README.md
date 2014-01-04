@@ -155,10 +155,10 @@ A total of ~27 million examples was submitted in 10 separate runs (for each setu
 
 The LP box has ~1TB (ie, 1 Terabyte) of memory.
 
-```
-netcat on LP, VW on LP - median time was 239.7 seconds
-webservice on LP, VW on LP - median time was 244.4 seconds.
-```
+| Setup                                 | # examples | # of features | median time | slowdown |
+|:--------------------------------------|-----------:|--------------:|------------:|---------:|
+| netcat and vw --daemon on localhost   | 27M        |1.2B           |      239.7s | baseline |
+| webservice and vw daemon on localhost | 27M        |1.2B           |      244.4s |       2% |
 
 The percentage difference in median times was ~2%, so the web service seemed to be performing quite nicely.
 
