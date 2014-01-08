@@ -11,5 +11,5 @@ package com.eharmony.matching.vw.webservice;
  */
 public class PredictionMediaTypes {
 
-	public static final String PLAINTEXT_1_0 = "text/plain";
+	public static final String PLAINTEXT_1_0 = "application/vowpal-wabbit-prediction-v1.0+plaintext";
 }

@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.List;
+import java.util.Map.Entry;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.WebApplicationException;
@@ -16,6 +18,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.message.internal.ReaderWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,13 +28,14 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
 
 /**
- * @author vrahimtoola A message body reader that can read an Iterable<String>
- *         from the message body of an HTTP request.
+ * @author vrahimtoola
+ * 
+ *         A message body reader that can read an Iterable<String> from the
+ *         message body of an HTTP request.
  */
 @Consumes({ MediaType.TEXT_PLAIN, ExampleMediaTypes.PLAINTEXT_1_0 })
 @Provider
-public class PlainTextExamplesMessageBodyReader implements
-		MessageBodyReader<ExamplesIterable> {
+public class PlainTextExamplesMessageBodyReader implements MessageBodyReader<ExamplesIterable> {
 
 	public PlainTextExamplesMessageBodyReader() {
 
@@ -42,10 +46,13 @@ public class PlainTextExamplesMessageBodyReader implements
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
 
-		LOGGER.info("Called with media type: {}", mediaType.toString());
+		LOGGER.debug("Called with media type: {} and type: {}", mediaType.toString(), type);
 
-		return (mediaType.toString().equals(MediaType.TEXT_PLAIN) || mediaType.toString().equals(ExampleMediaTypes.PLAINTEXT_1_0))
-				&& type == ExamplesIterable.class;
+		boolean willReturn = (mediaType.isCompatible(MediaType.TEXT_PLAIN_TYPE) || mediaType.toString().equals(ExampleMediaTypes.PLAINTEXT_1_0)) && type == ExamplesIterable.class;
+
+		LOGGER.debug("Returning: {}", willReturn);
+
+		return willReturn;
 	}
 
 	/*
@@ -62,6 +69,14 @@ public class PlainTextExamplesMessageBodyReader implements
 	 */
 	@Override
 	public ExamplesIterable readFrom(Class<ExamplesIterable> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream) throws IOException, WebApplicationException {
+
+		if (LOGGER.isDebugEnabled()) if (httpHeaders != null && httpHeaders.size() > 0) {
+			LOGGER.debug("Rec'd HTTP headers: ");
+
+			for (Entry<String, List<String>> entry : httpHeaders.entrySet()) {
+				LOGGER.debug("{}:{}", entry.getKey(), StringUtils.join(entry.getValue(), ','));
+			}
+		}
 
 		// TODO:
 		// if a content-length has been provided, then use that to read entire

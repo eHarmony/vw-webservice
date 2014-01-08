@@ -10,6 +10,8 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,6 +23,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class TCPIPSocketFactoryImpl implements TCPIPSocketFactory {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TCPIPSocketFactoryImpl.class);
 
 	private final String vwHost;
 	private final int vwPort;
@@ -38,6 +42,9 @@ public class TCPIPSocketFactoryImpl implements TCPIPSocketFactory {
 
 	@Override
 	public Socket getSocket() throws UnknownHostException, IOException {
+
+		LOGGER.debug("Returning socket for host: {} and port: {}", vwHost, vwPort);
+
 		return new Socket(vwHost, vwPort);
 	}
 

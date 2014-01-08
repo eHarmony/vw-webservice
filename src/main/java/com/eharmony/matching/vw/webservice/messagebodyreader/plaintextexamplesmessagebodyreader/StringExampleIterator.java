@@ -13,6 +13,9 @@ import java.nio.charset.Charset;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
 import com.eharmony.matching.vw.webservice.core.example.Example;
 import com.eharmony.matching.vw.webservice.core.example.StringExample;
@@ -27,6 +30,8 @@ import com.eharmony.matching.vw.webservice.core.example.StringExample;
  */
 public class StringExampleIterator implements Iterator<Example> {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(StringExampleIterator.class);
+
 	/*
 	 * The reader.
 	 */
@@ -37,8 +42,9 @@ public class StringExampleIterator implements Iterator<Example> {
 	 */
 	private String nextExampleToReturn = null;
 
-	public StringExampleIterator(InputStream inputStream, Charset charset)
-			throws IOException {
+	private long numTotalExamples = 0;
+
+	public StringExampleIterator(InputStream inputStream, Charset charset) throws IOException {
 
 		checkNotNull(inputStream, "A null input stream was provided!");
 		reader = new BufferedReader(new InputStreamReader(inputStream, charset));
@@ -55,16 +61,19 @@ public class StringExampleIterator implements Iterator<Example> {
 
 		String toReturn = nextExampleToReturn;
 
-		if (toReturn == null)
-			throw new NoSuchElementException("No element to return! Make sure to call 'hasNext()' and that it returns true before invoking this method!");
+		if (toReturn == null) throw new NoSuchElementException("No element to return! Make sure to call 'hasNext()' and that it returns true before invoking this method!");
 
 		try {
 			advance();
 		}
 		catch (IOException e) {
 
-			throw new ExampleReadException("Exception reading examples! Message: "
-					+ e.getMessage(), e);
+			throw new ExampleReadException("Exception reading examples! Message: " + e.getMessage(), e);
+		}
+
+		//TODO remove this
+		if (toReturn.length() >= 592) {
+			LOGGER.trace("Received super long example: {}", toReturn);
 		}
 
 		return new StringExample(toReturn);
@@ -78,6 +87,12 @@ public class StringExampleIterator implements Iterator<Example> {
 	private void advance() throws IOException {
 
 		nextExampleToReturn = reader.readLine();
+
+		if (nextExampleToReturn != null)
+			numTotalExamples++;
+		else {
+			LOGGER.debug("Read a total of {} examples", numTotalExamples);
+		}
 	}
 
 }

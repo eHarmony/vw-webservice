@@ -17,50 +17,56 @@ public interface ExampleProcessingEventHandler {
 	/*
 	 * Fired whenever there's an exception reading examples.
 	 * 
-	 * @param processor The example processor that fired this event.
+	 * @param exampleProcessingManager The example processing manager that can
+	 * be queried to find out more info about the example processing.
 	 * 
 	 * @param theException The exception that occurred.
 	 */
-	void onExampleReadException(ExampleProcessor processor, ExampleReadException theException);
+	void onExampleReadException(ExampleProcessingManager exampleProcessingManager, ExampleReadException theException);
 
 	/*
 	 * Fired whenever an invalid example is detected.
 	 * 
-	 * @param processor The example processor that fired this event.
+	 * @param exampleProcessingManager The example processing manager that can
+	 * be queried to find out more info about the example processing.
 	 * 
 	 * @param theException The exception that occurred.
 	 */
-	void onExampleFormatException(ExampleProcessor processor, ExampleFormatException theException);
+	void onExampleFormatException(ExampleProcessingManager exampleProcessingManager, ExampleFormatException theException);
 
 	/*
 	 * Fired whenever there's an exception submitting examples.
 	 * 
-	 * @param processor The example processor that fired this event.
+	 * @param exampleProcessingManager The example processing manager that can
+	 * be queried to find out more info about the example processing.
 	 * 
 	 * @param theException The exception that occurred.
 	 */
-	void onExampleSubmissionException(ExampleProcessor processor, ExampleSubmissionException theException);
+	void onExampleSubmissionException(ExampleProcessingManager exampleProcessingManager, ExampleSubmissionException theException);
 
 	/*
 	 * Fired when all examples have been submitted.
 	 * 
-	 * @param processor The example processor that fired this event.
+	 * @param exampleProcessingManager The example processing manager that can
+	 * be queried to find out more info about the example processing.
 	 */
-	void onExampleSubmissionComplete(ExampleProcessor processor);
+	void onExampleSubmissionComplete(ExampleProcessingManager exampleProcessingManager);
 
 	/*
 	 * Fired whenever there's an exception fetching predictions.
 	 * 
-	 * @param processor The example processor that fired this event.
+	 * @param exampleProcessingManager The example processing manager that can
+	 * be queried to find out more info about the example processing.
 	 * 
 	 * @param theException The exception that occurred.
 	 */
-	void onPredictionFetchException(ExampleProcessor processor, PredictionFetchException theException);
+	void onPredictionFetchException(ExampleProcessingManager exampleProcessingManager, PredictionFetchException theException);
 
 	/*
 	 * Fired when all predictions have been fetched.
 	 * 
-	 * @param processor The example processor that fired this event.
+	 * @param exampleProcessingManager The example processing manager that can
+	 * be queried to find out more info about the example processing.
 	 */
-	void onPredictionFetchComplete(ExampleProcessor processor);
+	void onPredictionFetchComplete(ExampleProcessingManager exampleProcessingManager);
 }

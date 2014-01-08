@@ -42,6 +42,11 @@ public enum ExampleSubmissionState {
 	/*
 	 * Examples are currently being submitted.
 	 */
-	OnGoing
+	OnGoing,
+
+	/*
+	 * Example submission was stopped for some reason.
+	 */
+	Stopped
 
 }

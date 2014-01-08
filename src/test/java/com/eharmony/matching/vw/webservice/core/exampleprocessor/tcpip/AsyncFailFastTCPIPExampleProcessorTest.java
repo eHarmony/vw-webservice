@@ -35,7 +35,7 @@ import com.eharmony.matching.vw.webservice.core.example.Example;
 import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
 import com.eharmony.matching.vw.webservice.core.example.StringExample;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
-import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingManager;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionState;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchException;
@@ -47,8 +47,7 @@ import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
  * 
  *         Tests the AsyncFailFastTCPIPExampleProcessor.
  */
-public class AsyncFailFastTCPIPExampleProcessorTest implements
-		ExampleProcessingEventHandler {
+public class AsyncFailFastTCPIPExampleProcessorTest implements ExampleProcessingEventHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFailFastTCPIPExampleProcessorTest.class);
 
@@ -56,16 +55,12 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 	 * These variables could get written to by the example submitting thread, so
 	 * we need to make them volatile.
 	 */
-	private volatile boolean exampleReadExceptionThrown,
-			exampleFormatExceptionThrown, exampleSubmissionExceptionThrown,
-			exampleSubmissionCompleteCalled;
-	private volatile boolean predictionFetchExceptionThrown,
-			predictionFetchCompleteCalled;
+	private volatile boolean exampleReadExceptionThrown, exampleFormatExceptionThrown, exampleSubmissionExceptionThrown, exampleSubmissionCompleteCalled;
+	private volatile boolean predictionFetchExceptionThrown, predictionFetchCompleteCalled;
 
 	private ExampleSubmissionState expectedStateOnExampleSubmissionComplete;
 	private PredictionFetchState expectedStateOnPredictionFetchComplete;
-	private long expectedNumberOfSkippedExamples,
-			expectedNumberOfSubmittedExamples;
+	private long expectedNumberOfSkippedExamples, expectedNumberOfSubmittedExamples;
 
 	private CountDownLatch countDownLatch;
 
@@ -119,7 +114,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 		expectedStateOnExampleSubmissionComplete = ExampleSubmissionState.Complete;
 		expectedStateOnPredictionFetchComplete = PredictionFetchState.Complete;
 
-		Iterable<Prediction> predictions = toTest.submitExamples(this);
+		Iterable<Prediction> predictions = toTest.submitExamples(this).getPredictionsIterable();
 
 		int x = 0;
 
@@ -243,7 +238,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 		expectedStateOnExampleSubmissionComplete = ExampleSubmissionState.ExampleReadFault;
 		expectedStateOnPredictionFetchComplete = PredictionFetchState.Complete;
 
-		Iterable<Prediction> predictions = toTest.submitExamples(this);
+		Iterable<Prediction> predictions = toTest.submitExamples(this).getPredictionsIterable();
 
 		int x = 0;
 
@@ -322,7 +317,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 		expectedStateOnExampleSubmissionComplete = ExampleSubmissionState.Complete;
 		expectedStateOnPredictionFetchComplete = PredictionFetchState.Complete;
 
-		Iterable<Prediction> predictions = toTest.submitExamples(this);
+		Iterable<Prediction> predictions = toTest.submitExamples(this).getPredictionsIterable();
 
 		int x = 0;
 
@@ -426,7 +421,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 		expectedStateOnExampleSubmissionComplete = ExampleSubmissionState.Complete;
 		expectedStateOnPredictionFetchComplete = PredictionFetchState.PredictionFetchFault;
 
-		Iterable<Prediction> predictions = toTest.submitExamples(this);
+		Iterable<Prediction> predictions = toTest.submitExamples(this).getPredictionsIterable();
 
 		int x = 0;
 
@@ -508,40 +503,40 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 	}
 
 	@Override
-	public void onExampleReadException(ExampleProcessor processor, ExampleReadException theException) {
+	public void onExampleReadException(ExampleProcessingManager exampleProcessingManager, ExampleReadException theException) {
 
-		Assert.assertTrue(processor.getExampleSubmissionState() == ExampleSubmissionState.ExampleReadFault);
+		Assert.assertTrue(exampleProcessingManager.getExampleSubmissionState() == ExampleSubmissionState.ExampleReadFault);
 
 		exampleReadExceptionThrown = true;
 	}
 
 	@Override
-	public void onExampleFormatException(ExampleProcessor processor, ExampleFormatException theException) {
+	public void onExampleFormatException(ExampleProcessingManager exampleProcessingManager, ExampleFormatException theException) {
 
 		//the async tcp ip example processor carries on when it encounters an example format exception,
 		//and doesn't consider it to be a fault.
-		Assert.assertTrue(processor.getExampleSubmissionState() == ExampleSubmissionState.OnGoing);
+		Assert.assertTrue(exampleProcessingManager.getExampleSubmissionState() == ExampleSubmissionState.OnGoing);
 
 		exampleFormatExceptionThrown = true;
 
 	}
 
 	@Override
-	public void onExampleSubmissionException(ExampleProcessor processor, ExampleSubmissionException theException) {
+	public void onExampleSubmissionException(ExampleProcessingManager exampleProcessingManager, ExampleSubmissionException theException) {
 
-		Assert.assertTrue(processor.getExampleSubmissionState() == ExampleSubmissionState.ExampleSubmissionFault);
+		Assert.assertTrue(exampleProcessingManager.getExampleSubmissionState() == ExampleSubmissionState.ExampleSubmissionFault);
 
 		exampleSubmissionExceptionThrown = true;
 	}
 
 	@Override
-	public void onExampleSubmissionComplete(ExampleProcessor processor) {
+	public void onExampleSubmissionComplete(ExampleProcessingManager exampleProcessingManager) {
 
 		LOGGER.info("Example submission complete called!");
 
-		Assert.assertTrue(processor.getExampleSubmissionState() == expectedStateOnExampleSubmissionComplete);
-		Assert.assertEquals(processor.getTotalNumberOfExamplesSkipped(), expectedNumberOfSkippedExamples);
-		Assert.assertEquals(processor.getTotalNumberOfExamplesSubmitted(), expectedNumberOfSubmittedExamples);
+		Assert.assertTrue(exampleProcessingManager.getExampleSubmissionState() == expectedStateOnExampleSubmissionComplete);
+		Assert.assertEquals(exampleProcessingManager.getTotalNumberOfExamplesSkipped(), expectedNumberOfSkippedExamples);
+		Assert.assertEquals(exampleProcessingManager.getTotalNumberOfExamplesSubmitted(), expectedNumberOfSubmittedExamples);
 
 		exampleSubmissionCompleteCalled = true;
 
@@ -550,19 +545,19 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements
 	}
 
 	@Override
-	public void onPredictionFetchException(ExampleProcessor processor, PredictionFetchException theException) {
+	public void onPredictionFetchException(ExampleProcessingManager exampleProcessingManager, PredictionFetchException theException) {
 
-		Assert.assertTrue(processor.getPredictionFetchState() == PredictionFetchState.PredictionFetchFault);
+		Assert.assertTrue(exampleProcessingManager.getPredictionFetchState() == PredictionFetchState.PredictionFetchFault);
 
 		predictionFetchExceptionThrown = true;
 	}
 
 	@Override
-	public void onPredictionFetchComplete(ExampleProcessor processor) {
+	public void onPredictionFetchComplete(ExampleProcessingManager exampleProcessingManager) {
 
 		LOGGER.info("Prediction fetch complete called!");
 
-		Assert.assertTrue(processor.getPredictionFetchState() == expectedStateOnPredictionFetchComplete);
+		Assert.assertTrue(exampleProcessingManager.getPredictionFetchState() == expectedStateOnPredictionFetchComplete);
 
 		predictionFetchCompleteCalled = true;
 

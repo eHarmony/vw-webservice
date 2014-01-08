@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
-import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchState;
 import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
@@ -36,21 +35,19 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 	private final Socket socket;
 	private final BufferedReader reader;
 	private final ExampleProcessingEventHandler callback;
-	private final ExampleProcessor exampleProcessor;
+	private final TCPIPExampleProcessingManager exampleProcessingManager;
 
 	private String nextLineToReturn = null;
 	private PredictionFetchState predictionFetchState = PredictionFetchState.OnGoing;
 
 	private boolean firstCallToHasNext = true;
 
-	public TCPIPPredictionsIterator(ExampleProcessor exampleProcessor,
-			Socket socket, ExampleProcessingEventHandler callback)
-			throws IOException {
+	public TCPIPPredictionsIterator(Socket socket, ExampleProcessingEventHandler callback, TCPIPExampleProcessingManager exampleProcessingManager) throws IOException {
 
-		this.exampleProcessor = exampleProcessor;
 		this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.callback = callback;
 		this.socket = socket;
+		this.exampleProcessingManager = exampleProcessingManager;
 	}
 
 	@Override
@@ -94,6 +91,8 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 			LOGGER.trace("Read prediction: {}", nextLineToReturn);
 
+			exampleProcessingManager.incrementNumberOfPredictionsFetched();
+
 			closeReader = nextLineToReturn == null;
 
 		}
@@ -107,8 +106,7 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 			setPredictionFetchState(PredictionFetchState.PredictionFetchFault);
 
-			if (callback != null)
-				callback.onPredictionFetchException(exampleProcessor, new PredictionFetchException(e));
+			if (callback != null) callback.onPredictionFetchException(exampleProcessingManager, new PredictionFetchException(e));
 
 		}
 		finally {
@@ -118,16 +116,15 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 					if (socket.isClosed() == false) reader.close();
 				}
 				catch (Exception e2) {
-					LOGGER.warn("Failed to close the reader in VWPredictionIterator: {}", e2.getMessage(), e2);
+					LOGGER.warn("Failed to close the reader in predictions iterator: {}", e2.getMessage(), e2);
 				}
 
-				if (socket.isClosed() == false)
-					try {
-						socket.close();
-					}
-					catch (Exception e2) {
-						LOGGER.warn("Failed to close the socket in VWPredictionIterator: {}", e2.getMessage(), e2);
-					}
+				if (socket.isClosed() == false) try {
+					socket.close();
+				}
+				catch (Exception e2) {
+					LOGGER.warn("Failed to close the socket in predictions iterator: {}", e2.getMessage(), e2);
+				}
 
 				nextLineToReturn = null; // need to set this explicitly, since
 											// an exception may have
@@ -137,9 +134,15 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 				if (!faulted)
 					setPredictionFetchState(PredictionFetchState.Complete);
+				else {
+					//faulted, so halt the example submission process
+					LOGGER.warn("Stopping example submission from within the TCP IP predictions iterator...");
+					exampleProcessingManager.stopAll();
 
-				if (callback != null)
-					callback.onPredictionFetchComplete(exampleProcessor);
+					//if faulted, the prediction fetch state will already have been set in the exception handling code.
+				}
+
+				if (callback != null) callback.onPredictionFetchComplete(exampleProcessingManager);
 			}
 		}
 	}

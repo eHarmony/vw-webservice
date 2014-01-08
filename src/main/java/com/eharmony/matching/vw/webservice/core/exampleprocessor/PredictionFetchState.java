@@ -22,6 +22,13 @@ public enum PredictionFetchState {
 	PredictionFetchFault,
 
 	/*
+	 * An exception occurred when sending predictions back to the client. No
+	 * more predictions will be sent. Typically example submission will also be
+	 * stopped.
+	 */
+	PredictionWriteFault,
+
+	/*
 	 * Predictions are currently being fetched.
 	 */
 	OnGoing

@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.util.Iterator;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
@@ -19,13 +18,12 @@ import com.eharmony.matching.vw.webservice.core.ExampleReadException;
 import com.eharmony.matching.vw.webservice.core.example.Example;
 import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
+import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingManager;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFeatures;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFeaturesImpl;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionState;
-import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchState;
-import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
 
 /**
  * @author vrahimtoola
@@ -45,12 +43,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 	private final TCPIPSocketFactory socketFactory;
 	private final Iterable<Example> examples;
 
-	private long numExamplesSubmitted, numExamplesSkipped;
-	private ExampleSubmissionState exampleSubmissionState = ExampleSubmissionState.OnGoing;
-	private TCPIPPredictionsIterator predictionsIterator;
-
-	public AsyncFailFastTCPIPExampleProcessor(TCPIPSocketFactory socketFactory,
-			ExecutorService executorService, Iterable<Example> examples) {
+	public AsyncFailFastTCPIPExampleProcessor(TCPIPSocketFactory socketFactory, ExecutorService executorService, Iterable<Example> examples) {
 
 		this.executorService = executorService;
 		this.socketFactory = socketFactory;
@@ -58,12 +51,12 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 	}
 
 	@Override
-	public Iterable<Prediction> submitExamples(final ExampleProcessingEventHandler callback) throws ExampleSubmissionException {
-
-		final ExampleProcessor exampleProcessor = this;
+	public ExampleProcessingManager submitExamples(final ExampleProcessingEventHandler callback) throws ExampleSubmissionException {
 
 		try {
 			final Socket socket = socketFactory.getSocket();
+
+			final TCPIPExampleProcessingManager exampleProcessingManager = new TCPIPExampleProcessingManager(socket, callback);
 
 			executorService.submit(new Callable<Void>() {
 
@@ -73,6 +66,8 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 					OutputStream outputStream;
 
 					boolean faulted = false;
+
+					boolean stoppedPrematurely = false;
 
 					BufferedWriter writer = null;
 
@@ -92,29 +87,32 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								toWrite = example.getVWStringRepresentation();
 								writer.write(toWrite);
 								writer.write(NEWLINE);
-								incrementNumberOfExamplesSubmitted();
+								exampleProcessingManager.incrementNumberOfExamplesSubmitted();
 
 								LOGGER.trace("Submitted example: {}", toWrite);
 							}
 							catch (ExampleFormatException e) {
 
-								incrementNumberOfExamplesSkipped();
-								if (callback != null)
-									callback.onExampleFormatException(exampleProcessor, e);
+								exampleProcessingManager.incrementNumberOfExamplesSkipped();
+								if (callback != null) callback.onExampleFormatException(exampleProcessingManager, e);
 
 							}
 
+							if (exampleProcessingManager.isStopped()) {
+								LOGGER.warn("Example submission process was stopped for some reason!");
+								stoppedPrematurely = true;
+								break;
+							}
 						}
 
-						LOGGER.info("All examples submitted to VW!");
+						if (!stoppedPrematurely) LOGGER.info("All examples submitted to VW!");
 
 					}
 					catch (ExampleReadException e) {
 
-						setExampleSubmissionState(ExampleSubmissionState.ExampleReadFault);
+						exampleProcessingManager.setExampleSubmissionState(ExampleSubmissionState.ExampleReadFault);
 
-						if (callback != null)
-							callback.onExampleReadException(exampleProcessor, e);
+						if (callback != null) callback.onExampleReadException(exampleProcessingManager, e);
 
 						LOGGER.error("ExampleReadException in ExampleSubmitter: {}", e.getMessage(), e);
 
@@ -122,10 +120,9 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 					}
 					catch (Exception e) {
 
-						setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
+						exampleProcessingManager.setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
 
-						if (callback != null)
-							callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
+						if (callback != null) callback.onExampleSubmissionException(exampleProcessingManager, new ExampleSubmissionException(e));
 
 						LOGGER.error("Other Exception in ExampleSubmitter: {}", e.getMessage(), e);
 
@@ -138,38 +135,39 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						}
 						catch (IOException e) {
 
-							setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
+							exampleProcessingManager.setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
 
-							if (callback != null)
-								callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e));
+							if (callback != null) callback.onExampleSubmissionException(exampleProcessingManager, new ExampleSubmissionException(e));
 
 							LOGGER.error("IOException when closing example writer in ExampleProcessor: {}", e.getMessage(), e);
 
 							faulted = true;
 						}
 
-						if (socket != null)
-							try {
+						if (socket != null) try {
 
-								socket.shutdownOutput();
+							socket.shutdownOutput();
+						}
+						catch (IOException e2) {
+
+							exampleProcessingManager.setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
+
+							if (callback != null) callback.onExampleSubmissionException(exampleProcessingManager, new ExampleSubmissionException(e2));
+
+							LOGGER.error("IOException when shutting down socket output in ExampleProcessor: {}", e2.getMessage(), e2);
+
+							faulted = true;
+						}
+
+						if (faulted == false) {
+							if (stoppedPrematurely == false)
+								exampleProcessingManager.setExampleSubmissionState(ExampleSubmissionState.Complete);
+							else {
+								exampleProcessingManager.setExampleSubmissionState(ExampleSubmissionState.Stopped);
 							}
-							catch (IOException e2) {
+						}
 
-								setExampleSubmissionState(ExampleSubmissionState.ExampleSubmissionFault);
-
-								if (callback != null)
-									callback.onExampleSubmissionException(exampleProcessor, new ExampleSubmissionException(e2));
-
-								LOGGER.error("IOException when shutting down socket output in ExampleProcessor: {}", e2.getMessage(), e2);
-
-								faulted = true;
-							}
-
-						if (faulted == false)
-							setExampleSubmissionState(ExampleSubmissionState.Complete);
-
-						if (callback != null)
-							callback.onExampleSubmissionComplete(exampleProcessor);
+						if (callback != null) callback.onExampleSubmissionComplete(exampleProcessingManager);
 
 					}
 
@@ -178,22 +176,11 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 			});
 
-			final TCPIPPredictionsIterator theIterator = new TCPIPPredictionsIterator(exampleProcessor, socket, callback);
-
-			setPredictionsIterator(theIterator);
-
-			return new Iterable<Prediction>() {
-
-				@Override
-				public Iterator<Prediction> iterator() {
-					return theIterator;
-				}
-			};
-
+			return exampleProcessingManager;
 		}
 		catch (Exception e1) {
 
-			LOGGER.error("Exception communicating with VW: {}", e1.getMessage());
+			LOGGER.error("Exception in submitExamples(): {}", e1.getMessage());
 
 			throw new ExampleSubmissionException(e1);
 		}
@@ -206,43 +193,4 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 		return new ExampleProcessorFeaturesImpl(true, null);
 	}
 
-	private synchronized void incrementNumberOfExamplesSubmitted() {
-		numExamplesSubmitted++;
-	}
-
-	private synchronized void incrementNumberOfExamplesSkipped() {
-		numExamplesSkipped++;
-	}
-
-	@Override
-	public synchronized long getTotalNumberOfExamplesSubmitted() {
-		return numExamplesSubmitted;
-	}
-
-	@Override
-	public synchronized long getTotalNumberOfExamplesSkipped() {
-		return numExamplesSkipped;
-	}
-
-	private synchronized void setExampleSubmissionState(ExampleSubmissionState newState) {
-		exampleSubmissionState = newState;
-	}
-
-	@Override
-	public synchronized ExampleSubmissionState getExampleSubmissionState() {
-		return exampleSubmissionState;
-	}
-
-	private synchronized void setPredictionsIterator(TCPIPPredictionsIterator predictionsIterator) {
-		this.predictionsIterator = predictionsIterator;
-	}
-
-	@Override
-	public synchronized PredictionFetchState getPredictionFetchState() {
-
-		if (predictionsIterator != null)
-			return predictionsIterator.getPredictionFetchState();
-
-		return PredictionFetchState.OnGoing;
-	}
 }

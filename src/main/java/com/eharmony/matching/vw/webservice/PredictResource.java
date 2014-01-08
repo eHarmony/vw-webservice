@@ -10,16 +10,16 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.container.AsyncResponse;
-import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.server.ChunkedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
+import com.eharmony.matching.vw.webservice.core.example.Example;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
 
 /**
@@ -36,8 +36,7 @@ public class PredictResource {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PredictResource.class);
 
 	@Autowired
-	public PredictResource(ExecutorService executorService,
-			ExampleProcessorFactory exampleProcessorFactory) {
+	public PredictResource(ExecutorService executorService, ExampleProcessorFactory exampleProcessorFactory) {
 
 		checkNotNull(exampleProcessorFactory, "An example processor factory must be provided!");
 
@@ -49,10 +48,31 @@ public class PredictResource {
 
 	@POST
 	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN })
-	@Produces({ /* PredictionMediaTypes.PLAINTEXT_1_0 */MediaType.TEXT_PLAIN })
-	public void doPredict(ExamplesIterable examplesIterable, @Suspended final AsyncResponse asyncResponse) throws IOException {
+	@Produces({ PredictionMediaTypes.PLAINTEXT_1_0 })
+	@Path("/main")
+	public ChunkedOutput<String> doPredict(ExamplesIterable examplesIterable) throws IOException {
 
-		new RequestHandler(executorService, exampleProcessorFactory).handleRequest(examplesIterable, asyncResponse);
+		return new RequestHandler(executorService, exampleProcessorFactory).handleRequest(examplesIterable);
+	}
+
+	@POST
+	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN })
+	@Produces({ PredictionMediaTypes.PLAINTEXT_1_0 })
+	@Path("/dumpExamples")
+	public String dumpExamples(ExamplesIterable examplesIterable) {
+		if (LOGGER.isTraceEnabled()) for (Example example : examplesIterable)
+			LOGGER.trace(example.getVWStringRepresentation());
+
+		return "Done!";
+	}
+
+	@POST
+	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN })
+	@Produces({ PredictionMediaTypes.PLAINTEXT_1_0 })
+	@Path("/dumpExamplesNew")
+	public String dumpExamplesNew(String content) {
+
+		return content;
 	}
 
 	/**
