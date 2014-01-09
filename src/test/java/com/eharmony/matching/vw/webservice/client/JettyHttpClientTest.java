@@ -22,6 +22,7 @@ import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http.HttpMethod;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,7 @@ public class JettyHttpClientTest {
 	/*
 	 * A small test (with just a few 100 or so examples).
 	 */
-	//@Ignore
+	@Ignore
 	@Test
 	public void smallTest() throws Exception {
 
