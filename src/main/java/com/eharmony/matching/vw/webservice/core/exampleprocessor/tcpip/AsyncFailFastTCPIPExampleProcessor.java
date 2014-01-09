@@ -24,6 +24,7 @@ import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcesso
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFeaturesImpl;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionState;
+import com.google.common.base.Charsets;
 
 /**
  * @author vrahimtoola
@@ -77,7 +78,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 						LOGGER.info("Starting to submit examples to VW...");
 
-						writer = new BufferedWriter(new OutputStreamWriter(outputStream));
+						writer = new BufferedWriter(new OutputStreamWriter(outputStream, Charsets.UTF_8));
 
 						for (Example example : examples) {
 
@@ -86,7 +87,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 							try {
 								toWrite = example.getVWStringRepresentation();
 								writer.write(toWrite);
-								writer.write(NEWLINE);
+								writer.newLine();
 								exampleProcessingManager.incrementNumberOfExamplesSubmitted();
 
 								LOGGER.trace("Submitted example: {}", toWrite);

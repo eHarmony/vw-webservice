@@ -84,6 +84,8 @@ public class PlainTextExamplesMessageBodyReader implements MessageBodyReader<Exa
 
 		Charset charset = ReaderWriter.getCharset(mediaType);
 
+		LOGGER.debug("Reading examples using charset: {}", charset.displayName());
+
 		StringExampleIterator theIterator = new StringExampleIterator(entityStream, charset);
 
 		// TODO: provide the proper number of examples here

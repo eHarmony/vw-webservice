@@ -91,9 +91,9 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 
 			LOGGER.trace("Read prediction: {}", nextLineToReturn);
 
-			exampleProcessingManager.incrementNumberOfPredictionsFetched();
-
 			closeReader = nextLineToReturn == null;
+
+			if (nextLineToReturn != null) exampleProcessingManager.incrementNumberOfPredictionsFetched();
 
 		}
 		catch (Exception e) {

@@ -40,12 +40,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author vrahimtoola A basic client that connects to a running instance of the
- *         VW webservice.
+ * @author vrahimtoola
+ * 
+ *         Tests the web service using Apache's async HTTP client.
  */
-public class BasicAsyncHttpClientTest {
+public class ApacheAsyncHttpClientTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BasicAsyncHttpClientTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApacheAsyncHttpClientTest.class);
 
 	@Ignore
 	@Test

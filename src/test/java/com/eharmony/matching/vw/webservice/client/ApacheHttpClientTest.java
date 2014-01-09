@@ -21,15 +21,19 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BasicHttpClientTest {
+/*
+ * Tests the web service using Apache's HTTP client.
+ */
+public class ApacheHttpClientTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(BasicHttpClientTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ApacheHttpClientTest.class);
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void simpleTest() throws SecurityException, IOException, InterruptedException {
 
