@@ -5,6 +5,7 @@ package com.eharmony.matching.vw.webservice.client;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -52,11 +53,11 @@ public class JettyHttpClientTest {
 	@Test
 	public void smallTest() throws Exception {
 
-		//final String vwWebService = "http://lp-prod1.dc1.eharmony.com:8080/vw-webservice/predict/main";
-
-		final String vwWebService = "http://localhost:8080/vw-webservice/predict/main";
+		final String host = "localhost";
+		final int port = 8080;
 
 		HttpClient httpClient = new HttpClient();
+		httpClient.setTCPNoDelay(false);
 		httpClient.start(); //must call start, otherwise weird exceptions get thrown!
 
 		//the examples
@@ -89,7 +90,7 @@ public class JettyHttpClientTest {
 
 				String example = null;
 
-				BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(exampleOutputStream, Charsets.UTF_8));
+				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(exampleOutputStream, Charsets.UTF_8);
 
 				long numExamplesWritten = 0;
 
@@ -97,8 +98,16 @@ public class JettyHttpClientTest {
 
 					while ((example = testReader.readLine()) != null) {
 
-						writer.write(example);
-						writer.newLine();
+						outputStreamWriter.write(example);
+						outputStreamWriter.write("\n");
+						//						writer.write(example);
+						//						writer.newLine();
+						//
+						//						writer.flush();
+
+						outputStreamWriter.flush();
+
+						writeExampleOut(example);
 
 						numExamplesWritten++;
 
@@ -111,23 +120,24 @@ public class JettyHttpClientTest {
 					onSubmissionFailed();
 				}
 				finally {
-					try {
-						writer.flush();
-					}
-					catch (IOException e) {
-						LOGGER.error("Error in submitting examples (flushing writer): {}", e.getMessage(), e);
-						onSubmissionFailed();
-					}
+					//					try {
+					//						writer.flush();
+					//					}
+					//					catch (IOException e) {
+					//						LOGGER.error("Error in submitting examples (flushing writer): {}", e.getMessage(), e);
+					//						onSubmissionFailed();
+					//					}
+					//
+					//					try {
+					//						writer.close();
+					//					}
+					//					catch (IOException e) {
+					//						LOGGER.error("Error in submitting examples (closing writer): {}", e.getMessage(), e);
+					//						onSubmissionFailed();
+					//					}
 
 					try {
-						writer.close();
-					}
-					catch (IOException e) {
-						LOGGER.error("Error in submitting examples (closing writer): {}", e.getMessage(), e);
-						onSubmissionFailed();
-					}
-
-					try {
+						exampleOutputStream.flush();
 						exampleOutputStream.close();
 					}
 					catch (IOException e) {
@@ -142,7 +152,7 @@ public class JettyHttpClientTest {
 
 		InputStreamResponseListener listener = new InputStreamResponseListener();
 
-		httpClient.newRequest("localhost", 8080).path("/vw-webservice/predict/main").method(HttpMethod.POST).header(HttpHeader.CONTENT_TYPE, "text/plain").content(outputStreamContentProvider).send(listener);
+		httpClient.newRequest(host, port).path("/vw-webservice/predict/main").method(HttpMethod.POST).header(HttpHeader.CONTENT_TYPE, "text/plain").content(outputStreamContentProvider).send(listener);
 
 		okToStartWriting.countDown();
 		okToStartReading.await();
@@ -181,4 +191,18 @@ public class JettyHttpClientTest {
 	private void onSubmissionFailed() {
 		submissionFailed = true;
 	}
+
+	private void writeExampleOut(String example) throws IOException {
+		BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/vrahimtoola/Desktop/vw-webservice-examples-test.txt", true), Charsets.UTF_8));
+
+		bufferedWriter.write(example);
+		bufferedWriter.newLine();
+
+		//		bufferedWriter.write("DELIMITER");
+		//		bufferedWriter.newLine();
+
+		bufferedWriter.flush();
+		bufferedWriter.close();
+	}
+
 }

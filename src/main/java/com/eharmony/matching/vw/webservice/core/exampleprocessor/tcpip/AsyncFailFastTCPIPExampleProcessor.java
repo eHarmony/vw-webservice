@@ -4,6 +4,7 @@
 package com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip;
 
 import java.io.BufferedWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -72,6 +73,8 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 					BufferedWriter writer = null;
 
+					long numExamplesSent = 0;
+
 					try {
 
 						outputStream = socket.getOutputStream();
@@ -88,9 +91,16 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								toWrite = example.getVWStringRepresentation();
 								writer.write(toWrite);
 								writer.newLine();
+
+								numExamplesSent++;
+
+								if (numExamplesSent == 1) LOGGER.debug("First example: {}", example);
+
+								writeExampleOut(toWrite);
+
 								exampleProcessingManager.incrementNumberOfExamplesSubmitted();
 
-								LOGGER.trace("Submitted example: {}", toWrite);
+								LOGGER.trace("Submitted example #{}: {}", numExamplesSent, toWrite);
 							}
 							catch (ExampleFormatException e) {
 
@@ -107,6 +117,8 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 						}
 
 						if (!stoppedPrematurely) LOGGER.info("All examples submitted to VW!");
+
+						LOGGER.info("Sent a total of {} examples to VW", numExamplesSent);
 
 					}
 					catch (ExampleReadException e) {
@@ -192,6 +204,19 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 	public ExampleProcessorFeatures getExampleSubmitterFeatures() {
 
 		return new ExampleProcessorFeaturesImpl(true, null);
+	}
+
+	private void writeExampleOut(String example) throws IOException {
+		BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/vrahimtoola/Desktop/vw-webservice-examples.txt", true), Charsets.UTF_8));
+
+		bufferedWriter.write(example);
+		bufferedWriter.newLine();
+
+		//		bufferedWriter.write("DELIMITER");
+		//		bufferedWriter.newLine();
+
+		bufferedWriter.flush();
+		bufferedWriter.close();
 	}
 
 }

@@ -48,6 +48,7 @@ public class StringExampleIterator implements Iterator<Example> {
 
 		checkNotNull(inputStream, "A null input stream was provided!");
 		reader = new BufferedReader(new InputStreamReader(inputStream, charset));
+
 		advance();
 	}
 
@@ -88,8 +89,11 @@ public class StringExampleIterator implements Iterator<Example> {
 
 		nextExampleToReturn = reader.readLine();
 
-		if (nextExampleToReturn != null)
+		if (nextExampleToReturn != null) {
 			numTotalExamples++;
+
+			if (numTotalExamples == 1) LOGGER.debug("First example read: {}", nextExampleToReturn);
+		}
 		else {
 			LOGGER.debug("Read a total of {} examples", numTotalExamples);
 		}

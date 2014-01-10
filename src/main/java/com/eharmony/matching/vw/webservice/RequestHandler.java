@@ -45,7 +45,7 @@ class RequestHandler implements ExampleProcessingEventHandler {
 
 	public ChunkedOutput<String> handleRequest(ExamplesIterable examplesIterable) {
 
-		ChunkedOutput<String> chunkedOutput = new ChunkedOutput<String>(String.class);
+		ChunkedOutput<String> chunkedOutput = new ChunkedOutput<String>(String.class, "\n");
 
 		// get the example submitter
 		ExampleProcessor exampleProcessor = exampleProcessorFactory.getExampleProcessor(examplesIterable);

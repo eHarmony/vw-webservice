@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -56,7 +57,7 @@ public class ApacheAsyncHttpClientTest {
 		LogManager.getLogManager().readConfiguration(this.getClass().getClassLoader().getResourceAsStream("logging.properties"));
 
 		//change these accordingly
-		final String host = "lp-prod1.dc1.eharmony.com";
+		final String host = "localhost";
 		final String hostAndPort = "http://" + host + ":8080/vw-webservice/predict/main";
 
 		HttpHost httpHost = new HttpHost(host, 8080);
@@ -202,7 +203,7 @@ public class ApacheAsyncHttpClientTest {
 
 				numExamples++;
 
-				if (numExamples == 1500) break;
+				if (numExamples == 150000) break;
 			}
 
 			contentEncoder.complete();
@@ -248,27 +249,35 @@ public class ApacheAsyncHttpClientTest {
 		}
 
 		@Override
-		protected void onContentReceived(ContentDecoder arg0, IOControl arg1) throws IOException {
+		protected void onContentReceived(ContentDecoder contentDecoder, IOControl arg1) throws IOException {
+
+			LOGGER.debug("OnContentReceived fired with a content decoder of {}", contentDecoder.getClass());
+
 			//LOGGER.debug("Content received!");
 
 			ByteBuffer byteBuffer = ByteBuffer.allocate(2048);
 
-			int numRead = arg0.read(byteBuffer);
+			int numRead = contentDecoder.read(byteBuffer);
 
-			//LOGGER.debug("Read a total of {} bytes", numRead);
+			LOGGER.debug("Read a total of {} bytes", numRead);
 
 			if (numRead > 0) {
-				byte[] bytearr = new byte[byteBuffer.remaining()];
-				byteBuffer.get(bytearr);
-				String s = new String(bytearr);
 
-				//LOGGER.debug("Read prediction: {}", s);
+				CharBuffer charBuffer = byteBuffer.asCharBuffer();
+
+				StringBuilder sbr = new StringBuilder();
+
+				for (int x = 0; x < charBuffer.length(); x++)
+					sbr.append(charBuffer.get(x));
+
+				LOGGER.debug("Read: {}", sbr.toString());
+
 			}
 
 			//LOGGER.debug("Is completed state: {}", arg0.isCompleted());
 
-			if (arg0.isCompleted()) {
-				LOGGER.debug("All content received!!");
+			if (contentDecoder.isCompleted()) {
+				LOGGER.debug("All content received! contentDecoder's isComplete returned true");
 				countDownLatch.countDown();
 			}
 		}
