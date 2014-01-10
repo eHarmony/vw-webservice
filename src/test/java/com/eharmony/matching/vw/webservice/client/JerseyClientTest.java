@@ -30,7 +30,10 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 
 /**
- * @author vrahimtoola This is the only client that actually works!
+ * @author vrahimtoola
+ * 
+ *         This is the only client that actually works! Need to use the Grizzly
+ *         Connector Provider tho otherwise it won't work.
  */
 public class JerseyClientTest {
 
