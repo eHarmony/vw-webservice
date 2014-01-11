@@ -4,8 +4,6 @@
 package com.eharmony.matching.vw.webservice.client;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -107,7 +105,7 @@ public class JettyHttpClientTest {
 
 						outputStreamWriter.flush();
 
-						writeExampleOut(example);
+						//writeExampleOut(example);
 
 						numExamplesWritten++;
 
@@ -190,19 +188,6 @@ public class JettyHttpClientTest {
 
 	private void onSubmissionFailed() {
 		submissionFailed = true;
-	}
-
-	private void writeExampleOut(String example) throws IOException {
-		BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/vrahimtoola/Desktop/vw-webservice-examples-test.txt", true), Charsets.UTF_8));
-
-		bufferedWriter.write(example);
-		bufferedWriter.newLine();
-
-		//		bufferedWriter.write("DELIMITER");
-		//		bufferedWriter.newLine();
-
-		bufferedWriter.flush();
-		bufferedWriter.close();
 	}
 
 }

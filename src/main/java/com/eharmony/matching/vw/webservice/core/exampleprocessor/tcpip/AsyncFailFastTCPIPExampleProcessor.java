@@ -4,7 +4,6 @@
 package com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip;
 
 import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -95,8 +94,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 								numExamplesSent++;
 
 								if (numExamplesSent == 1) LOGGER.debug("First example: {}", example);
-
-								writeExampleOut(toWrite);
 
 								exampleProcessingManager.incrementNumberOfExamplesSubmitted();
 
@@ -204,19 +201,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 	public ExampleProcessorFeatures getExampleSubmitterFeatures() {
 
 		return new ExampleProcessorFeaturesImpl(true, null);
-	}
-
-	private void writeExampleOut(String example) throws IOException {
-		BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("/Users/vrahimtoola/Desktop/vw-webservice-examples.txt", true), Charsets.UTF_8));
-
-		bufferedWriter.write(example);
-		bufferedWriter.newLine();
-
-		//		bufferedWriter.write("DELIMITER");
-		//		bufferedWriter.newLine();
-
-		bufferedWriter.flush();
-		bufferedWriter.close();
 	}
 
 }
