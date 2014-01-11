@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -92,7 +93,7 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements ExampleProcessing
 	 * Just a simple test to verify that examples can be submitted and read as
 	 * expected.
 	 */
-	@Test(timeout = 5000)
+	@Test(timeout = 10000)
 	public void simpleTest() throws IOException, ExampleSubmissionException, InterruptedException {
 
 		Iterable<Example> examples = getExamples("One", "Two", "Three");
@@ -141,7 +142,9 @@ public class AsyncFailFastTCPIPExampleProcessorTest implements ExampleProcessing
 
 		Assert.assertEquals(3, x);
 
-		countDownLatch.await(); //wait till the example thread is done as well.
+		boolean succeeded = countDownLatch.await(9, TimeUnit.SECONDS); //wait till the example thread is done as well.
+
+		Assert.assertTrue("Waited for longer than 9 seconds!!", succeeded);
 
 		//check that all examples got there
 		BufferedReader bReader = new BufferedReader(new StringReader(new String(outputStream.toByteArray())));
