@@ -26,6 +26,9 @@
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <fork>true</fork>
+				    <meminitial>1024m</meminitial>
+				    <maxmem>2048m</maxmem>
                 </configuration>
             </plugin>
 
@@ -230,6 +233,20 @@
             <scope>test</scope>
         </dependency>
 
+   		<dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-apache-connector</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.glassfish.jersey.connectors</groupId>
+            <artifactId>jersey-jetty-connector</artifactId>
+            <version>${jersey.version}</version>
+            <scope>test</scope>
+        </dependency>
+        
 		<!-- base64 coding/decoding used in the protobuf string wrapper example tests -->
    		<dependency>
    			<groupId>commons-codec</groupId>
