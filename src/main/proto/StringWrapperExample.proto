@@ -1,0 +1,8 @@
+syntax = "proto2";
+package com.eharmony.matching.vw.webservice.core.example;
+
+option java_outer_classname="ProtoBufStringWrapperVWExample";
+
+message StringWrapperExample {
+	required string exampleString = 1; //the VW example string.
+}

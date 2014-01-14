@@ -9,8 +9,14 @@
     <version>1.0-SNAPSHOT</version>
     <name>vw-webservice</name>
 
+    <properties>
+        <jersey.version>2.5.1</jersey.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <build>
         <finalName>vw-webservice</finalName>
+        
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -45,6 +51,21 @@
                 </configuration>
             </plugin>
             
+             <plugin>
+                <groupId>com.google.protobuf.tools</groupId>
+                <artifactId>maven-protoc-plugin</artifactId>
+                <!-- 0.1.10 on Maven 2.X 0.3.1 on Maven 3.X -->
+                <version>0.1.10</version>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 
@@ -89,9 +110,16 @@
 			<scope>test</scope>
 		</dependency>
         
-        <!-- used to write the test client. remove this if/when the client code is moved to a separate project. -->
-        
       <!-- end dependencies for testing -->
+        
+        <!-- protocol buffers dependencies -->
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>2.4.1</version>
+        </dependency>
+        
+        
         
  		<dependency>
  			<groupId>org.apache.commons</groupId>
@@ -183,10 +211,10 @@
 			<groupId>org.eclipse.jetty</groupId>
 			<artifactId>jetty-client</artifactId>
 			<version>9.1.0.v20131115</version>
-<!-- 			<version>8.1.0.v20120127</version> -->
 			<scope>test</scope>
 		</dependency>
             
+        <!-- jersey apache client, used for testing -->
 		<dependency>
 			<groupId>com.sun.jersey.contribs</groupId>
 			<artifactId>jersey-apache-client</artifactId>
@@ -194,6 +222,7 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- grizzly connector used for testing the jersey client -->
    		<dependency>
             <groupId>org.glassfish.jersey.connectors</groupId>
             <artifactId>jersey-grizzly-connector</artifactId>
@@ -201,22 +230,15 @@
             <scope>test</scope>
         </dependency>
 
-<!-- 		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-grizzly2</artifactId>
-			<version>1.18</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<dependency>
-		  <groupId>com.sun.jersey</groupId>
-		  <artifactId>jersey-server</artifactId>
-		  <version>1.16</version>
-		</dependency> -->
-		
+		<!-- base64 coding/decoding used in the protobuf string wrapper example tests -->
+   		<dependency>
+   			<groupId>commons-codec</groupId>
+   			<artifactId>commons-codec</artifactId>
+   			<version>1.9</version>
+   			<scope>test</scope>
+   		</dependency>
+   		
+   		
     </dependencies>
-    <properties>
-        <jersey.version>2.5.1</jersey.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+
 </project>
