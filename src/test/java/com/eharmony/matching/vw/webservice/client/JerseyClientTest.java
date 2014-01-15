@@ -9,10 +9,15 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
@@ -30,6 +35,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import junit.framework.Assert;
+
 import org.glassfish.jersey.client.ChunkedInput;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
@@ -41,6 +48,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
+import com.eharmony.matching.vw.webservice.core.example.ProtoBufStringWrapperVWExample;
 import com.google.common.base.Charsets;
 
 /**
@@ -82,9 +91,78 @@ public class JerseyClientTest {
 		LOGGER.debug("starting to read responses...");
 
 		while ((chunk = chunkedInput.read()) != null) {
-			System.out.println("Next chunk received: " + chunk);
+			LOGGER.debug("Next chunk received: " + chunk);
 		}
 
+	}
+
+	@Ignore
+	@Test
+	public void simpleStringWrappingProtoBufExamplesTest() throws IOException, InterruptedException, ExecutionException {
+		//the examples
+		GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
+		final BufferedReader testReader = new BufferedReader(new InputStreamReader(gzipInputStream, Charsets.UTF_8));
+
+		ClientConfig clientConfig = new ClientConfig();
+		clientConfig.connectorProvider(new GrizzlyConnectorProvider()); //must use this, HttpUrlConnector doesn't seem to handle chunked encoding too well.
+
+		Client client = ClientBuilder.newClient(clientConfig);
+
+		final PipedOutputStream pipedOutputStream = new PipedOutputStream();
+		PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
+
+		final CountDownLatch startWritingExamplesLatch = new CountDownLatch(1);
+
+		Future<Void> successFuture = Executors.newCachedThreadPool().submit(new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception {
+
+				startWritingExamplesLatch.await();
+
+				String readExample = null;
+
+				while ((readExample = testReader.readLine()) != null) {
+					ProtoBufStringWrapperVWExample.StringWrapperExample writtenExample = ProtoBufStringWrapperVWExample.StringWrapperExample.newBuilder().setExampleString(readExample).build();
+
+					writtenExample.writeDelimitedTo(pipedOutputStream);
+
+					pipedOutputStream.flush(); //need to flush right after writing, otherwise the reading thread won't get it 
+
+				}
+
+				pipedOutputStream.flush();
+				pipedOutputStream.close();
+
+				return null;
+			}
+
+		});
+
+		WebTarget target = client.target("http://localhost:8080").path("/vw-webservice/predict/main");
+
+		Future<Response> future = target.request("*/*").async().post(Entity.entity(pipedInputStream, MediaType.valueOf(ExampleMediaTypes.SIMPLE_PROTOBUF_1_0)));
+
+		startWritingExamplesLatch.countDown();
+
+		Response response = future.get();
+
+		final ChunkedInput<String> chunkedInput = response.readEntity(new GenericType<ChunkedInput<String>>() {
+		});
+		chunkedInput.setParser(ChunkedInput.createParser("\n"));
+		String chunk;
+		LOGGER.debug("starting to read responses...");
+
+		long numExamplesProcessed = 0;
+
+		while ((chunk = chunkedInput.read()) != null) {
+			LOGGER.debug("Next chunk received: " + chunk);
+			numExamplesProcessed++;
+		}
+
+		Assert.assertEquals(272274, numExamplesProcessed);
+
+		successFuture.get(); //verify that no exception was thrown
 	}
 
 	/*
