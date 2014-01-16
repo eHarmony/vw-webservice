@@ -51,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
 import com.eharmony.matching.vw.webservice.core.example.ProtoBufStringWrapperVWExample;
 import com.google.common.base.Charsets;
+import com.google.gson.stream.JsonWriter;
 
 /**
  * @author vrahimtoola
@@ -94,6 +95,7 @@ public class JerseyClientTest {
 			LOGGER.debug("Next chunk received: " + chunk);
 		}
 
+		client.close();
 	}
 
 	@Ignore
@@ -163,6 +165,87 @@ public class JerseyClientTest {
 		Assert.assertEquals(272274, numExamplesProcessed);
 
 		successFuture.get(); //verify that no exception was thrown
+
+		client.close();
+	}
+
+	@Test
+	public void jsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
+		//the examples
+		GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
+		final BufferedReader testReader = new BufferedReader(new InputStreamReader(gzipInputStream, Charsets.UTF_8));
+
+		ClientConfig clientConfig = new ClientConfig();
+		clientConfig.connectorProvider(new GrizzlyConnectorProvider()); //must use this, HttpUrlConnector doesn't seem to handle chunked encoding too well.
+
+		Client client = ClientBuilder.newClient(clientConfig);
+
+		final PipedOutputStream pipedOutputStream = new PipedOutputStream();
+		PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
+
+		final CountDownLatch startWritingExamplesLatch = new CountDownLatch(1);
+
+		final JsonWriter jsonWriter = new JsonWriter(new OutputStreamWriter(pipedOutputStream));
+
+		Future<Void> successFuture = Executors.newCachedThreadPool().submit(new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception {
+
+				startWritingExamplesLatch.await();
+
+				String readExample = null;
+
+				jsonWriter.beginArray();
+
+				while ((readExample = testReader.readLine()) != null) {
+					jsonWriter.beginObject();
+					jsonWriter.name("example");
+					jsonWriter.value(readExample);
+					jsonWriter.endObject();
+
+					jsonWriter.flush();
+					pipedOutputStream.flush(); //need to flush right after writing, otherwise the reading thread won't get it 
+
+				}
+
+				jsonWriter.endArray();
+				jsonWriter.flush();
+				jsonWriter.close();
+				pipedOutputStream.flush();
+				pipedOutputStream.close();
+
+				return null;
+			}
+
+		});
+
+		WebTarget target = client.target("http://localhost:8080").path("/vw-webservice/predict/main");
+
+		Future<Response> future = target.request("*/*").async().post(Entity.entity(pipedInputStream, MediaType.valueOf(ExampleMediaTypes.SIMPLE_JSON_1_0)));
+
+		startWritingExamplesLatch.countDown();
+
+		Response response = future.get();
+
+		final ChunkedInput<String> chunkedInput = response.readEntity(new GenericType<ChunkedInput<String>>() {
+		});
+		chunkedInput.setParser(ChunkedInput.createParser("\n"));
+		String chunk;
+		LOGGER.debug("starting to read responses...");
+
+		long numExamplesProcessed = 0;
+
+		while ((chunk = chunkedInput.read()) != null) {
+			LOGGER.debug("Next chunk received: " + chunk);
+			numExamplesProcessed++;
+		}
+
+		Assert.assertEquals(272274, numExamplesProcessed);
+
+		successFuture.get(); //verify that no exception was thrown
+
+		client.close();
 	}
 
 	/*
@@ -221,6 +304,8 @@ public class JerseyClientTest {
 			//System.out.println("Next chunk received: " + chunk);
 		}
 
+		client.close();
+
 	}
 
 	class ExampleClass {
@@ -246,6 +331,8 @@ public class JerseyClientTest {
 		public void writeTo(ExampleClass t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType, MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws IOException, WebApplicationException {
 
 			LOGGER.debug("Writing to a stream of type: {}", entityStream.getClass());
+
+			//(org.glassfish.jersey.message.internal.)
 
 			try {
 

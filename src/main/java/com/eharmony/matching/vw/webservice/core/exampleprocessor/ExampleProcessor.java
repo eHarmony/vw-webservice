@@ -33,6 +33,6 @@ public interface ExampleProcessor {
 	 * @returns The example processor features provided by the example
 	 * processor.
 	 */
-	ExampleProcessorFeatures getExampleSubmitterFeatures();
+	ExampleProcessorFeatures getExampleProcessorFeatures();
 
 }

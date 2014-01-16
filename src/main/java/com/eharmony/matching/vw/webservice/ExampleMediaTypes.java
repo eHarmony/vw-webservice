@@ -12,6 +12,6 @@ package com.eharmony.matching.vw.webservice;
 public class ExampleMediaTypes {
 
 	public static final String PLAINTEXT_1_0 = "application/vowpal-wabbit-example-v1.0+plaintext";
-	public static final String SIMPLE_PROTOBUF_1_0 = "application/vowpal-wabbit-example-v1.0+protobuf";
-	public static final String JSON_1_0 = "application/vowpal-wabbit-example-v1.0+json";
+	public static final String SIMPLE_PROTOBUF_1_0 = "application/vowpal-wabbit-example-v1.0+simpleprotobuf";
+	public static final String SIMPLE_JSON_1_0 = "application/vowpal-wabbit-example-v1.0+simplejson";
 }

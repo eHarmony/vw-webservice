@@ -47,10 +47,10 @@ class RequestHandler implements ExampleProcessingEventHandler {
 
 		ChunkedOutput<String> chunkedOutput = new ChunkedOutput<String>(String.class, "\n");
 
-		// get the example submitter
+		// get the example processor.
 		ExampleProcessor exampleProcessor = exampleProcessorFactory.getExampleProcessor(examplesIterable);
 
-		if (exampleProcessor.getExampleSubmitterFeatures().isAsync() == false)
+		if (exampleProcessor.getExampleProcessorFeatures().isAsync() == false)
 			submitSynchronously(exampleProcessor, chunkedOutput);
 		else {
 			submitAsynchronously(exampleProcessor, chunkedOutput);

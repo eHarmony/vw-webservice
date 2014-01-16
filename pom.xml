@@ -194,6 +194,13 @@
 		    <version>15.0</version>
 		</dependency>
 
+		<!-- google gson for reading json examples, used in the jsonexamplesmessagebodyreader package -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.2.4</version>
+		</dependency>
+ 
 		<!--  apache commons collections -->
  		<dependency>
  			<groupId>commons-collections</groupId>
@@ -225,6 +232,14 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- jboss resteasy client, used for testing -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>3.0.6.Final</version>
+			<scope>test</scope>
+		</dependency>
+
 		<!-- grizzly connector used for testing the jersey client -->
    		<dependency>
             <groupId>org.glassfish.jersey.connectors</groupId>
@@ -233,6 +248,7 @@
             <scope>test</scope>
         </dependency>
 
+		<!-- apache connector used for testing the jersey client -->
    		<dependency>
             <groupId>org.glassfish.jersey.connectors</groupId>
             <artifactId>jersey-apache-connector</artifactId>
@@ -240,6 +256,7 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- jetty connector used for testing the jersey client -->
         <dependency>
             <groupId>org.glassfish.jersey.connectors</groupId>
             <artifactId>jersey-jetty-connector</artifactId>

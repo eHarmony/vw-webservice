@@ -198,7 +198,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 	}
 
 	@Override
-	public ExampleProcessorFeatures getExampleSubmitterFeatures() {
+	public ExampleProcessorFeatures getExampleProcessorFeatures() {
 
 		return new ExampleProcessorFeaturesImpl(true, null);
 	}

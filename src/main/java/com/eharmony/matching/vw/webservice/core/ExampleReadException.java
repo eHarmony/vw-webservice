@@ -9,8 +9,10 @@ package com.eharmony.matching.vw.webservice.core;
  *         Exception thrown when there's a problem reading examples submitted to
  *         the web service.
  * 
- *         Technically this isn't a RuntimeException but makes the exception
- *         handling code cleaner.
+ *         Need to make this a RuntimeException since an ExampleReadException
+ *         can be thrown from within an iterator, but the iterator interface
+ *         doesn't allow you to declare a throws clause in the 'next' method
+ *         signature in the implementation.
  */
 public class ExampleReadException extends RuntimeException {
 
