@@ -1,1 +1,12 @@
 language:  java
+install: 
+  - wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
+  - tar -xzvf protobuf-2.4.1.tar.gz
+  - cd protobuf-2.4.1
+  - ./configure --prefix=/usr
+  - make
+  - make check
+  - sudo make install
+  - cd ./../
+  - cd ./org.eclipselab.emf.protobuf.releng/
+  - mvn package -DskipTests=true
