@@ -8,7 +8,6 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.CountDownLatch;
-import java.util.logging.LogManager;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -38,10 +37,10 @@ public class ApacheHttpClientTest {
 	public void simpleTest() throws SecurityException, IOException, InterruptedException {
 
 		//java.util.logging used by HttpClient.
-		LogManager.getLogManager().readConfiguration(this.getClass().getClassLoader().getResourceAsStream("logging.properties"));
+		//LogManager.getLogManager().readConfiguration(this.getClass().getClassLoader().getResourceAsStream("logging.properties"));
 
 		//change these accordingly
-		final String host = "lp-prod1.dc1.eharmony.com";
+		final String host = "localhost";
 		final String hostAndPort = "http://" + host + ":8080/vw-webservice/predict/main";
 
 		//the examples
@@ -61,6 +60,7 @@ public class ApacheHttpClientTest {
 
 		final HttpPost postMessage = new HttpPost(hostAndPort);
 		postMessage.setEntity(inputStreamEntity);
+		postMessage.setHeader("Accept", "*/*");
 
 		final CountDownLatch okToCloseHttpClientLatch = new CountDownLatch(1);
 
@@ -142,14 +142,23 @@ public class ApacheHttpClientTest {
 
 		LOGGER.debug("Submitting examples...");
 
+		long maxExamplesToWrite = 50000;
+		long examplesWritten = 0;
+
 		while ((exampleString = testReader.readLine()) != null) {
 			exampleWriter.write(exampleString);
 			exampleWriter.write("\n");
+
+			examplesWritten++;
+
+			if (examplesWritten == maxExamplesToWrite) break;
 		}
 
 		exampleWriter.flush();
 
 		exampleWriter.close();
+
+		postMessage.completed();
 
 		LOGGER.debug("All examples written!");
 

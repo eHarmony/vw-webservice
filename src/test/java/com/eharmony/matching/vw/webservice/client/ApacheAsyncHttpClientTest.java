@@ -32,6 +32,7 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.nio.ContentDecoder;
 import org.apache.http.nio.ContentEncoder;
 import org.apache.http.nio.IOControl;
+import org.apache.http.nio.client.methods.AsyncCharConsumer;
 import org.apache.http.nio.protocol.AbstractAsyncResponseConsumer;
 import org.apache.http.nio.protocol.HttpAsyncRequestProducer;
 import org.apache.http.protocol.HttpContext;
@@ -64,7 +65,7 @@ public class ApacheAsyncHttpClientTest {
 
 		//the examples
 		final GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
-		InputStreamEntity inputStreamEntity = new InputStreamEntity(gzipInputStream, ContentType.TEXT_PLAIN);
+		InputStreamEntity inputStreamEntity = new InputStreamEntity(gzipInputStream, -1, ContentType.TEXT_PLAIN);
 		inputStreamEntity.setChunked(true); //chunked transfer encoding.
 
 		RequestConfig requestConfig = RequestConfig.custom().setSocketTimeout(300000).setConnectTimeout(3000).build();
@@ -76,7 +77,46 @@ public class ApacheAsyncHttpClientTest {
 		try {
 			httpclient.start();
 
-			httpclient.execute(new MyHttpAsyncRequestProducer(httpHost, inputStreamEntity, countDownLatch), new MyHttpAsyncResponseConsumer(countDownLatch), new org.apache.http.concurrent.FutureCallback<HttpResponse>() {
+			httpclient.execute(new MyHttpAsyncRequestProducer(httpHost, inputStreamEntity, countDownLatch),
+
+			new AsyncCharConsumer<HttpResponse>() {
+
+				private HttpResponse httpResponse;
+
+				@Override
+				protected void onCharReceived(CharBuffer buf, IOControl ioctrl) throws IOException {
+
+					LOGGER.debug("OnCharReceived fired, pos={}, lim={}, cap={}", buf.position(), buf.limit(), buf.capacity());
+
+					StringBuilder sbr = new StringBuilder();
+
+					while (buf.hasRemaining()) {
+						sbr.append(buf.get());
+					}
+
+					LOGGER.debug("Read prediction: {}", sbr.toString());
+
+				}
+
+				@Override
+				protected void onResponseReceived(HttpResponse response) throws HttpException, IOException {
+
+					LOGGER.debug("Received a response!");
+
+					this.httpResponse = response;
+
+				}
+
+				@Override
+				protected HttpResponse buildResult(HttpContext context) throws Exception {
+
+					LOGGER.debug("build result invoked!");
+
+					return this.httpResponse;
+				}
+			},
+
+			new org.apache.http.concurrent.FutureCallback<HttpResponse>() {
 
 				@Override
 				public void cancelled() {
@@ -127,11 +167,14 @@ public class ApacheAsyncHttpClientTest {
 
 		private final long numTimesCalled = 0;
 
-		public MyHttpAsyncRequestProducer(HttpHost httpHost, InputStreamEntity inputStreamEntity, CountDownLatch countDownLatch) {
+		private final BufferedReader reader;
+
+		public MyHttpAsyncRequestProducer(HttpHost httpHost, InputStreamEntity inputStreamEntity, CountDownLatch countDownLatch) throws IOException {
 
 			this.httpHost = httpHost;
 			this.inputStreamEntity = inputStreamEntity;
 			this.countDownLatch = countDownLatch;
+			this.reader = new BufferedReader(new InputStreamReader(inputStreamEntity.getContent()));
 		}
 
 		@Override
@@ -185,53 +228,21 @@ public class ApacheAsyncHttpClientTest {
 		}
 
 		@Override
-		public void produceContent(ContentEncoder contentEncoder, IOControl arg1) throws IOException {
-
-			//			LOGGER.debug("Writing content of request with a content encoder of type {}...", contentEncoder.getClass());
-			//
-			//			LOGGER.debug("produce content called!");
-			//
-			//			contentEncoder.write(ByteBuffer.wrap("1 |tag ahd abdb".getBytes()));
-			//			contentEncoder.write(ByteBuffer.wrap("\n".getBytes()));
-			//
-			//			contentEncoder.write(ByteBuffer.wrap("1 |tag ahd abdb".getBytes()));
-			//			contentEncoder.write(ByteBuffer.wrap("\n".getBytes()));
-			//
-			//			contentEncoder.complete();
+		public void produceContent(final ContentEncoder contentEncoder, IOControl arg1) throws IOException {
 
 			LOGGER.debug("Writing content of request with a content encoder of type {}...", contentEncoder.getClass());
 
-			final GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
+			String toWrite = reader.readLine();
 
-			BufferedReader reader = new BufferedReader(new InputStreamReader(gzipInputStream));
+			if (toWrite != null) {
 
-			String line = null;
-
-			//String newLine = "\r\n";
-
-			long numExamples = 0;
-
-			long numTotalBytes = 0;
-
-			while ((line = reader.readLine()) != null) {
-
-				//line = line.concat(newLine);
-
-				contentEncoder.write(ByteBuffer.wrap(line.getBytes()));
-
+				contentEncoder.write(ByteBuffer.wrap(toWrite.getBytes()));
 				contentEncoder.write(ByteBuffer.wrap("\n".getBytes()));
 
-				numExamples++;
-
-				numTotalBytes += (line.getBytes().length + "\n".getBytes().length);
-
-				if (numExamples == 1500) break;
 			}
-
-			contentEncoder.complete();
-
-			LOGGER.debug("Wrote a total of {} examples and {} bytes", numExamples, numTotalBytes);
-
+			else {
+				contentEncoder.complete();
+			}
 		}
 
 		@Override
@@ -279,26 +290,22 @@ public class ApacheAsyncHttpClientTest {
 
 			ByteBuffer byteBuffer = ByteBuffer.allocate(2048);
 
-			StringBuilder sbr = new StringBuilder();
+			int numRead = contentDecoder.read(byteBuffer);
 
-			int numRead;
+			if (numRead > 0) {
 
-			while ((numRead = contentDecoder.read(byteBuffer)) > 0) {
-
-				//LOGGER.debug("Read a total of {} bytes", numRead);
+				byteBuffer.flip();
 
 				CharBuffer charBuffer = byteBuffer.asCharBuffer();
 
-				for (int x = 0; x < charBuffer.length(); x++)
-					sbr.append(charBuffer.get(x));
+				StringBuilder builder = new StringBuilder();
 
-				byteBuffer = ByteBuffer.allocate(2048);
+				while (charBuffer.hasRemaining()) {
+					builder.append(charBuffer.get());
+				}
 
+				LOGGER.debug("Read: {}", builder.toString());
 			}
-
-			//LOGGER.debug("Read: {}", sbr.toString());
-
-			//LOGGER.debug("Is completed state: {}", arg0.isCompleted());
 
 			if (contentDecoder.isCompleted()) {
 				LOGGER.debug("All content received! contentDecoder's isComplete returned true");

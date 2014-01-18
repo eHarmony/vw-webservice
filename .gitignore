@@ -2,4 +2,11 @@
 .classpath
 .project
 .springBeans
+.gitignore
 target/
+WEB-INF/
+META-INF/
+vw-webservice.np.dc1.eharmony.com
+/vowpal_wabbit
+ner.train
+index.jsp
