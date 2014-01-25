@@ -18,6 +18,8 @@ public class ExampleFormatException extends IllegalArgumentException {
 	 */
 	private static final long serialVersionUID = -6238484930971388916L;
 
+	private long exampleNumber = Long.MIN_VALUE;
+
 	public ExampleFormatException() {
 		super();
 	}
@@ -32,5 +34,33 @@ public class ExampleFormatException extends IllegalArgumentException {
 
 	public ExampleFormatException(String message, Throwable cause) {
 		super(message, cause);
+	}
+
+	public long getExampleNumber() {
+		return exampleNumber;
+	}
+
+	public ExampleFormatException(long exampleNumber) {
+		super();
+		this.exampleNumber = exampleNumber;
+	}
+
+	public ExampleFormatException(long exampleNumber, String message) {
+		super(message);
+		this.exampleNumber = exampleNumber;
+	}
+
+	public ExampleFormatException(long exampleNumber, Throwable cause) {
+		super(cause);
+		this.exampleNumber = exampleNumber;
+	}
+
+	public ExampleFormatException(long exampleNumber, String message, Throwable cause) {
+		super(message, cause);
+		this.exampleNumber = exampleNumber;
+	}
+
+	public void setExampleNumber(long exampleNumber) {
+		this.exampleNumber = exampleNumber;
 	}
 }

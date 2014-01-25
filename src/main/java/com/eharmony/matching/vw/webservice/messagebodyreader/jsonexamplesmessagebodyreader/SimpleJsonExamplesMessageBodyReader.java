@@ -31,9 +31,9 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
  */
 @Consumes({ ExampleMediaTypes.SIMPLE_JSON_1_0 })
 @Provider
-public class JsonExamplesMessageBodyReader implements MessageBodyReader<ExamplesIterable> {
+public class SimpleJsonExamplesMessageBodyReader implements MessageBodyReader<ExamplesIterable> {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JsonExamplesMessageBodyReader.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleJsonExamplesMessageBodyReader.class);
 
 	@Override
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

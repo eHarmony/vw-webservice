@@ -67,6 +67,9 @@
                 <artifactId>maven-protoc-plugin</artifactId>
                 <!-- 0.1.10 on Maven 2.X 0.3.1 on Maven 3.X -->
                 <version>0.1.10</version>
+                <configuration>
+                	<checkStaleness>true</checkStaleness>
+                </configuration>
                 <executions>
                     <execution>
                         <phase>generate-sources</phase>
@@ -207,6 +210,13 @@
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>2.2.4</version>
+		</dependency>
+
+		<!-- jackson for json debug writer -->
+		<dependency>
+		  <groupId>com.fasterxml.jackson.core</groupId>
+		  <artifactId>jackson-core</artifactId>
+		  <version>2.3.1</version>
 		</dependency>
  
 		<!--  apache commons collections -->

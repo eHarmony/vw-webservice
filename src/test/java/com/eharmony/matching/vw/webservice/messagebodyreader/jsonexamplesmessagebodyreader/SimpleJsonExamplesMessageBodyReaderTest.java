@@ -37,17 +37,17 @@ import com.google.gson.stream.JsonWriter;
 /**
  * @author vrahimtoola
  * 
- *         Tests the JsonExamplesMessageBodyReader.
+ *         Tests the SimpleJsonExamplesMessageBodyReader.
  */
-public class JsonExamplesMessageBodyReaderTest {
+public class SimpleJsonExamplesMessageBodyReaderTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JsonExamplesMessageBodyReaderTest.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(SimpleJsonExamplesMessageBodyReaderTest.class);
 
-	private JsonExamplesMessageBodyReader toTest;
+	private SimpleJsonExamplesMessageBodyReader toTest;
 
 	@Before
 	public void setUp() {
-		toTest = new JsonExamplesMessageBodyReader();
+		toTest = new SimpleJsonExamplesMessageBodyReader();
 	}
 
 	/*
