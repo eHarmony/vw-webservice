@@ -37,12 +37,14 @@ import javax.ws.rs.ext.Provider;
 
 import junit.framework.Assert;
 
+import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.client.ChunkedInput;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.RequestEntityProcessing;
 import org.glassfish.jersey.client.spi.Connector;
 import org.glassfish.jersey.grizzly.connector.GrizzlyConnectorProvider;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -50,6 +52,10 @@ import org.slf4j.LoggerFactory;
 
 import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
 import com.eharmony.matching.vw.webservice.core.example.ProtoBufStringWrapperVWExample;
+import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredExample;
+import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredExample.Namespace;
+import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredExample.Namespace.Feature;
+import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredJsonPropertyNames;
 import com.google.common.base.Charsets;
 import com.google.gson.stream.JsonWriter;
 
@@ -63,39 +69,13 @@ public class JerseyClientTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JerseyClientTest.class);
 
-	@Ignore
-	@Test
-	public void test() throws IOException, InterruptedException, ExecutionException {
+	private String server;
+	private int port;
 
-		//the examples
-		GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
-		final BufferedReader testReader = new BufferedReader(new InputStreamReader(gzipInputStream, Charsets.UTF_8));
-
-		ClientConfig clientConfig = new ClientConfig();
-		clientConfig.connectorProvider(new GrizzlyConnectorProvider()); //must use this, HttpUrlConnector doesn't seem to handle chunked encoding too well.
-
-		Client client = ClientBuilder.newClient(clientConfig);
-
-		//		client.property(ClientProperties.CHUNKED_ENCODING_SIZE, 2048);
-		//		client.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
-
-		WebTarget target = client.target("http://localhost:8080").path("/vw-webservice/predict/main");
-
-		Future<Response> future = target.request("*/*").async().post(Entity.text(gzipInputStream));
-
-		Response response = future.get();
-
-		final ChunkedInput<String> chunkedInput = response.readEntity(new GenericType<ChunkedInput<String>>() {
-		});
-		chunkedInput.setParser(ChunkedInput.createParser("\n"));
-		String chunk;
-		LOGGER.debug("starting to read responses...");
-
-		while ((chunk = chunkedInput.read()) != null) {
-			LOGGER.debug("Next chunk received: " + chunk);
-		}
-
-		client.close();
+	@Before
+	public void setUp() {
+		server = "localhost";
+		port = 8080;
 	}
 
 	@Ignore
@@ -141,7 +121,7 @@ public class JerseyClientTest {
 
 		});
 
-		WebTarget target = client.target("http://localhost:8080").path("/vw-webservice/predict/main");
+		WebTarget target = client.target("http://" + server + ":" + port).path("/vw-webservice/predict/main");
 
 		Future<Response> future = target.request("*/*").async().post(Entity.entity(pipedInputStream, MediaType.valueOf(ExampleMediaTypes.SIMPLE_PROTOBUF_1_0)));
 
@@ -171,7 +151,7 @@ public class JerseyClientTest {
 
 	@Ignore
 	@Test
-	public void jsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
+	public void simpleJsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
 		//the examples
 		GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
 		final BufferedReader testReader = new BufferedReader(new InputStreamReader(gzipInputStream, Charsets.UTF_8));
@@ -221,7 +201,7 @@ public class JerseyClientTest {
 
 		});
 
-		WebTarget target = client.target("http://localhost:8080").path("/vw-webservice/predict/main");
+		WebTarget target = client.target("http://" + server + ":" + port).path("/vw-webservice/predict/main");
 
 		Future<Response> future = target.request("*/*").async().post(Entity.entity(pipedInputStream, MediaType.valueOf(ExampleMediaTypes.SIMPLE_JSON_1_0)));
 
@@ -247,6 +227,211 @@ public class JerseyClientTest {
 		successFuture.get(); //verify that no exception was thrown
 
 		client.close();
+	}
+
+	@Ignore
+	@Test
+	public void structuredJsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
+		//the examples
+		GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
+		final BufferedReader testReader = new BufferedReader(new InputStreamReader(gzipInputStream, Charsets.UTF_8));
+
+		ClientConfig clientConfig = new ClientConfig();
+		clientConfig.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+		clientConfig.property(ClientProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, Integer.valueOf(-1));
+		clientConfig.connectorProvider(new GrizzlyConnectorProvider()); //must use this, HttpUrlConnector doesn't seem to handle chunked encoding too well.
+
+		Client client = ClientBuilder.newClient(clientConfig);
+
+		final PipedOutputStream pipedOutputStream = new PipedOutputStream();
+		PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
+
+		final CountDownLatch startWritingExamplesLatch = new CountDownLatch(1);
+
+		Future<Void> successFuture = Executors.newCachedThreadPool().submit(new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception {
+
+				startWritingExamplesLatch.await();
+
+				String readExample;
+
+				JsonWriter jsonWriter = new JsonWriter(new OutputStreamWriter(pipedOutputStream, Charsets.UTF_8));
+
+				jsonWriter.beginArray();
+
+				while ((readExample = testReader.readLine()) != null) {
+
+					StructuredExample exampleToWrite = getStructuredExampleToWrite(readExample);
+
+					if (exampleToWrite == StructuredExample.EMPTY_EXAMPLE) {
+						jsonWriter.beginObject();
+						jsonWriter.endObject();
+					}
+					else
+						writeExample(jsonWriter, exampleToWrite);
+
+					jsonWriter.flush();
+				}
+
+				jsonWriter.endArray();
+
+				return null;
+			}
+
+			private StructuredExample getStructuredExampleToWrite(String readExample) {
+
+				StructuredExample.ExampleBuilder exampleBuilder = new StructuredExample.ExampleBuilder();
+				StructuredExample.Namespace.NamespaceBuilder namespaceBuilder = new StructuredExample.Namespace.NamespaceBuilder();
+
+				if (readExample.trim().length() == 0) {
+					//just a line - empty example
+					return StructuredExample.EMPTY_EXAMPLE;
+				}
+				else {
+					//locate the " | "
+					int indexOfSpacePipeSpace = readExample.indexOf(" | ");
+
+					Assert.assertTrue(indexOfSpacePipeSpace > 0);
+
+					String[] labelAndAllFeatures = readExample.split(" \\| ");
+
+					Assert.assertEquals(2, labelAndAllFeatures.length);
+
+					exampleBuilder.setLabel(labelAndAllFeatures[0]);
+
+					String allFeaturesString = labelAndAllFeatures[1];
+
+					String[] individualFeatures = allFeaturesString.split(" ");
+
+					for (String individualFeature : individualFeatures) {
+						namespaceBuilder.addFeature(individualFeature);
+					}
+
+					exampleBuilder.addNamespace(namespaceBuilder.build());
+
+					return exampleBuilder.build();
+				}
+			}
+
+		});
+
+		WebTarget target = client.target("http://" + server + ":" + port).path("/vw-webservice/predict/main");
+
+		Future<Response> future = target.request("*/*").async().post(Entity.entity(pipedInputStream, MediaType.valueOf(ExampleMediaTypes.STRUCTURED_JSON_1_0)));
+
+		startWritingExamplesLatch.countDown();
+
+		Response response = future.get();
+
+		final ChunkedInput<String> chunkedInput = response.readEntity(new GenericType<ChunkedInput<String>>() {
+		});
+		chunkedInput.setParser(ChunkedInput.createParser("\n"));
+		String chunk;
+		LOGGER.debug("starting to read responses...");
+
+		long numExamplesProcessed = 0;
+
+		while ((chunk = chunkedInput.read()) != null) {
+			LOGGER.debug("Next chunk received: " + chunk);
+			numExamplesProcessed++;
+		}
+
+		Assert.assertEquals(272274, numExamplesProcessed);
+
+		successFuture.get(); //verify that no exception was thrown
+
+		client.close();
+	}
+
+	private void writeExample(JsonWriter jsonWriter, StructuredExample structuredExample) throws IOException {
+
+		jsonWriter.beginObject();
+
+		String label = structuredExample.getLabel();
+
+		//always write the label out, this is how a pipe example is distinguished from an empty example.
+		jsonWriter.name(StructuredJsonPropertyNames.EXAMPLE_LABEL_PROPERTY);
+
+		if (StringUtils.isBlank(label)) {
+			jsonWriter.nullValue();
+		}
+		else {
+			jsonWriter.value(label);
+		}
+
+		//for the tag and namespaces properties, only write them if they're non-null
+		String tag = structuredExample.getTag();
+
+		if (StringUtils.isBlank(tag) == false) jsonWriter.name(StructuredJsonPropertyNames.EXAMPLE_TAG_PROPERTY).value(tag);
+
+		Iterable<Namespace> namespaces = structuredExample.getNamespaces();
+
+		if (namespaces != null) {
+
+			jsonWriter.name(StructuredJsonPropertyNames.EXAMPLE_NAMESPACES_PROPERTY);
+
+			jsonWriter.beginArray();
+
+			for (Namespace ns : namespaces) {
+				writeNamespace(ns, jsonWriter);
+			}
+
+			jsonWriter.endArray();
+
+		}
+
+		jsonWriter.endObject(); //for the empty example, just write the "{}". 
+
+	}
+
+	private void writeNamespace(Namespace namespace, JsonWriter jsonWriter) throws IOException {
+		jsonWriter.beginObject();
+
+		String name = namespace.getName();
+		Float scale = namespace.getScalingFactor();
+
+		if (StringUtils.isBlank(name) == false) {
+			jsonWriter.name(StructuredJsonPropertyNames.NAMESPACE_NAME_PROPERTY).value(name);
+		}
+
+		if (scale != null) {
+			jsonWriter.name(StructuredJsonPropertyNames.NAMESPACE_SCALING_FACTOR_PROPERTY).value(scale);
+		}
+
+		Iterable<Feature> features = namespace.getFeatures();
+
+		if (features != null) {
+			jsonWriter.name(StructuredJsonPropertyNames.NAMESPACE_FEATURES_PROPERTY);
+
+			jsonWriter.beginArray();
+
+			for (Feature feature : features) {
+				writeFeature(feature, jsonWriter);
+			}
+
+			jsonWriter.endArray();
+		}
+
+		jsonWriter.endObject();
+	}
+
+	private void writeFeature(Feature feature, JsonWriter jsonWriter) throws IOException {
+		jsonWriter.beginObject();
+
+		String name = feature.getName();
+		Float value = feature.getValue();
+
+		if (StringUtils.isBlank(name) == false) {
+			jsonWriter.name(StructuredJsonPropertyNames.FEATURE_NAME_PROPERTY).value(name);
+		}
+
+		if (value != null) {
+			jsonWriter.name(StructuredJsonPropertyNames.FEATURE_VALUE_PROPERTY).value(value);
+		}
+
+		jsonWriter.endObject();
 	}
 
 	/*
