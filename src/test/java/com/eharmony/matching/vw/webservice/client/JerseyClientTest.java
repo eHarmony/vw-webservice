@@ -13,6 +13,8 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -232,13 +234,21 @@ public class JerseyClientTest {
 	@Ignore
 	@Test
 	public void structuredJsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
+
+		//start the web service
+		//Future<Void> listeningFuture = startListening();
+
 		//the examples
 		GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
 		final BufferedReader testReader = new BufferedReader(new InputStreamReader(gzipInputStream, Charsets.UTF_8));
 
 		ClientConfig clientConfig = new ClientConfig();
-		clientConfig.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
-		clientConfig.property(ClientProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, Integer.valueOf(-1));
+		//		clientConfig.property(ClientProperties.REQUEST_ENTITY_PROCESSING, RequestEntityProcessing.CHUNKED);
+		//		clientConfig.property(ClientProperties.CHUNKED_ENCODING_SIZE, 2048);
+		//		clientConfig.property(ClientProperties.CONNECT_TIMEOUT, 2000);
+		//		clientConfig.property(ClientProperties.OUTBOUND_CONTENT_LENGTH_BUFFER, -1);
+		//		clientConfig.property(ClientProperties.READ_TIMEOUT, 5000);
+
 		clientConfig.connectorProvider(new GrizzlyConnectorProvider()); //must use this, HttpUrlConnector doesn't seem to handle chunked encoding too well.
 
 		Client client = ClientBuilder.newClient(clientConfig);
@@ -247,6 +257,12 @@ public class JerseyClientTest {
 		PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
 
 		final CountDownLatch startWritingExamplesLatch = new CountDownLatch(1);
+
+		final OutputStreamWriter outputStreamWriter = new OutputStreamWriter(pipedOutputStream, Charsets.UTF_8);
+
+		final JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
+
+		//final JsonGenerator jsonGenerator = new JsonFactory().createGenerator(pipedOutputStream);
 
 		Future<Void> successFuture = Executors.newCachedThreadPool().submit(new Callable<Void>() {
 
@@ -257,25 +273,44 @@ public class JerseyClientTest {
 
 				String readExample;
 
-				JsonWriter jsonWriter = new JsonWriter(new OutputStreamWriter(pipedOutputStream, Charsets.UTF_8));
-
 				jsonWriter.beginArray();
+
+				//jsonGenerator.writeStartArray();
+
+				int numExamples = 0;
 
 				while ((readExample = testReader.readLine()) != null) {
 
 					StructuredExample exampleToWrite = getStructuredExampleToWrite(readExample);
 
-					if (exampleToWrite == StructuredExample.EMPTY_EXAMPLE) {
-						jsonWriter.beginObject();
-						jsonWriter.endObject();
-					}
-					else
-						writeExample(jsonWriter, exampleToWrite);
+					writeExample(jsonWriter, exampleToWrite);
 
-					jsonWriter.flush();
+					//					jsonWriter.beginObject();
+					//					jsonWriter.name("example").value("the value");
+					//
+					//					jsonWriter.endObject();
+
+					//jsonWriter.flush();
+					outputStreamWriter.flush();
+					pipedOutputStream.flush();
+
+					//if (++numExamples == 200000) break;
+
 				}
 
 				jsonWriter.endArray();
+				//jsonGenerator.writeEndArray();
+
+				//jsonGenerator.flush();
+				//jsonGenerator.close();
+				jsonWriter.flush();
+				jsonWriter.close();
+
+				//outputStreamWriter.flush();
+				//outputStreamWriter.close();
+
+				//pipedOutputStream.flush();
+				//pipedOutputStream.close();
 
 				return null;
 			}
@@ -317,6 +352,8 @@ public class JerseyClientTest {
 
 		});
 
+		LOGGER.debug("Connecting to service...");
+
 		WebTarget target = client.target("http://" + server + ":" + port).path("/vw-webservice/predict/main");
 
 		Future<Response> future = target.request("*/*").async().post(Entity.entity(pipedInputStream, MediaType.valueOf(ExampleMediaTypes.STRUCTURED_JSON_1_0)));
@@ -343,6 +380,50 @@ public class JerseyClientTest {
 		successFuture.get(); //verify that no exception was thrown
 
 		client.close();
+
+		//listeningFuture.get();
+	}
+
+	private Future<Void> startListening() throws IOException {
+
+		Future<Void> listeningFuture = Executors.newCachedThreadPool().submit(new Callable<Void>() {
+
+			@Override
+			public Void call() throws Exception {
+
+				ServerSocket serverSocket = new ServerSocket(8080);
+
+				try {
+					Socket clientSocket = serverSocket.accept();
+
+					BufferedReader reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
+					String readLine;
+
+					while ((readLine = reader.readLine()) != null) {
+
+						LOGGER.debug("read from client: {}", readLine);
+
+					}
+
+				}
+				finally {
+					if (serverSocket != null) try {
+						serverSocket.close();
+					}
+					catch (Exception e) {
+						LOGGER.error("Failed to close listening socket!", e);
+					}
+
+				}
+
+				return null;
+
+			}
+		});
+
+		return listeningFuture;
+
 	}
 
 	private void writeExample(JsonWriter jsonWriter, StructuredExample structuredExample) throws IOException {

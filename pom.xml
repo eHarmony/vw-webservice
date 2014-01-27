@@ -282,6 +282,14 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- async http client for testing -->
+        <dependency>
+		  <groupId>com.ning</groupId>
+		  <artifactId>async-http-client</artifactId>
+		  <version>1.7.22</version>
+		  <scope>test</scope>
+		</dependency>
+        
 		<!-- base64 coding/decoding used in the protobuf string wrapper example tests -->
    		<dependency>
    			<groupId>commons-codec</groupId>

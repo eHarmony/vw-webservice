@@ -184,3 +184,4 @@ ToDo
 * CometD support
 * Speed optimizations
 * Document extension points
+* Re-organize project structure into client, common and server side projects
