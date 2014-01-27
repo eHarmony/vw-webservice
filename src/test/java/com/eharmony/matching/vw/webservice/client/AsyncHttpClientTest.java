@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,14 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 
 /**
  * @author vrahimtoola
- *         Uses the Async Http Client to hit the web service.
+ *         Uses the Async Http Client to hit the web service. This is the only
+ *         java client that actually works!
  */
 public class AsyncHttpClientTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHttpClientTest.class);
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void simpleTest() throws IOException, InterruptedException, ExecutionException {
 
