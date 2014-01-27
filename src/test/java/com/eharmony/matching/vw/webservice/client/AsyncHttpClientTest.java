@@ -14,6 +14,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -41,6 +42,13 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 public class AsyncHttpClientTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHttpClientTest.class);
+
+	private int roundsOfDataToSubmit = 1;
+
+	@Before
+	public void setUp() {
+		roundsOfDataToSubmit = 5; //this means 5 * (number of examples in ner.train) examples will be submitted to the web service.
+	}
 
 	@Ignore
 	@Test

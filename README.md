@@ -185,3 +185,4 @@ ToDo
 * Speed optimizations
 * Document extension points
 * Re-organize project structure into client, common and server side projects
+* re-factor tests to instantiate a web-service instance, perhaps using Grizzly http server?
