@@ -58,7 +58,18 @@ cd vw-webservice
 
 Now that you have the webservice, under the vw-webservice folder, you should find a folder for vowpal wabbit as well that contains all the source. Before you can launch the vowpal wabbit daemon though you will have to build it.
 
+```
+cd vowpal_wabbit
+make clean
+make
+```
 
+Note: if you're on Mac OS X and you run into issues trying to build vowpal wabbit with an error message about "boost program options", then try the following:
+
+1) If you don't have it already, install brew: http://brew.sh
+2) Run this from the command line: brew install boost
+
+Then try to make once again.
 
 Now that we have vowpal wabbit up and running, we just need to make sure that when the web service comes up, it knows the host and port for the daemon.
 
