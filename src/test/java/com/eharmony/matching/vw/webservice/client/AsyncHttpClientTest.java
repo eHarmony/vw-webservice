@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.zip.GZIPInputStream;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,7 +39,7 @@ import com.ning.http.client.generators.InputStreamBodyGenerator;
 /**
  * @author vrahimtoola
  *         Uses the Async Http Client to hit the web service. This is the only
- *         java client that actually works!
+ *         java client that I've been able to get to work!
  */
 public class AsyncHttpClientTest {
 
@@ -52,7 +54,7 @@ public class AsyncHttpClientTest {
 
 	@Ignore
 	@Test
-	public void simpleTest() throws IOException, InterruptedException, ExecutionException {
+	public void plainTextExamplesTest() throws IOException, InterruptedException, ExecutionException {
 
 		RequestBuilder builder = new RequestBuilder("POST");
 
@@ -117,7 +119,7 @@ public class AsyncHttpClientTest {
 					numPredictionsRead++;
 				}
 
-				LOGGER.debug("Got {} predictions", numPredictionsRead);
+				Assert.assertEquals(roundsOfDataToSubmit * 272274, numPredictionsRead);
 
 				return null;
 			}
@@ -125,13 +127,13 @@ public class AsyncHttpClientTest {
 
 		Builder config = new AsyncHttpClientConfig.Builder();
 
-		config.setRequestTimeoutInMs(-1);
+		config.setRequestTimeoutInMs(-1); //need to set this to -1, to indicate wait forever. setting to 0 actually means a 0 ms timeout!
 
 		AsyncHttpClient client = new AsyncHttpClient(config.build());
 
 		client.executeRequest(request, asyncHandler).get();
 
-		readingThreadFuture.get();
+		readingThreadFuture.get(); //verify no exceptions occurred when reading predictions
 
 		client.close();
 	}
@@ -154,7 +156,7 @@ public class AsyncHttpClientTest {
 
 					int submitRound = 0;
 
-					for (int x = 0; x < 100; x++) {
+					for (int x = 0; x < roundsOfDataToSubmit; x++) {
 
 						//the examples
 						GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
