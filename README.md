@@ -141,22 +141,22 @@ Usage
 You can submit individual examples to the web service using curl (assuming all your VW examples are sitting in examples.txt in the directory where you're invoking curl from):
 
 ```
-curl -H "Content-Type:text/plain" \
-        --data-binary @examples.txt \
-        http://host.running.jetty.com:8080/vw-webservice/predict \
+curl -H "Content-Type:text/plain" -X POST \
+        -T examples.txt \
+        http://host.running.jetty.com:8080/vw-webservice/predict/main \
         -v
 ```
 
 If you happen to have a humongous gzipped file containing millions of examples, you can do the following:
 
 ```
-gunzip -c /path/to/lotsAndLotsOfVWExamples.txt.gz | curl -H "Content-Type:text/plain" \
---data-binary @- \
-http://host.running.jetty.com:8080/vw-webservice/predict \
+gzcat /path/to/lotsAndLotsOfVWExamples.txt.gz | curl -H "Content-Type:text/plain" -X POST \
+-T - \
+http://host.running.jetty.com:8080/vw-webservice/predict/main \
 -v
 ```
 
-The '@-' tells curl to read from STDIN, while the --data-binary tells it to just leave the data as is (otherwise it will try to url encode it or do some other processing).
+The '-T' switch of curl does a file transfer without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
 Examples must adhere to the documented VW example format. Some sample examples are:
 
