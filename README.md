@@ -9,14 +9,16 @@ Below you will find a description and installation instructions.
 Dependencies
 ------------
 
-* Maven 2.2.1
-* Java
-* Jetty 9.1.10
 * Vowpal Wabbit
+* Maven 2.2.1
+* Jetty 9.1.10
+* Java 1.7
+* Protobuf 2.4.1
 
 The current web service was developed against and tested on Jetty 9.1.0, so
 these instructions are for that version of Jetty. You will also need to have Maven 2.2.1
 installed in order to build the source code. Maven 3 seems to have some trouble building the source, so for now it's Maven 2.2.1.
+You will also need to have Java 1.7 and the protobuf compiler (protoc) 2.4.1 installed.
 
 Installation
 ------------
@@ -49,8 +51,8 @@ export PATH=$PATH:$M2_HOME/bin
 mvn -version
 ```
 
-Jetty
------
+Jetty 9.1.10
+------------
 
 On the box where you wish to run the web service, install Jettty 9.1.0.
 
@@ -60,6 +62,23 @@ You can download this from the Jetty website. For the rest of this README, it wi
 
 (but of course you can install it anywhere you like).
 
+Protoc 2.4.1
+------------
+
+```
+wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
+tar -xzvf protobuf-2.4.1.tar.gz
+cd protobuf-2.4.1
+./configure --prefix=/usr
+make
+make check
+sudo make install
+
+#check that it worked - this should print 'libprotoc 2.4.1'
+protoc --version
+```
+
+Now that you have all the pre-requisites set up, you can go ahead and set up the VW web service.
 
 VW webservice
 -------------
@@ -105,7 +124,7 @@ Now you can deploy the war file:
 cp /path/to/vw-webservice/target/vw-webservice.war /path/to/jetty-9.1.0/webapps/
 
 # alternatively, you can scp the war file to the box where you are running your jetty instance:
-# scp target/vw-webservice.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
+# scp /path/to/vw-webservice/target/vw-webservice.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
 
 # Restart the Jetty instance (wherever you have Jetty running).
 cd /path/to/jetty-9.1.0
@@ -113,7 +132,8 @@ java -jar start.jar
 
 ```
 
-The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice which will log to the console.
+The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice which will log to the console. The web service
+uses logback for logging, and the logging configuration can be found under src/main/resources/logback.xml.
 
 Usage
 -----
