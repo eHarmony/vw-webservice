@@ -9,11 +9,9 @@ Below you will find a description and installation instructions.
 Dependencies
 ------------
 
-* Vowpal Wabbit
 * Maven 2.2.1
 * Jetty 9.1.10
 * Java 1.7
-* Protobuf 2.4.1
 
 The current web service was developed against and tested on Jetty 9.1.0, so
 these instructions are for that version of Jetty. You will also need to have Maven 2.2.1
@@ -22,21 +20,6 @@ You will also need to have Java 1.7 and the protobuf compiler (protoc) 2.4.1 ins
 
 Installation
 ------------
-
-Vowpal wabbit
--------------
-
-```
-git clone git@github.com:JohnLangford/vowpal_wabbit.git
-cd vowpal_wabbit
-make
-
-# launch daemon with the parameters you want
-# for example loading a pretrained model
-vowpalwabbit/vw --daemon
-```
-
-Note that by default, the VW daemon runs on port 26542 but you can specify the port you want it to run on. Refer to the VW documentation for the exact command line argument to use to do this.
 
 Maven 2.2.1
 -----------
@@ -62,31 +45,21 @@ You can download this from the Jetty website. For the rest of this README, it wi
 
 (but of course you can install it anywhere you like).
 
-Protoc 2.4.1
-------------
-
-```
-wget https://protobuf.googlecode.com/files/protobuf-2.4.1.tar.gz
-tar -xzvf protobuf-2.4.1.tar.gz
-cd protobuf-2.4.1
-./configure --prefix=/usr
-make
-make check
-sudo make install
-
-#check that it worked - this should print 'libprotoc 2.4.1'
-protoc --version
-```
-
 Now that you have all the pre-requisites set up, you can go ahead and set up the VW web service.
 
 VW webservice
 -------------
 
+Note: for the --recursive option (needed to grab the Vowpal Wabbit submodule), you will need to be using version 1.6.5 (or higher) of git.
+
 ```
-git clone git@github.com:eHarmony/vw-webservice.git
+git clone --recursive git@github.com:eHarmony/vw-webservice.git
 cd vw-webservice
 ```
+
+Now that you have the webservice, under the vw-webservice folder, you should find a folder for vowpal wabbit as well that contains all the source. Before you can launch the vowpal wabbit daemon though you will have to build it.
+
+
 
 Under src/main/resources you should find a file called 'vw-webservice.properties'. Open up this file and place the proper values for the vw host and port where you started the VW daemon. 
 
