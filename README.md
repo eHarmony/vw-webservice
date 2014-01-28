@@ -46,10 +46,18 @@ You can download this from the Jetty website. For the rest of this README, it wi
 
 Now that you have all the pre-requisites set up, you can go ahead and set up the VW web service.
 
-VW webservice
+Building and Deploying the VW Web Service
 -------------
 
-Note: for the --recursive option (needed to grab the Vowpal Wabbit submodule), you will need to be using version 1.6.5 (or higher) of git.
+There are 3 steps involved here:
+
+1) Build vowpal wabbit from source, then launch it in daemon mode
+2) Place the details about the host and port where the vowpal wabbit is running, into the vw-webservice.properties file and build+package the webservice to produce the .war file
+3) Place the .war file into the /webapps folder of Jetty.
+
+Let's get started.
+
+Note: for the --recursive option (needed to grab the vowpal wabbit submodule), you will need to be using version 1.6.5 (or higher) of git.
 
 ```
 git clone --recursive git@github.com:eHarmony/vw-webservice.git
@@ -62,12 +70,20 @@ Now that you have the webservice, under the vw-webservice folder, you should fin
 cd vowpal_wabbit
 make clean
 make
+
+#now launch it in daemon mode
+#assume that we are still in the vowpal_wabbit directory
+./vowpalwabbit/vw --daemon
 ```
 
 Note: if you're on Mac OS X and you run into issues trying to build vowpal wabbit with an error message about "boost program options", then try the following:
 
 1) If you don't have it already, install brew: http://brew.sh
-2) Run this from the command line: brew install boost
+2) Run this from the command line: 
+
+```
+brew install boost
+```
 
 Then try to make once again.
 
