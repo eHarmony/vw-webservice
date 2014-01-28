@@ -15,12 +15,12 @@
     </properties>
 
 	<!-- adding this so we can properly fetch the maven-protoc-plugin -->
-    <pluginRepositories>
+<!--     <pluginRepositories>
         <pluginRepository>
             <id>dtrott</id>
             <url>http://maven.davidtrott.com/repository</url>
         </pluginRepository>
-    </pluginRepositories> 
+    </pluginRepositories>  -->
 
     <build>
         <finalName>vw-webservice</finalName>
@@ -62,10 +62,10 @@
                 </configuration>
             </plugin>
             
-             <plugin>
+             <!-- <plugin>
                 <groupId>com.google.protobuf.tools</groupId>
                 <artifactId>maven-protoc-plugin</artifactId>
-                <!-- 0.1.10 on Maven 2.X 0.3.1 on Maven 3.X -->
+                0.1.10 on Maven 2.X 0.3.1 on Maven 3.X
                 <version>0.1.10</version>
                 <configuration>
                 	<checkStaleness>true</checkStaleness>
@@ -78,7 +78,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin> -->
 
         </plugins>
     </build>
@@ -127,11 +127,11 @@
       <!-- end dependencies for testing -->
         
         <!-- protocol buffers dependencies -->
-        <dependency>
+<!--         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>2.4.1</version>
-        </dependency>
+        </dependency> -->
         
         
         
@@ -226,78 +226,13 @@
  			<version>3.2.1</version>
  		</dependency>
 
-		<!-- apache http client used for testing -->
- 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpasyncclient</artifactId>
-			<version>4.0</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- jetty http client used for testing -->
-		<dependency>
-			<groupId>org.eclipse.jetty</groupId>
-			<artifactId>jetty-client</artifactId>
-			<version>9.1.0.v20131115</version>
-			<scope>test</scope>
-		</dependency>
-            
-        <!-- jersey apache client, used for testing -->
-		<dependency>
-			<groupId>com.sun.jersey.contribs</groupId>
-			<artifactId>jersey-apache-client</artifactId>
-			<version>1.18</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- jboss resteasy client, used for testing -->
-		<dependency>
-			<groupId>org.jboss.resteasy</groupId>
-			<artifactId>resteasy-jaxrs</artifactId>
-			<version>3.0.6.Final</version>
-			<scope>test</scope>
-		</dependency>
-
-		<!-- grizzly connector used for testing the jersey client -->
-   		<dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-grizzly-connector</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-		<!-- apache connector used for testing the jersey client -->
-   		<dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-apache-connector</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
-        <!-- jetty connector used for testing the jersey client -->
-        <dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-jetty-connector</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
-        
         <!-- async http client for testing -->
         <dependency>
 		  <groupId>com.ning</groupId>
 		  <artifactId>async-http-client</artifactId>
 		  <version>1.7.22</version>
 		  <scope>test</scope>
-		</dependency>
-        
-		<!-- base64 coding/decoding used in the protobuf string wrapper example tests -->
-   		<dependency>
-   			<groupId>commons-codec</groupId>
-   			<artifactId>commons-codec</artifactId>
-   			<version>1.9</version>
-   			<scope>test</scope>
-   		</dependency>
-   		
+		</dependency>   		
    		
     </dependencies>
 
