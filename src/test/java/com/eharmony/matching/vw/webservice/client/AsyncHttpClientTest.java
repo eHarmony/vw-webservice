@@ -17,6 +17,7 @@ import java.util.concurrent.Future;
 import junit.framework.Assert;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +66,7 @@ public class AsyncHttpClientTest {
 		return testFailed;
 	}
 
-	//@Ignore
+	@Ignore
 	@Test
 	public void plainTextExamplesTest() throws IOException, InterruptedException, ExecutionException {
 
@@ -79,6 +80,7 @@ public class AsyncHttpClientTest {
 		doTest(request);
 	}
 
+	@Ignore
 	@Test
 	public void structuredJsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
 
