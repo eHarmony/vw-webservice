@@ -207,8 +207,6 @@ public class AsyncHttpClientTest {
 
 				try {
 
-					int submitRound = 0;
-
 					for (int x = 0; x < roundsOfDataToSubmit; x++) {
 
 						Iterable<StructuredExample> structuredExamplesIterable = TestUtils.getStructuredExamplesFromNerTrain();
@@ -218,7 +216,7 @@ public class AsyncHttpClientTest {
 							pipedOutputStream.flush();
 						}
 
-						LOGGER.info("Submitted round {} of examples...", ++submitRound);
+						LOGGER.info("Submitted round {} of examples...", (x + 1));
 					}
 
 				}
