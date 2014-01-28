@@ -78,8 +78,8 @@ make
 
 Note: if you're on Mac OS X and you run into issues trying to build vowpal wabbit with an error message about "boost program options", then try the following:
 
-1) If you don't have it already, install brew: http://brew.sh
-2) Run this from the command line: 
+1. If you don't have it already, install brew: http://brew.sh
+2. Run this from the command line: 
 
 ```
 brew install boost
