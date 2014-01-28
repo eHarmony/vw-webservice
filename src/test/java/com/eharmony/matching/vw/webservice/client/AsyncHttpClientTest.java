@@ -66,6 +66,9 @@ public class AsyncHttpClientTest {
 		return testFailed;
 	}
 
+	/*
+	 * The ignore annotation is so to keep the travis-ci build from failing.
+	 */
 	@Ignore
 	@Test
 	public void plainTextExamplesTest() throws IOException, InterruptedException, ExecutionException {
@@ -80,6 +83,9 @@ public class AsyncHttpClientTest {
 		doTest(request);
 	}
 
+	/*
+	 * The ignore annotation is so to keep the travis-ci build from failing.
+	 */
 	@Ignore
 	@Test
 	public void structuredJsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
