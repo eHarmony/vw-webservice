@@ -93,7 +93,7 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 								numExamplesSent++;
 
-								if (numExamplesSent == 1) LOGGER.debug("First example: {}", example);
+								if (numExamplesSent == 1) LOGGER.debug("First example: {}", toWrite);
 
 								exampleProcessingManager.incrementNumberOfExamplesSubmitted();
 

@@ -6,23 +6,25 @@ package com.eharmony.matching.vw.webservice.client;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.zip.GZIPInputStream;
 
 import junit.framework.Assert;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
+import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.JsonTestUtils;
+import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredExample;
+import com.google.gson.stream.JsonWriter;
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.AsyncHttpClientConfig;
@@ -47,19 +49,54 @@ public class AsyncHttpClientTest {
 
 	private int roundsOfDataToSubmit = 1;
 
+	private boolean testFailed = false;
+
 	@Before
 	public void setUp() {
-		roundsOfDataToSubmit = 5; //this means 5 * (number of examples in ner.train) examples will be submitted to the web service.
+		roundsOfDataToSubmit = 2; //this means 2 * (number of examples in ner.train) examples will be submitted to the web service.
+		testFailed = false;
 	}
 
-	@Ignore
+	private synchronized void onTestFailed() {
+		testFailed = true;
+	}
+
+	private synchronized boolean getTestFailed() {
+		return testFailed;
+	}
+
+	//@Ignore
 	@Test
 	public void plainTextExamplesTest() throws IOException, InterruptedException, ExecutionException {
 
 		RequestBuilder builder = new RequestBuilder("POST");
 
-		Request request = builder.setUrl("http://localhost:8080/vw-webservice/predict/main").addHeader("Content-Type", ExampleMediaTypes.PLAINTEXT_1_0).setBody(getInputStreamBodyGenerator()).build();
+		//note: assumes that a vw-webservice is running on localhost at 8080.
+		//modify the address accordingly if it's running on a different host/port.
 
+		Request request = builder.setUrl("http://localhost:8080/vw-webservice/predict/main").addHeader("Content-Type", ExampleMediaTypes.PLAINTEXT_1_0).setBody(getPlainTextInputStreamBodyGenerator()).build();
+
+		doTest(request);
+	}
+
+	@Test
+	public void structuredJsonExamplesTest() throws IOException, InterruptedException, ExecutionException {
+
+		RequestBuilder builder = new RequestBuilder("POST");
+
+		//note: assumes that a vw-webservice is running on localhost at 8080.
+		//modify the address accordingly if it's running on a different host/port.
+
+		Request request = builder.setUrl("http://localhost:8080/vw-webservice/predict/main").addHeader("Content-Type", ExampleMediaTypes.STRUCTURED_JSON_1_0).setBody(getJsonInputStreamBodyGenerator()).build();
+
+		doTest(request);
+	}
+
+	/*
+	 * The main method that carries out the test agains the web service and
+	 * verifies the results.
+	 */
+	private void doTest(Request request) throws InterruptedException, ExecutionException, IOException {
 		final PipedOutputStream pipedOutputStream = new PipedOutputStream();
 		final PipedInputStream pipedInputStream = new PipedInputStream(pipedOutputStream);
 
@@ -100,6 +137,7 @@ public class AsyncHttpClientTest {
 			public void onThrowable(Throwable arg0) {
 				// TODO Auto-generated method stub
 				LOGGER.error("Error: {}", arg0);
+				onTestFailed();
 			}
 
 		};
@@ -119,6 +157,7 @@ public class AsyncHttpClientTest {
 					numPredictionsRead++;
 				}
 
+				LOGGER.info("Read a total of {} predictions", numPredictionsRead);
 				Assert.assertEquals(roundsOfDataToSubmit * 272274, numPredictionsRead);
 
 				return null;
@@ -136,9 +175,15 @@ public class AsyncHttpClientTest {
 		readingThreadFuture.get(); //verify no exceptions occurred when reading predictions
 
 		client.close();
+
+		Assert.assertFalse(getTestFailed());
 	}
 
-	private BodyGenerator getInputStreamBodyGenerator() throws IOException {
+	/*
+	 * Returns a body generator that places plain text examples into the request
+	 * body.
+	 */
+	private BodyGenerator getPlainTextInputStreamBodyGenerator() throws IOException {
 
 		//the examples
 		//final GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
@@ -158,15 +203,10 @@ public class AsyncHttpClientTest {
 
 					for (int x = 0; x < roundsOfDataToSubmit; x++) {
 
-						//the examples
-						GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
+						Iterable<StructuredExample> structuredExamplesIterable = TestUtils.getStructuredExamplesFromNerTrain();
 
-						BufferedReader reader = new BufferedReader(new InputStreamReader(gzipInputStream));
-
-						String readExample;
-
-						while ((readExample = reader.readLine()) != null) {
-							pipedOutputStream.write((readExample + "\n").getBytes());
+						for (StructuredExample structuredExample : structuredExamplesIterable) {
+							pipedOutputStream.write((structuredExample.getVWStringRepresentation() + "\n").getBytes());
 							pipedOutputStream.flush();
 						}
 
@@ -177,6 +217,64 @@ public class AsyncHttpClientTest {
 				}
 				catch (Exception e) {
 					LOGGER.error("Error in submitting examples to piped output stream!", e);
+					onTestFailed();
+				}
+
+			}
+		});
+
+		return new InputStreamBodyGenerator(pipedInputStream);
+	}
+
+	/*
+	 * Returns a body generator that places JSON formatted examples into the
+	 * request body.
+	 */
+	private BodyGenerator getJsonInputStreamBodyGenerator() throws IOException {
+
+		//the examples
+		//final GZIPInputStream gzipInputStream = new GZIPInputStream(this.getClass().getClassLoader().getResourceAsStream("ner.train.gz"));
+
+		PipedInputStream pipedInputStream = new PipedInputStream();
+
+		final PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream);
+
+		Executors.newCachedThreadPool().submit(new Runnable() {
+
+			@Override
+			public void run() {
+
+				try {
+
+					int submitRound = 0;
+
+					OutputStreamWriter outputStreamWriter = new OutputStreamWriter(pipedOutputStream);
+					JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
+
+					jsonWriter.beginArray();
+
+					for (int x = 0; x < roundsOfDataToSubmit; x++) {
+
+						Iterable<StructuredExample> structuredExamplesIterable = TestUtils.getStructuredExamplesFromNerTrain();
+
+						for (StructuredExample structuredExample : structuredExamplesIterable) {
+							JsonTestUtils.writeExample(jsonWriter, structuredExample);
+							outputStreamWriter.flush();
+							pipedOutputStream.flush();
+						}
+
+						LOGGER.info("Submitted round {} of examples...", ++submitRound);
+					}
+
+					jsonWriter.endArray();
+					jsonWriter.flush();
+					jsonWriter.close();
+
+					pipedOutputStream.close();
+				}
+				catch (Exception e) {
+					LOGGER.error("Error in submitting examples to piped output stream!", e);
+					onTestFailed();
 				}
 
 			}
