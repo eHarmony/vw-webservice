@@ -1,27 +1,22 @@
 [![Build Status](https://travis-ci.org/eHarmony/vw-webservice.png)](https://travis-ci.org/eHarmony/vw-webservice)
 
-Vowpal Wabbit Webservice
-=============
+# Vowpal Wabbit Webservice
 
-This is a simple web service that wraps vowpal wabbit daemon.
-Below you will find a description and installation instructions.
+This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnLangford/vowpal_wabbit) daemon. Pull-requests and other feedback welcome!
 
-Dependencies
-------------
+## Installation
+
+### Dependencies
 
 * Maven 2.2.1
 * Jetty 9.1.10
 * Java 1.7
+* Vowpal Wabbit (included as a submodule)
 
-The current web service was developed against and tested on Jetty 9.1.0, so
-these instructions are for that version of Jetty. You will also need to have Maven 2.2.1
-installed in order to build the source code. Maven 3 seems to have some trouble building the source, so for now it's Maven 2.2.1.
+The current web service was developed and tested on Jetty 9.1.0, and you will also need Maven 2.2.1
+to build the project as Maven 3 seems to have issues with it.
 
-Installation
-------------
-
-Maven 2.2.1
------------
+#### Maven 2.2.1
 
 ```
 wget http://mirror.tcpdiag.net/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
@@ -33,21 +28,19 @@ export PATH=$PATH:$M2_HOME/bin
 mvn -version
 ```
 
-Jetty 9.1.10
-------------
+#### Jetty 9.1.10
 
-On the box where you wish to run the web service, install Jettty 9.1.0.
+On the box where you wish to run the web service, install [Jettty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
 
-You can download this from the Jetty website. For the rest of this README, it will be assumed that you have it installed at the location:
+We will assume that you have it installed at the location:
 
+```
 ~/jetty-9.1.0
-
-(but of course you can install it anywhere you like).
+```
 
 Now that you have all the pre-requisites set up, you can go ahead and set up the VW web service.
 
-Building and Deploying the VW Web Service
--------------
+### Building and Deploying the VW Web Service
 
 There are 3 steps involved here:
 
@@ -57,12 +50,16 @@ There are 3 steps involved here:
 
 Let's get started.
 
-Note: for the --recursive option (needed to grab the vowpal wabbit submodule), you will need to be using version 1.6.5 (or higher) of git.
+Clone this repo:
 
 ```
 git clone --recursive git@github.com:eHarmony/vw-webservice.git
 cd vw-webservice
 ```
+
+Note: for the --recursive option (needed to grab the vowpal wabbit submodule), you will need to be using git 1.6.5 or later. Otherwise you can pull the vowpal wabbit submodule in separately.
+
+#### Building Vowpal Wabbit
 
 Now that you have the webservice, under the vw-webservice folder, you should find a folder for vowpal wabbit as well that contains all the source. Before you can launch the vowpal wabbit daemon though you will have to build it.
 
@@ -72,20 +69,12 @@ make clean
 make
 
 #now launch it in daemon mode
-#assume that we are still in the vowpal_wabbit directory
-./vowpalwabbit/vw --daemon
+./vowpalwabbit/vw --daemon [other options you like]
 ```
 
-Note: if you're on Mac OS X and you run into issues trying to build vowpal wabbit with an error message about "boost program options", then try the following:
+Note: Vowpal Wabbit depends on boost program options (on a Mac this can be installed using [homebrew](http://brew.sh):``brew install boost`` 
 
-1. If you don't have it already, install brew: http://brew.sh
-2. Run this from the command line: 
-
-```
-brew install boost
-```
-
-Then try to make once again.
+#### Building VW Web Service
 
 Now that we have vowpal wabbit up and running, we just need to make sure that when the web service comes up, it knows the host and port for the daemon.
 
@@ -116,7 +105,6 @@ In the output, you should see the location where the WAR (Web Application Resour
 ...
 ```
 
-
 Now you can deploy the war file:
 
 ```
@@ -136,15 +124,14 @@ java -jar start.jar
 The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice which will log to the console. The web service
 uses logback for logging, and the logging configuration can be found under src/main/resources/logback.xml.
 
-Usage
------
+## Using the Web Service
 
-You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use must support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the web service without having to buffer it all in memory first (in order to calculate the value of the Content-Length request header). A Java client that supports this is the AsynHttpClient, found at http://sonatype.github.io/async-http-client/. You can find a test that uses this client at src/test/java/AsyncHttpClientTest.java.
+You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the web service without having to buffer it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the AsynHttpClient, found at http://sonatype.github.io/async-http-client/. You can find a test that uses this client at src/test/java/AsyncHttpClientTest.java.
 
 You can also submit examples to the web service from the command line using curl. Assuming all your VW examples are sitting in examples.txt in the directory where you're invoking curl from:
 
 ```
-curl -H "Content-Type:text/plain" -X POST \
+curl    -H "Content-Type:text/plain" -X POST \
         -T examples.txt \
         http://host.running.jetty.com:8080/vw-webservice/predict/main \
         -v
@@ -153,15 +140,17 @@ curl -H "Content-Type:text/plain" -X POST \
 If you happen to have a humongous gzipped file containing millions of examples, you can do the following:
 
 ```
-gzcat /path/to/lotsAndLotsOfVWExamples.txt.gz | curl -H "Content-Type:text/plain" -X POST \
--T - \
-http://host.running.jetty.com:8080/vw-webservice/predict/main \
--v
+gzcat /path/to/lotsAndLotsOfVWExamples.txt.gz \
+| curl  -H "Content-Type:text/plain" \
+        -X POST \
+        -T - \
+        http://host.running.jetty.com:8080/vw-webservice/predict/main \
+        -v
 ```
 
 The '-T' switch of curl does a file transfer without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
-Examples must adhere to the documented VW example format. Some sample examples are:
+Examples should follow VW format - for instance:
 
 ```
 1 first| w_2=German pre1_2=g c_0=A_fw=y c_0=A c_2=Aa suf2_2=an pre2_2=ge c_2=Aa_fw=n w_-1=<s> suf3_0=u suf1_0=u suf2_1=ts pre3_1=rej c_1=a w_1=rejects suf2_0=eu pre2_1=re suf3_1=cts suf3_2=man w_0=EU pre1_1=r pre1_0=e c_1=a_fw=n w_-2=<s> pre3_2=ger l_2=german l_0=eu pre3_0=eu pre2_0=eu suf1_1=s l_1=rejects suf1_2=n
@@ -169,32 +158,22 @@ Examples must adhere to the documented VW example format. Some sample examples a
 3 third| c_2=a_fw=n suf2_0=an pre1_0=g suf2_-1=ts c_-1=a c_-2=A c_0=Aa pre3_-1=rej pre1_-2=e suf3_-2=u suf3_0=man suf3_1=all l_-1=rejects w_0=German suf3_-1=cts pre1_-1=r suf2_1=ll l_-2=eu pre2_0=ge l_0=german pre3_-2=eu c_-2=A_fw=y c_1=a pre1_2=t l_2=to suf1_0=n pre3_1=cal pre2_2=to pre3_0=ger c_2=a c_-1=a_fw=n c_0=Aa_fw=n suf3_2=o suf2_2=to w_-1=rejects c_1=a_fw=n pre1_1=c suf2_-2=eu suf1_2=o pre3_2=to w_2=to suf1_1=l pre2_1=ca pre2_-1=re w_1=call suf1_-1=s pre2_-2=eu w_-2=EU l_1=call suf1_-2=u
 ```
 
-Comparing different ways of invoking VW to retrieve predictions
-----
+## Benchmarks
 
-Some basic benchmarking seems to indicate that as the number of examples increases and hardware memory improves, the web-service seems to perform roughly as well as a simple netcat to VW. Note that in the generation of these numbers, no performance tweaking was done to the web-service. VW was running in daemon mode with the '-b 10' switch, ie, it was brought up in the following manner: "vw -b 10 --daemon".
-
-A total of ~27 million examples was submitted in 10 separate runs (for each setup). 
-
-The LP box has ~1TB (ie, 1 Terabyte) of memory.
+Some basic benchmarks seems to indicate that as the number of examples increases and hardware memory improves, the web-service seems to perform comparably to netcat. Note that we did not do any performance tweaking of the web-service. VW was running in daemon mode as "vw -b 10 --daemon" and we did 10 runs with each setup.
 
 | Setup                                 | # examples | # of features | median time | slowdown |
 |:--------------------------------------|-----------:|--------------:|------------:|---------:|
 | netcat and vw --daemon on localhost   | 27M        |1.2B           |      239.7s | baseline |
 | webservice and vw daemon on localhost | 27M        |1.2B           |      244.4s |       2% |
 
-The percentage difference in median times was ~2%, so the web service seemed to be performing quite nicely.
+The percentage hit in terms of median times was only about 2% which seems acceptable.
 
-
-ToDo
-----
+## ToDo
 
 * document application/x-vw-text
 * more tests
-* Announce ------------------------------------------
-* Benchmarks
-* JSON support
-* protocol buffer support (JSON may be free)
+* protocol buffer support
 * Java client
 * Javascript client
 * add compression support
