@@ -16,7 +16,6 @@ Dependencies
 The current web service was developed against and tested on Jetty 9.1.0, so
 these instructions are for that version of Jetty. You will also need to have Maven 2.2.1
 installed in order to build the source code. Maven 3 seems to have some trouble building the source, so for now it's Maven 2.2.1.
-You will also need to have Java 1.7 and the protobuf compiler (protoc) 2.4.1 installed.
 
 Installation
 ------------
@@ -61,11 +60,13 @@ Now that you have the webservice, under the vw-webservice folder, you should fin
 
 
 
+Now that we have vowpal wabbit up and running, we just need to make sure that when the web service comes up, it knows the host and port for the daemon.
+
 Under src/main/resources you should find a file called 'vw-webservice.properties'. Open up this file and place the proper values for the vw host and port where you started the VW daemon. 
 
 Note that this properties file will shortly be removed to some external location as a matter of best practice.
 
-Now you can build the web service:
+Now you can build and package up the web service:
 
 ```
 mvn package
