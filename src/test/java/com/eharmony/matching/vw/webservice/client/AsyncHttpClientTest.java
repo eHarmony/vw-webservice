@@ -54,7 +54,7 @@ public class AsyncHttpClientTest {
 
 	@Before
 	public void setUp() {
-		roundsOfDataToSubmit = 2; //this means 2 * (number of examples in ner.train) examples will be submitted to the web service.
+		roundsOfDataToSubmit = 3; //this means 2 * (number of examples in ner.train) examples will be submitted to the web service.
 		testFailed = false;
 	}
 
@@ -67,7 +67,7 @@ public class AsyncHttpClientTest {
 	}
 
 	/*
-	 * The ignore annotation is so to keep the travis-ci build from failing.
+	 * The ignore annotation is to keep the travis-ci build from failing.
 	 */
 	@Ignore
 	@Test
@@ -84,7 +84,7 @@ public class AsyncHttpClientTest {
 	}
 
 	/*
-	 * The ignore annotation is so to keep the travis-ci build from failing.
+	 * The ignore annotation is to keep the travis-ci build from failing.
 	 */
 	@Ignore
 	@Test
@@ -221,11 +221,19 @@ public class AsyncHttpClientTest {
 						LOGGER.info("Submitted round {} of examples...", ++submitRound);
 					}
 
-					pipedOutputStream.close();
 				}
 				catch (Exception e) {
 					LOGGER.error("Error in submitting examples to piped output stream!", e);
 					onTestFailed();
+				}
+				finally {
+					try {
+						pipedOutputStream.close();
+					}
+					catch (IOException e) {
+						LOGGER.error("Failed to close piped outputstream!", e);
+						onTestFailed();
+					}
 				}
 
 			}
@@ -252,12 +260,12 @@ public class AsyncHttpClientTest {
 			@Override
 			public void run() {
 
+				OutputStreamWriter outputStreamWriter = new OutputStreamWriter(pipedOutputStream);
+				JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
+
 				try {
 
 					int submitRound = 0;
-
-					OutputStreamWriter outputStreamWriter = new OutputStreamWriter(pipedOutputStream);
-					JsonWriter jsonWriter = new JsonWriter(outputStreamWriter);
 
 					jsonWriter.beginArray();
 
@@ -275,14 +283,36 @@ public class AsyncHttpClientTest {
 					}
 
 					jsonWriter.endArray();
-					jsonWriter.flush();
-					jsonWriter.close();
 
-					pipedOutputStream.close();
 				}
 				catch (Exception e) {
 					LOGGER.error("Error in submitting examples to piped output stream!", e);
 					onTestFailed();
+				}
+				finally {
+					try {
+						jsonWriter.flush();
+					}
+					catch (IOException e) {
+						LOGGER.error("Error flushing json writer!", e);
+						onTestFailed();
+					}
+
+					try {
+						jsonWriter.close();
+					}
+					catch (IOException e) {
+						LOGGER.error("Error closing json writer!", e);
+						onTestFailed();
+					}
+
+					try {
+						pipedOutputStream.close();
+					}
+					catch (IOException e) {
+						LOGGER.error("Error closing piped outputstream!", e);
+						onTestFailed();
+					}
 				}
 
 			}
