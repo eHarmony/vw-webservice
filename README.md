@@ -74,7 +74,7 @@ make
 ./vowpalwabbit/vw --daemon [other options you like]
 ```
 
-Note: Vowpal Wabbit depends on boost program options (on a Mac this can be installed using [homebrew](http://brew.sh) and ``brew install boost`` 
+Note: Vowpal Wabbit depends on boost program options (on a Mac this can be installed via [homebrew](http://brew.sh): ``brew install boost``)
 
 #### Building VW Web Service
 
