@@ -131,7 +131,7 @@ uses logback for logging, and the logging configuration can be found under src/m
 
 ## Using the Web Service
 
-You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the webservice, without buffering it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the AsynHttpClient, found at http://sonatype.github.io/async-http-client/. You can find a test that uses this client at src/test/java/AsyncHttpClientTest.java.
+You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the webservice, without buffering it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the [AsynHttpClient](http://sonatype.github.io/async-http-client/). You can find a test that uses this client in ``src/test/java/AsyncHttpClientTest.java``.
 
 You can also submit examples to the web service from the command line using curl. Assuming all your VW examples are sitting in examples.txt, in the directory where you invoke curl:
 
