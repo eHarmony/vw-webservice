@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
+import com.eharmony.matching.vw.webservice.core.example.StructuredExample;
 import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.JsonTestUtils;
-import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredExample;
 import com.google.gson.stream.JsonWriter;
 import com.ning.http.client.AsyncHandler;
 import com.ning.http.client.AsyncHttpClient;

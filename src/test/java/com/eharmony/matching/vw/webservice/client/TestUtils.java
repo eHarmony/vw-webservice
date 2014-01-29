@@ -11,7 +11,7 @@ import java.util.zip.GZIPInputStream;
 
 import junit.framework.Assert;
 
-import com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader.StructuredExample;
+import com.eharmony.matching.vw.webservice.core.example.StructuredExample;
 import com.google.common.collect.AbstractIterator;
 
 /**

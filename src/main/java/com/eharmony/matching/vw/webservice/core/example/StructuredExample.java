@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader;
+package com.eharmony.matching.vw.webservice.core.example;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -10,8 +10,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
 import com.google.common.collect.ImmutableList;
 
 /**

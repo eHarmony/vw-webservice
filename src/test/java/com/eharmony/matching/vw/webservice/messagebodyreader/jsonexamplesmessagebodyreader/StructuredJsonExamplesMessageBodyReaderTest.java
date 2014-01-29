@@ -30,6 +30,7 @@ import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
 import com.eharmony.matching.vw.webservice.client.TestUtils;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 import com.eharmony.matching.vw.webservice.core.example.Example;
+import com.eharmony.matching.vw.webservice.core.example.StructuredExample;
 import com.google.common.base.Charsets;
 import com.google.gson.stream.JsonWriter;
 
