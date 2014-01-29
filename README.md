@@ -2,7 +2,9 @@
 
 # Vowpal Wabbit Webservice
 
-This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnLangford/vowpal_wabbit) daemon. Pull-requests and other feedback welcome!
+This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnLangford/vowpal_wabbit) daemon. 
+
+Pull-requests and other feedback very much appreciated!
 
 ## Installation
 
@@ -32,7 +34,7 @@ mvn -version
 
 On the box where you wish to run the web service, install [Jettty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
 
-We will assume that you have it installed at the location:
+We will assume that you have it installed in:
 
 ```
 ~/jetty-9.1.0
@@ -57,7 +59,7 @@ git clone --recursive git@github.com:eHarmony/vw-webservice.git
 cd vw-webservice
 ```
 
-Note: for the --recursive option (needed to grab the vowpal wabbit submodule), you will need to be using git 1.6.5 or later. Otherwise you can pull the vowpal wabbit submodule in separately.
+Note: for the --recursive option to work (grabs the vowpal wabbit submodule for you), you will need git 1.6.5 or later. Otherwise you can pull the vowpal wabbit submodule in separately using ``git submodule``.
 
 #### Building Vowpal Wabbit
 
@@ -72,17 +74,23 @@ make
 ./vowpalwabbit/vw --daemon [other options you like]
 ```
 
-Note: Vowpal Wabbit depends on boost program options (on a Mac this can be installed using [homebrew](http://brew.sh):``brew install boost`` 
+Note: Vowpal Wabbit depends on boost program options (on a Mac this can be installed using [homebrew](http://brew.sh) and ``brew install boost`` 
 
 #### Building VW Web Service
 
-Now that we have vowpal wabbit up and running, we just need to make sure that when the web service comes up, it knows the host and port for the daemon.
+Now that we have vowpal wabbit up and running, we just need to make sure that the web service knows the host and port where the deamon lives. Edit the config:
 
-Under src/main/resources you should find a file called 'vw-webservice.properties'. Open up this file and place the proper values for the vw host and port where you started the VW daemon. 
+```
+vim vw-webservice/src/main/resources/vw-webservice.properties
+``` 
 
-Note that this properties file will shortly be removed to some external location as a matter of best practice.
+and change if necessary:
+```
+vw.hostName=localhost
+vw.port=26542
+```
 
-Now you can build and package up the web service:
+Now lets build and package up the web service:
 
 ```
 mvn package
@@ -118,7 +126,6 @@ cp /path/to/vw-webservice/target/vw-webservice.war /path/to/jetty-9.1.0/webapps/
 # Restart the Jetty instance (wherever you have Jetty running).
 cd /path/to/jetty-9.1.0
 java -jar start.jar
-
 ```
 
 The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice which will log to the console. The web service
