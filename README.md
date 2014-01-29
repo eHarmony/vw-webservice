@@ -47,7 +47,7 @@ Once you have set up the prerequisites, you can go ahead and set up the VW web s
 This involves 3 steps:
 
 1. Build vowpal wabbit from source, then launch it in daemon mode.
-2. Specify the host and port where vowpal wabbit is running in the vw-webservice.properties file, and build+package the webservice to produce the WAR (Web Application Resource) .war file.
+2. Specify the host and port where vowpal wabbit is running in the vw-webservice.properties file, and build+package the webservice to produce the .war (Web Application Resource) file.
 3. Place the .war file into the /webapps folder of Jetty.
 
 Let's get started.
