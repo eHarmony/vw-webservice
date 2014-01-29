@@ -15,8 +15,8 @@ Pull-requests and other feedback very much appreciated!
 * Java 1.7
 * Vowpal Wabbit (included as a submodule)
 
-The current web service was developed and tested on Jetty 9.1.0, and you will also need Maven 2.2.1
-to build the project as Maven 3 seems to have issues with it.
+The current web service was developed and tested on Jetty 9.1.0. You will need Maven 2.2.1
+to build the project (Maven 3 seems to have issues with it).
 
 #### Maven 2.2.1
 
@@ -32,22 +32,22 @@ mvn -version
 
 #### Jetty 9.1.10
 
-On the box where you wish to run the web service, install [Jettty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
+On the box where you plan on running the web service, install [Jetty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
 
-We will assume that you have it installed in:
+We assume that you have installed it in:
 
 ```
 ~/jetty-9.1.0
 ```
 
-Now that you have all the pre-requisites set up, you can go ahead and set up the VW web service.
+Once you have set up the prerequisites, you can go ahead and set up the VW web service.
 
 ### Building and Deploying the VW Web Service
 
-There are 3 steps involved here:
+This involves 3 steps:
 
-1. Build vowpal wabbit from source, then launch it in daemon mode
-2. Place the details about the host and port where the vowpal wabbit is running, into the vw-webservice.properties file and build+package the webservice to produce the .war file
+1. Build vowpal wabbit from source, then launch it in daemon mode.
+2. Specify the host and port where vowpal wabbit is running in the vw-webservice.properties file, and build+package the webservice to produce the WAR (Web Application Resource) .war file.
 3. Place the .war file into the /webapps folder of Jetty.
 
 Let's get started.
@@ -63,7 +63,7 @@ Note: for the --recursive option to work (grabs the vowpal wabbit submodule for 
 
 #### Building Vowpal Wabbit
 
-Now that you have the webservice, under the vw-webservice folder, you should find a folder for vowpal wabbit as well that contains all the source. Before you can launch the vowpal wabbit daemon though you will have to build it.
+Now that you have the webservice, under the vw-webservice folder, you should find an additional folder for vowpal wabbit that contains all the source. Before you can launch the vowpal wabbit daemon you will have to build it.
 
 ```
 cd vowpal_wabbit
@@ -90,7 +90,7 @@ vw.hostName=localhost
 vw.port=26542
 ```
 
-Now lets build and package up the web service:
+Now let's build and package up the web service:
 
 ```
 mvn package
@@ -113,7 +113,7 @@ In the output, you should see the location where the WAR (Web Application Resour
 ...
 ```
 
-Now you can deploy the war file:
+Now you can deploy the .war file:
 
 ```
 # the maven build (assuming you're using the default directories) will have spit out the WAR file to the 'target' subdirectory
@@ -128,14 +128,14 @@ cd /path/to/jetty-9.1.0
 java -jar start.jar
 ```
 
-The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice which will log to the console. The web service
+The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice, which will log to the console. The web service
 uses logback for logging, and the logging configuration can be found under src/main/resources/logback.xml.
 
 ## Using the Web Service
 
-You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the web service without having to buffer it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the AsynHttpClient, found at http://sonatype.github.io/async-http-client/. You can find a test that uses this client at src/test/java/AsyncHttpClientTest.java.
+You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the webservice, without buffering it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the AsynHttpClient, found at http://sonatype.github.io/async-http-client/. You can find a test that uses this client at src/test/java/AsyncHttpClientTest.java.
 
-You can also submit examples to the web service from the command line using curl. Assuming all your VW examples are sitting in examples.txt in the directory where you're invoking curl from:
+You can also submit examples to the web service from the command line using curl. Assuming all your VW examples are sitting in examples.txt, in the directory where you invoke curl:
 
 ```
 curl    -H "Content-Type:text/plain" -X POST \
@@ -155,7 +155,7 @@ gzcat /path/to/lotsAndLotsOfVWExamples.txt.gz \
         -v
 ```
 
-The '-T' switch of curl does a file transfer without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
+The curl '-T' switch performs a file transfer, without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
 Examples should follow VW format - for instance:
 
@@ -167,31 +167,31 @@ Examples should follow VW format - for instance:
 
 ## Benchmarks
 
-Some basic benchmarks seems to indicate that as the number of examples increases and hardware memory improves, the web-service seems to perform comparably to netcat. Note that we did not do any performance tweaking of the web-service. VW was running in daemon mode as "vw -b 10 --daemon" and we did 10 runs with each setup.
+Some basic benchmarks seems to indicate that, as the number of examples increases and hardware memory improves, the web-service seems to perform comparably to netcat. Note that we did not do any performance tweaking of the web-service. VW was running in daemon mode as "vw -b 10 --daemon", and we performed 10 runs with each setup.
 
 | Setup                                 | # examples | # of features | median time | slowdown |
 |:--------------------------------------|-----------:|--------------:|------------:|---------:|
 | netcat and vw --daemon on localhost   | 27M        |1.2B           |      239.7s | baseline |
 | webservice and vw daemon on localhost | 27M        |1.2B           |      244.4s |       2% |
 
-The percentage hit in terms of median times was only about 2% which seems acceptable.
+The percentage hit in terms of median times was only about 2%, which seems acceptable.
 
 ## ToDo
 
-* document application/x-vw-text
-* more tests
-* protocol buffer support
-* Java client
-* Javascript client
-* add compression support
-* mvn test (use examples.txt)
-* automate setup and installation
-* flesh out the spring application context and get rid of spring annotations from the actual source code
-* move all property configuration to some place outside the .war file, right now it's packaged inside it effectively making them hard coded
-* add codahale metrics gathering
-* go through all the TODO comments in the source code and make changes where necessary
-* CometD support
-* Speed optimizations
-* Document extension points
-* Re-organize project structure into client, common and server side projects
-* re-factor tests to instantiate a web-service instance, perhaps using Grizzly http server?
+* Document application/x-vw-text.
+* More tests.
+* Protocol buffer support.
+* Java client.
+* Javascript client.
+* Add compression support.
+* mvn test (use examples.txt).
+* Automate setup and installation.
+* Flesh out the spring application context, and get rid of spring annotations from the actual source code.
+* Move all property configuration outside the .war file. Right now the configuration is packaged inside, effectively making the .war files hard-coded.
+* Add codahale metrics gathering.
+* Go through all the TODO comments in the source code and make changes where necessary.
+* CometD support.
+* Speed optimizations.
+* Document extension points.
+* Re-organize project structure into client, common, and server side projects.
+* Re-factor tests to instantiate a web-service instance, perhaps using Grizzly http server?
