@@ -4,8 +4,6 @@
 
 This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnLangford/vowpal_wabbit) daemon. 
 
-Pull-requests and other feedback very much appreciated!
-
 ## Installation
 
 ### Dependencies
@@ -78,7 +76,7 @@ Note: Vowpal Wabbit depends on boost program options (on a Mac this can be insta
 
 #### Building VW Web Service
 
-Now that we have vowpal wabbit up and running, we just need to make sure that the web service knows the host and port where the deamon lives. Edit the config:
+Now that we have vowpal wabbit up and running, we just need to make sure that the web service knows the host and port where the daemon lives. Edit the config:
 
 ```
 vim vw-webservice/src/main/resources/vw-webservice.properties
