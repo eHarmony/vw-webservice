@@ -14,12 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eharmony.matching.vw.webservice.common.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.ExampleFormatException;
+import com.eharmony.matching.vw.webservice.common.example.StructuredExample;
+import com.eharmony.matching.vw.webservice.common.example.StructuredExample.Namespace;
+import com.eharmony.matching.vw.webservice.common.example.StructuredExample.Namespace.NamespaceBuilder;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
-import com.eharmony.matching.vw.webservice.core.example.StructuredExample;
-import com.eharmony.matching.vw.webservice.core.example.StructuredExample.Namespace;
-import com.eharmony.matching.vw.webservice.core.example.StructuredExample.Namespace.NamespaceBuilder;
 import com.google.common.collect.AbstractIterator;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;

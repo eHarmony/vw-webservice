@@ -7,9 +7,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.concurrent.ExecutorService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
@@ -20,7 +17,6 @@ import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcesso
  *         A factory that returns example processors that submit examples to VW
  *         over a TCP-IP socket and read predictions back the same way.
  */
-@Component
 public class TCPIPExampleProcessorFactory implements ExampleProcessorFactory {
 
 	private final TCPIPSocketFactory socketFactory;
@@ -30,7 +26,6 @@ public class TCPIPExampleProcessorFactory implements ExampleProcessorFactory {
 	 */
 	private final ExecutorService executorService;
 
-	@Autowired
 	public TCPIPExampleProcessorFactory(TCPIPSocketFactory socketFactory,
 	/* @Value("#{executorService}") */
 	ExecutorService executorService) {
@@ -49,7 +44,6 @@ public class TCPIPExampleProcessorFactory implements ExampleProcessorFactory {
 	 * ExampleProcessorFactory#getExampleSubmitter(java.lang.Iterable,
 	 * java.util.EnumSet)
 	 */
-	@Override
 	public ExampleProcessor getExampleProcessor(ExamplesIterable theExamples) {
 
 		// TODO: return a proper example submitter based on the provided

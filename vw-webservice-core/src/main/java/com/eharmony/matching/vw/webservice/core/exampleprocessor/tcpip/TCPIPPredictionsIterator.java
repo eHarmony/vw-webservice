@@ -12,11 +12,11 @@ import java.util.Iterator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eharmony.matching.vw.webservice.common.prediction.Prediction;
+import com.eharmony.matching.vw.webservice.common.prediction.StringPrediction;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchState;
-import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
-import com.eharmony.matching.vw.webservice.core.prediction.StringPrediction;
 
 /**
  * @author vrahimtoola
@@ -50,7 +50,6 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 		this.exampleProcessingManager = exampleProcessingManager;
 	}
 
-	@Override
 	public boolean hasNext() {
 
 		if (firstCallToHasNext) {
@@ -67,7 +66,6 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 		return nextLineToReturn != null;
 	}
 
-	@Override
 	public Prediction next() {
 		String toReturn = nextLineToReturn;
 
@@ -76,7 +74,6 @@ class TCPIPPredictionsIterator implements Iterator<Prediction> {
 		return new StringPrediction(toReturn);
 	}
 
-	@Override
 	public void remove() {
 		throw new UnsupportedOperationException("The 'remove' operation is not supported!");
 	}

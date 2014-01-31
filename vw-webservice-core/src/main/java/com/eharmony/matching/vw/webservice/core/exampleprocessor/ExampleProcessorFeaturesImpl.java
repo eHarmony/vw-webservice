@@ -26,7 +26,6 @@ public class ExampleProcessorFeaturesImpl implements ExampleProcessorFeatures {
     /* (non-Javadoc)
      * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFeatures#getAllFeatures()
      */
-    @Override
     public Map<String, Object> getAllFeatures() {
 		return getShallowCopyOfMap(featuresMap);
     }
@@ -45,7 +44,6 @@ public class ExampleProcessorFeaturesImpl implements ExampleProcessorFeatures {
 		return copy;
     }
 
-    @Override
     public boolean isAsync() {
 		return isAsync;
     }

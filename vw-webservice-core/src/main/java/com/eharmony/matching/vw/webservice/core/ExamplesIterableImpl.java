@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import com.eharmony.matching.vw.webservice.core.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.Example;
 
 /**
  * @author vrahimtoola
@@ -39,17 +39,14 @@ public class ExamplesIterableImpl implements ExamplesIterable {
 		this.exampleIterator = exampleIterator;
 	}
 
-	@Override
 	public Iterator<Example> iterator() {
 		return exampleIterator;
 	}
 
-	@Override
 	public String getAttribute(String attributeKey) {
 		return attributesMap.get(attributeKey);
 	}
 
-	@Override
 	public int getNumberOfExamples() {
 		return this.numberOfExamples;
 	}

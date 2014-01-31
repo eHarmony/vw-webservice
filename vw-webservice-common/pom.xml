@@ -8,49 +8,22 @@
    <relativePath>../../vw-webservice</relativePath>
   </parent>
 
-  <groupId>com.eharmony.matching</groupId>
   <artifactId>vw-webservice-common</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  <description>Examples in various formats that can be submitted to the VW web service. Also contains code that represents predictions coming from VW.</description>
+
+  <name>VW Web Service Common.</name>
+  <description>Common components used by client and server side projects.</description>
 
     <build>
-        <finalName>vw-webservice</finalName>
         
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
-                <inherited>true</inherited>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                    <fork>true</fork>
-				    <meminitial>1024m</meminitial>
-				    <maxmem>2048m</maxmem>
-                </configuration>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.13</version>
-                <executions>
-                    <execution>
-                        <id>surefire-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                    <includes>
-                        <include>**/*Test.java</include>
-                    </includes>
-                    <forkMode>once</forkMode>
-                </configuration>
             </plugin>
 
         </plugins>
@@ -62,77 +35,25 @@
  		<dependency>
 		    <groupId>com.google.guava</groupId>
 		    <artifactId>guava</artifactId>
-		    <version>15.0</version>
-		</dependency>
-
-		<!-- google gson for reading/writing json examples -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>2.2.4</version>
-		</dependency>
-
-		<!-- jackson for json debug writer -->
-		<dependency>
-		  <groupId>com.fasterxml.jackson.core</groupId>
-		  <artifactId>jackson-core</artifactId>
-		  <version>2.3.1</version>
 		</dependency>
 
 		<!-- apache commons lang, used for some utilities -->
  		<dependency>
  			<groupId>org.apache.commons</groupId>
   			<artifactId>commons-lang3</artifactId>
-  			<version>3.1</version>
  		</dependency>
 
-		<!--  apache commons collections, used for MapUtils -->
- 		<dependency>
- 			<groupId>commons-collections</groupId>
- 			<artifactId>commons-collections</artifactId>
- 			<version>3.2.1</version>
- 		</dependency>
-
-		<!-- logback dependencies -->
-		<dependency>
- 			<groupId>org.slf4j</groupId>
- 			<artifactId>slf4j-api</artifactId>
- 			<version>1.7.5</version>
- 		</dependency>
- 		
- 		<dependency>
- 			<groupId>ch.qos.logback</groupId>
- 			<artifactId>logback-classic</artifactId>
- 			<version>1.0.13</version>
- 			<scope>runtime</scope>
- 		</dependency>
- 		
- 		<dependency>
- 			<groupId>ch.qos.logback</groupId>
- 			<artifactId>logback-core</artifactId>
- 			<version>1.0.13</version>
- 			<scope>runtime</scope>
- 		</dependency>
-
-		<!-- dependencies used only for testing -->
-	
        	<!-- junit used for testing -->
         <dependency>
         	<groupId>junit</groupId>
         	<artifactId>junit</artifactId>
-        	<version>4.8.2</version>
-        	<scope>test</scope>
         </dependency>
         
         <!-- mockito used for mocking -->
         <dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
-			<scope>test</scope>
 		</dependency>
-
-
 
 	</dependencies>
 

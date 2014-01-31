@@ -11,12 +11,11 @@ import java.net.Socket;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eharmony.matching.vw.webservice.common.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.ExampleFormatException;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingManager;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
@@ -36,9 +35,7 @@ import com.google.common.base.Charsets;
  */
 class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
-	private static final String NEWLINE = System.getProperty("line.separator");
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(AsyncFailFastTCPIPExampleProcessor.class);
+	private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(AsyncFailFastTCPIPExampleProcessor.class);
 
 	private final ExecutorService executorService;
 	private final TCPIPSocketFactory socketFactory;
@@ -51,7 +48,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 		this.examples = examples;
 	}
 
-	@Override
 	public ExampleProcessingManager submitExamples(final ExampleProcessingEventHandler callback) throws ExampleSubmissionException {
 
 		try {
@@ -61,7 +57,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 			executorService.submit(new Callable<Void>() {
 
-				@Override
 				public Void call() {
 
 					OutputStream outputStream;
@@ -197,7 +192,6 @@ class AsyncFailFastTCPIPExampleProcessor implements ExampleProcessor {
 
 	}
 
-	@Override
 	public ExampleProcessorFeatures getExampleProcessorFeatures() {
 
 		return new ExampleProcessorFeaturesImpl(true, null);

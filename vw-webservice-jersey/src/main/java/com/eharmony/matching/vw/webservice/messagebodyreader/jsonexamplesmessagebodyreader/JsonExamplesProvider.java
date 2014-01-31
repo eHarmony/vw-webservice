@@ -6,8 +6,8 @@ package com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessag
 import java.io.InputStream;
 import java.util.Iterator;
 
+import com.eharmony.matching.vw.webservice.common.example.Example;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.Example;
 
 /**
  * @author vrahimtoola

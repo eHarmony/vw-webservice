@@ -7,9 +7,9 @@ import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
 
-import com.eharmony.matching.vw.webservice.core.example.StructuredExample;
-import com.eharmony.matching.vw.webservice.core.example.StructuredExample.Namespace;
-import com.eharmony.matching.vw.webservice.core.example.StructuredExample.Namespace.Feature;
+import com.eharmony.matching.vw.webservice.common.example.StructuredExample;
+import com.eharmony.matching.vw.webservice.common.example.StructuredExample.Namespace;
+import com.eharmony.matching.vw.webservice.common.example.StructuredExample.Namespace.Feature;
 import com.google.gson.stream.JsonWriter;
 
 /**

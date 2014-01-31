@@ -16,9 +16,9 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eharmony.matching.vw.webservice.common.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.StringExample;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.core.example.StringExample;
 
 /**
  * @author vrahimtoola

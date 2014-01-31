@@ -3,8 +3,8 @@
  */
 package com.eharmony.matching.vw.webservice.core.exampleprocessor;
 
+import com.eharmony.matching.vw.webservice.common.example.ExampleFormatException;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
 
 /**
  * @author vrahimtoola

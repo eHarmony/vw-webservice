@@ -3,7 +3,7 @@
  */
 package com.eharmony.matching.vw.webservice.core.exampleprocessor;
 
-import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
+import com.eharmony.matching.vw.webservice.common.prediction.Prediction;
 
 /**
  * @author vrahimtoola

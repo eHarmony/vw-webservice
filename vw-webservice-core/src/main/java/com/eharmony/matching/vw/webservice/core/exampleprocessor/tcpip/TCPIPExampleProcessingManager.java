@@ -7,11 +7,11 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Iterator;
 
+import com.eharmony.matching.vw.webservice.common.prediction.Prediction;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingManager;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionState;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchState;
-import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
 
 /**
  * @author vrahimtoola An implementation of ExampleProcessingManager for use by
@@ -35,12 +35,10 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
 	 * ExampleProcessingManager#getPredictionsIterable()
 	 */
-	@Override
 	public Iterable<Prediction> getPredictionsIterable() {
 
 		return new Iterable<Prediction>() {
 
-			@Override
 			public Iterator<Prediction> iterator() {
 				return predictionsIterator;
 			}
@@ -53,7 +51,6 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
 	 * ExampleProcessingManager#stopAll()
 	 */
-	@Override
 	public synchronized void stopAll() {
 
 		isStopped = true;
@@ -65,7 +62,6 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
 	 * ExampleProcessingManager#getTotalNumberOfExamplesSubmitted()
 	 */
-	@Override
 	public synchronized long getTotalNumberOfExamplesSubmitted() {
 		return numExamplesSubmitted;
 	}
@@ -76,7 +72,6 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
 	 * ExampleProcessingManager#getTotalNumberOfExamplesSkipped()
 	 */
-	@Override
 	public synchronized long getTotalNumberOfExamplesSkipped() {
 		return numExamplesSkipped;
 	}
@@ -87,7 +82,6 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
 	 * ExampleProcessingManager#getExampleSubmissionState()
 	 */
-	@Override
 	public synchronized ExampleSubmissionState getExampleSubmissionState() {
 		return exampleSubmissionState;
 	}
@@ -98,7 +92,6 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 	 * @see com.eharmony.matching.vw.webservice.core.exampleprocessor.
 	 * ExampleProcessingManager#getPredictionFetchState()
 	 */
-	@Override
 	public PredictionFetchState getPredictionFetchState() {
 
 		return predictionsIterator.getPredictionFetchState();
@@ -124,7 +117,6 @@ class TCPIPExampleProcessingManager implements ExampleProcessingManager {
 		return isStopped;
 	}
 
-	@Override
 	public synchronized long getTotalNumberOfPredictionsFetched() {
 		return numPredictionsFetched;
 	}

@@ -8,9 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 
+import com.eharmony.matching.vw.webservice.common.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.StringExample;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
-import com.eharmony.matching.vw.webservice.core.example.Example;
-import com.eharmony.matching.vw.webservice.core.example.StringExample;
 import com.google.common.collect.AbstractIterator;
 import com.google.gson.stream.JsonReader;
 

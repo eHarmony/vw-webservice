@@ -1,18 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-     <groupId>com.eharmony.matching</groupId>
+  	<parent>
+     	<groupId>com.eharmony.matching</groupId>
         <artifactId>vw-webservice</artifactId>
-	   <version>0.0.1-SNAPSHOT</version>
-	      <relativePath>../../vw-webservice</relativePath>
-	      </parent>
+	   	<version>0.0.1-SNAPSHOT</version>
+	    <relativePath>../../vw-webservice</relativePath>
+	</parent>
 
 
 
-  <groupId>com.eharmony.matching</groupId>
   <artifactId>vw-webservice-core</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+
   <name>VW Web Service Core.</name>
   <description>The core components used when building a web service that wraps the VW daemon. Reference this project when you're building your own web service using the framework of your choice (eg, Jersey, Restlet, etc).</description>
 
@@ -21,11 +20,26 @@
   
   	<!-- the vw-webservice-common project for common components. -->
   	<dependency>
-  	  	<groupId>com.eharmony.matching</groupId>
+  		<groupId>com.eharmony.matching</groupId>
   		<artifactId>vw-webservice-common</artifactId>
-  		<version>0.0.1-SNAPSHOT</version>
+  		<version>${vw.webservice.version}</version>
   	</dependency>
   
+	<!-- logback dependencies -->
+	<dependency>
+		<groupId>org.slf4j</groupId>
+		<artifactId>slf4j-api</artifactId>
+	</dependency>
+	
+	<dependency>
+		<groupId>ch.qos.logback</groupId>
+		<artifactId>logback-classic</artifactId>
+	</dependency>
+	
+	<dependency>
+		<groupId>ch.qos.logback</groupId>
+		<artifactId>logback-core</artifactId>
+	</dependency>
   </dependencies>
 
 </project>

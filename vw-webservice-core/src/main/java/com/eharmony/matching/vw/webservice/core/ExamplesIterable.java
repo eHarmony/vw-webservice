@@ -3,7 +3,7 @@
  */
 package com.eharmony.matching.vw.webservice.core;
 
-import com.eharmony.matching.vw.webservice.core.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.Example;
 
 /**
  * @author vrahimtoola

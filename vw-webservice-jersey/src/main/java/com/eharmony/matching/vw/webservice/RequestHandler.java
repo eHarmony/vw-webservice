@@ -12,16 +12,16 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.eharmony.matching.vw.webservice.common.example.ExampleFormatException;
+import com.eharmony.matching.vw.webservice.common.prediction.Prediction;
 import com.eharmony.matching.vw.webservice.core.ExampleReadException;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
-import com.eharmony.matching.vw.webservice.core.example.ExampleFormatException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingEventHandler;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessingManager;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessor;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleSubmissionException;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.PredictionFetchException;
-import com.eharmony.matching.vw.webservice.core.prediction.Prediction;
 
 /**
  * @author vrahimtoola
