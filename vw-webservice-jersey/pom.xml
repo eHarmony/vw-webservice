@@ -3,6 +3,17 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+     <groupId>com.eharmony.matching</groupId>
+        <artifactId>vw-webservice</artifactId>
+	   <version>0.0.1-SNAPSHOT</version>
+	      <relativePath>../../vw-webservice</relativePath>
+	        </parent>
+
+
+
+
+
     <groupId>com.eharmony.matching</groupId>
     <artifactId>vw-webservice-jersey</artifactId>
     <packaging>war</packaging>

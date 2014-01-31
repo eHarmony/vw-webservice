@@ -1,12 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.eharmony.matching</groupId>
-  <artifactId>vw-webservice-parent</artifactId>
+  <artifactId>vw-webservice</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>VW Web Service Parent</name>
+  <name>VW Web Service</name>
   <description>The parent project of all the other vw web service projects.</description>
   
+
+
+  <!-- the list of modules being aggregated by this project -->
+  <modules>
+	<module>vw-webservice-common</module>
+	<module>vw-webservice-core</module>
+	<module>vw-webservice-jersey</module>
+  </modules>
+
   <dependencyManagement>
   	<dependencies>	
   	 	<!-- dependencies for testing -->
