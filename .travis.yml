@@ -7,4 +7,5 @@ install:
   - echo "$PATH"
   - echo "$M2_HOME"
   - echo "$PWD"
+  - ls -al apache-maven-2.2.1
 
