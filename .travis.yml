@@ -1,1 +1,8 @@
 language:  java
+install:
+ - wget http://mirror.tcpdiag.net/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
+ - tar xzvf apache-maven-2.2.1-bin.tar.gz
+ - export M2_HOME=$PWD/apache-maven-2.2.1
+ - export PATH=$M2_HOME/bin:$PATH
+
+
