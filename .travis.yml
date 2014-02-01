@@ -8,4 +8,4 @@ install:
   - echo "$M2_HOME"
   - echo "$PWD"
   - ls -al apache-maven-2.2.1
-
+  - ./apache-maven-2.2.1/bin/mvn test
