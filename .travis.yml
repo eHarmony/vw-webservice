@@ -4,5 +4,7 @@ install:
   - tar xzvf apache-maven-2.2.1-bin.tar.gz
   - export M2_HOME=$PWD/apache-maven-2.2.1
   - export PATH=$M2_HOME/bin:$PATH
-
+  - echo "$PATH"
+  - echo "$M2_HOME"
+  - echo "$PWD"
 
