@@ -12,11 +12,11 @@
     <appender-ref ref="STDOUT" />
   </root>
   
-  <logger name="com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip.AsyncFailFastTCPIPExampleProcessor" additivity="false" level="debug">
+  <logger name="com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip.AsyncFailFastTCPIPExampleProcessor" additivity="false" level="trace">
   	<appender-ref ref="STDOUT"></appender-ref>
   </logger>
   
-  <logger name="com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip.TCPIPPredictionsIterator" additivity="false" level="debug">
+  <logger name="com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip.TCPIPPredictionsIterator" additivity="false" level="trace">
   	<appender-ref ref="STDOUT"></appender-ref>
   </logger>
   
