@@ -80,10 +80,10 @@ Note: for the --recursive option to work (it grabs the vowpal wabbit submodule f
 
 You should now have a vw-webservice directory with some files and 4 directories inside of it:
 
-vowpal_wabbit
-vw-webservice-common
-vw-webservice-core
-vw-webservice-jersey
+* vowpal_wabbit
+* vw-webservice-common
+* vw-webservice-core
+* vw-webservice-jersey
 
 #### Building Vowpal Wabbit
 
