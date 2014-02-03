@@ -78,16 +78,23 @@ cd vw-webservice
 
 Note: for the --recursive option to work (it grabs the vowpal wabbit submodule for you), you will need git 1.6.5 or later. Otherwise you can pull the vowpal wabbit submodule in separately using ``git submodule``.
 
+You should now have a vw-webservice directory with some files and 4 directories inside of it:
+
+vowpal_wabbit
+vw-webservice-common
+vw-webservice-core
+vw-webservice-jersey
+
 #### Building Vowpal Wabbit
 
-Now that you have the webservice, under the vw-webservice folder, you should find an additional folder for vowpal wabbit that contains all the source. Before you can launch the vowpal wabbit daemon you will have to build it.
+Now that you have the webservice, under the vw-webservice/vowpal_wabbit folder, you should find the C++ source for Vowpal Wabbit. Before you can launch the daemon you will have to build it.
 
 ```
 cd vowpal_wabbit
 make clean
 make
 
-#now launch it in daemon mode
+#now launch it in daemon mode (from within the vw-webservice/vowpal_wabbit directory)
 ./vowpalwabbit/vw --daemon [other options you like]
 ```
 
@@ -95,10 +102,10 @@ Note: Vowpal Wabbit depends on boost program options (on a Mac this can be insta
 
 #### Building VW Web Service
 
-Now that we have vowpal wabbit up and running, we just need to make sure that the web service knows the host and port where the daemon lives. Edit the config:
+Now that we have Vowpal Wabbit up and running, we just need to make sure that the web service knows the host and port where the daemon lives. Edit the config:
 
 ```
-vim vw-webservice-jersey/src/main/resources/vw-webservice.properties
+vim vw-webservice/vw-webservice-jersey/src/main/resources/vw-webservice.properties
 ``` 
 
 and change if necessary:
@@ -120,7 +127,7 @@ In the output, you should see the location where the WAR (Web Application Resour
 ...
 ...
 [INFO] Webapp assembled in[172 msecs]
-[INFO] Building war: /path/to/vw-webservice-jersey/target/vw-webservice-jersey.war
+[INFO] Building war: vw-webservice/vw-webservice-jersey/target/vw-webservice-jersey.war
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESSFUL
 [INFO] ------------------------------------------------------------------------
@@ -135,10 +142,10 @@ Now you can deploy the .war file:
 ```
 # the maven build (assuming you're using the default directories) will have spit out the WAR file to the 'target' subdirectory
 # if you're running the Jetty instance on your local machine, copy the WAR over to the 'webapps' directory of Jetty
-cp /vw-webservice/vw-webservice-jersey/target/vw-webservice-jersey.war /path/to/jetty-9.1.0/webapps/
+cp vw-webservice/vw-webservice-jersey/target/vw-webservice-jersey.war /path/to/jetty-9.1.0/webapps/
 
 # alternatively, you can scp the war file to the box where you are running your jetty instance:
-# scp /vw-webservice/vw-webservice-jersey/target/vw-webservice-jersey.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
+# scp vw-webservice/vw-webservice-jersey/target/vw-webservice-jersey.war  box.running.jetty.com:/path/to/jetty-9.1.0/webapps/
 
 # Restart the Jetty instance (wherever you have Jetty running).
 cd /path/to/jetty-9.1.0
