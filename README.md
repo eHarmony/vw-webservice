@@ -27,7 +27,7 @@ From the Maven documentation:
 Make sure that JAVA_HOME is set to the location of your JDK, e.g. export JAVA_HOME=/usr/java/jdk1.7.x and that $JAVA_HOME/bin is in your PATH environment variable. 
 ```
 
-Once the Java 7 JDK is ready to go (with JAVA_HOME also properly set on your PATH), you can install the version of Maven you'd like to use (pick either 2.2.1 or 3.1.1 from below).
+Once the Java 7 JDK is ready to go (with JAVA_HOME/bin also properly set on your PATH), you can install the version of Maven you'd like to use (pick either 2.2.1 or 3.1.1 from below).
 
 #### Maven 2.2.1
 
