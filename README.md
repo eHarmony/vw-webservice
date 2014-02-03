@@ -8,14 +8,24 @@ This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnL
 
 ### Dependencies
 
+* Java 1.7
 * Maven 2.2.1 or Maven 3
 * Jetty 9.1.10
-* Java 1.7
 * Vowpal Wabbit (included as a submodule)
 
 The current web service was developed and tested on Jetty 9.1.0. You will need Maven 2.2.1
 to build the project (Maven 3 also works, though). Instructions for both versions have been included in this document, so pick the version of Maven you'd like
 to use and execute the provided instructions.
+
+### Java 1.7
+
+You will need Java 7 in order to run Jetty 9.1.10. Furthermore, you need the JDK (instead of the JRE) in order to run Maven. 
+
+From the Maven documentation:
+
+```
+Make sure that JAVA_HOME is set to the location of your JDK, e.g. export JAVA_HOME=/usr/java/jdk1.7.x and that $JAVA_HOME/bin is in your PATH environment variable. 
+```
 
 #### Maven 2.2.1
 
