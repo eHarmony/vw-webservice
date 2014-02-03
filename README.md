@@ -14,7 +14,8 @@ This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnL
 * Vowpal Wabbit (included as a submodule)
 
 The current web service was developed and tested on Jetty 9.1.0. You will need Maven 2.2.1
-to build the project (Maven 3 also works, though). These instructions assume you want to use Maven 2.2.1, but you can just as easily use Maven 3 if you like.
+to build the project (Maven 3 also works, though). Instructions for both versions have been included in this document, so pick the version of Maven you'd like
+to use and execute the provided instructions.
 
 #### Maven 2.2.1
 
@@ -22,7 +23,19 @@ to build the project (Maven 3 also works, though). These instructions assume you
 wget http://mirror.tcpdiag.net/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
 tar xzvf apache-maven-2.2.1-bin.tar.gz
 export M2_HOME=$PWD/apache-maven-2.2.1
-export PATH=$PATH:$M2_HOME/bin
+export PATH=$M2_HOME/bin:$PATH
+
+# check it worked
+mvn -version
+```
+
+#### Maven 3.1.1
+
+```
+wget http://mirror.tcpdiag.net/apache/maven/maven-3/3.1.1/binaries/apache-maven-3.1.1-bin.tar.gz 
+tar xzvf apache-maven-3.1.1-bin.tar.gz 
+export M2_HOME=$PWD/apache-maven-3.1.1
+export PATH=$M2_HOME/bin:$PATH
 
 # check it worked
 mvn -version
@@ -142,10 +155,11 @@ curl    -H "Content-Type:text/plain" -X POST \
         -v
 ```
 
-If you happen to have a humongous gzipped file containing millions of examples, you can do the following:
+If you happen to have a humongous gzipped file containing millions of examples (eg, ner.train.gz, included under src/test/resources, which has ~272K examples), you can do the following:
 
 ```
-gzcat /path/to/lotsAndLotsOfVWExamples.txt.gz \
+# assume we are in the vw-webservice directory
+gzcat vw-webservice-jersey/src/test/resources/ner.train.gz \
 | curl  -H "Content-Type:text/plain" \
         -X POST \
         -T - \
@@ -155,7 +169,9 @@ gzcat /path/to/lotsAndLotsOfVWExamples.txt.gz \
 
 The curl '-T' switch performs a file transfer, without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
-Examples should follow VW format - for instance:
+Examples should follow VW format. For more information on the VW input format, refer to the documentation at: https://github.com/JohnLangford/vowpal_wabbit/wiki/Input-format
+
+For instance:
 
 ```
 1 first| w_2=German pre1_2=g c_0=A_fw=y c_0=A c_2=Aa suf2_2=an pre2_2=ge c_2=Aa_fw=n w_-1=<s> suf3_0=u suf1_0=u suf2_1=ts pre3_1=rej c_1=a w_1=rejects suf2_0=eu pre2_1=re suf3_1=cts suf3_2=man w_0=EU pre1_1=r pre1_0=e c_1=a_fw=n w_-2=<s> pre3_2=ger l_2=german l_0=eu pre3_0=eu pre2_0=eu suf1_1=s l_1=rejects suf1_2=n
