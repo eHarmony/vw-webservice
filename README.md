@@ -153,18 +153,18 @@ java -jar start.jar
 ```
 
 The last command will start spitting out the Jetty logs to the console. You can keep an eye on this as you submit requests to the vw-webservice, which will log to the console. The web service
-uses logback for logging, and the logging configuration can be found under src/main/resources/logback.xml.
+uses logback for logging, and the logging configuration can be found under vw-webservice-jersey/src/main/resources/logback.xml.
 
 ## Using the Web Service
 
-You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the webservice, without buffering it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the [AsynHttpClient](http://sonatype.github.io/async-http-client/). You can find a test that uses this client in ``src/test/java/AsyncHttpClientTest.java``.
+You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the webservice, without buffering it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the [AsynHttpClient](http://sonatype.github.io/async-http-client/). You can find a test that uses this client in ``vw-webservice-jersey/src/test/java/AsyncHttpClientTest.java``.
 
 You can also submit examples to the web service from the command line using curl. Assuming all your VW examples are sitting in examples.txt, in the directory where you invoke curl:
 
 ```
 curl    -H "Content-Type:text/plain" -X POST \
         -T examples.txt \
-        http://host.running.jetty.com:8080/vw-webservice/predict/main \
+        http://host.running.jetty.com:8080/vw-webservice-jersey/predict/main \
         -v
 ```
 
@@ -176,13 +176,13 @@ gzcat vw-webservice-jersey/src/test/resources/ner.train.gz \
 | curl  -H "Content-Type:text/plain" \
         -X POST \
         -T - \
-        http://host.running.jetty.com:8080/vw-webservice/predict/main \
+        http://host.running.jetty.com:8080/vw-webservice-jersey/predict/main \
         -v
 ```
 
 The curl '-T' switch performs a file transfer, without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
-Examples should follow VW format. For more information on the VW input format, refer to the documentation at: https://github.com/JohnLangford/vowpal_wabbit/wiki/Input-format
+Examples should follow the VW format. For more information on the VW input format, refer to the documentation at: https://github.com/JohnLangford/vowpal_wabbit/wiki/Input-format
 
 For instance:
 
@@ -211,14 +211,11 @@ The percentage hit in terms of median times was only about 2%, which seems accep
 * Java client.
 * Javascript client.
 * Add compression support.
-* mvn test (use examples.txt).
 * Automate setup and installation.
-* Flesh out the spring application context, and get rid of spring annotations from the actual source code.
 * Move all property configuration outside the .war file. Right now the configuration is packaged inside, effectively making the .war files hard-coded.
 * Add codahale metrics gathering.
 * Go through all the TODO comments in the source code and make changes where necessary.
 * CometD support.
 * Speed optimizations.
 * Document extension points.
-* Re-organize project structure into client, common, and server side projects.
 * Re-factor tests to instantiate a web-service instance, perhaps using Grizzly http server?
