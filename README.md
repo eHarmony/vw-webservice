@@ -27,6 +27,8 @@ From the Maven documentation:
 Make sure that JAVA_HOME is set to the location of your JDK, e.g. export JAVA_HOME=/usr/java/jdk1.7.x and that $JAVA_HOME/bin is in your PATH environment variable. 
 ```
 
+Once the Java 7 JDK is ready to go (with JAVA_HOME also properly set on your PATH), you can install the version of Maven you'd like to use (pick either 2.2.1 or 3.1.1 from below).
+
 #### Maven 2.2.1
 
 ```
@@ -55,13 +57,7 @@ mvn -version
 
 On the box where you plan on running the web service, install [Jetty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
 
-We assume that you have installed it in:
-
-```
-~/jetty-9.1.0
-```
-
-Once you have set up the prerequisites, you can go ahead and set up the VW web service.
+That's it for the prerequisites. Now you can go ahead and set up the VW web service.
 
 ### Building and Deploying the VW Web Service
 
@@ -80,7 +76,7 @@ git clone --recursive git@github.com:eHarmony/vw-webservice.git
 cd vw-webservice
 ```
 
-Note: for the --recursive option to work (grabs the vowpal wabbit submodule for you), you will need git 1.6.5 or later. Otherwise you can pull the vowpal wabbit submodule in separately using ``git submodule``.
+Note: for the --recursive option to work (it grabs the vowpal wabbit submodule for you), you will need git 1.6.5 or later. Otherwise you can pull the vowpal wabbit submodule in separately using ``git submodule``.
 
 #### Building Vowpal Wabbit
 
