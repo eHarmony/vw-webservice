@@ -21,7 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eharmony.matching.vw.webservice.ExampleMediaTypes;
+import com.eharmony.matching.vw.webservice.common.example.ExampleMediaTypes;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
 

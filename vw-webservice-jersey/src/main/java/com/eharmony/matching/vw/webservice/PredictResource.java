@@ -19,6 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.common.example.Example;
+import com.eharmony.matching.vw.webservice.common.example.ExampleMediaTypes;
+import com.eharmony.matching.vw.webservice.common.prediction.PredictionMediaTypes;
 import com.eharmony.matching.vw.webservice.core.ExamplesIterable;
 import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcessorFactory;
 
