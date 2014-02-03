@@ -15,6 +15,8 @@ This is a simple web service that wraps [vowpal wabbit](https://github.com/JohnL
 
 The current web service was developed and tested on Jetty 9.1.0. You will need Maven (either version 2 or 3) to build the web service. Instructions for both versions have been included in this document, so pick the version of Maven you'd like to use and execute the provided instructions.
 
+But first, we need to get the right version of Java...
+
 #### Java 1.7
 
 You will need Java 7 in order to run Jetty 9.1.10. Furthermore, you need the JDK (instead of the JRE) in order to run Maven. 
