@@ -16,7 +16,6 @@ import org.glassfish.jersey.server.ChunkedOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.eharmony.matching.vw.webservice.common.example.Example;
 import com.eharmony.matching.vw.webservice.common.example.ExampleMediaTypes;
@@ -27,7 +26,6 @@ import com.eharmony.matching.vw.webservice.core.exampleprocessor.ExampleProcesso
 /**
  * Root resource (exposed at "predict" path)
  */
-@Component
 @Path("/predict")
 public class PredictResource {
 

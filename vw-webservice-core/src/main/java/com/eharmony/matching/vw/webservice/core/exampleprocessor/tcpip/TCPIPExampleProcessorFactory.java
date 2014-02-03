@@ -27,7 +27,6 @@ public class TCPIPExampleProcessorFactory implements ExampleProcessorFactory {
 	private final ExecutorService executorService;
 
 	public TCPIPExampleProcessorFactory(TCPIPSocketFactory socketFactory,
-	/* @Value("#{executorService}") */
 	ExecutorService executorService) {
 
 		checkNotNull(socketFactory, "A null socket factory cannot be provided!");

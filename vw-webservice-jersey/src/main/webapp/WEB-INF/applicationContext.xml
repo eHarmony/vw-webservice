@@ -8,9 +8,20 @@
             			http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
 	<context:property-placeholder location="classpath:vw-webservice.properties"/>
-
-	<context:component-scan base-package="com.eharmony.matching.vw.webservice"/>
-
+	
 	<bean id="executorService" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool"></bean>
+
+	<!-- the TCP socket factory impl -->
+	<bean id="tcpSocketFactoryImpl" class="com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip.TCPIPSocketFactoryImpl">
+		<constructor-arg name="vwHost" value="${vw.hostName}"></constructor-arg>
+		<constructor-arg name="vwPort" value="${vw.port}"></constructor-arg>
+	</bean>
+	
+	<!-- the TCP example processor factory -->
+	<bean id="tcpExampleProcessorFactory" class="com.eharmony.matching.vw.webservice.core.exampleprocessor.tcpip.TCPIPExampleProcessorFactory">
+		<constructor-arg ref="tcpSocketFactoryImpl"></constructor-arg>
+		<constructor-arg ref="executorService"></constructor-arg>
+	</bean>
+
 
 </beans>
