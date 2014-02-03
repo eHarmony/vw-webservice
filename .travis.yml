@@ -1,10 +1,1 @@
 language:  java
-install:
-  - wget http://mirror.tcpdiag.net/apache/maven/maven-2/2.2.1/binaries/apache-maven-2.2.1-bin.tar.gz
-  - tar xzvf apache-maven-2.2.1-bin.tar.gz
-  - export M2_HOME=$PWD/apache-maven-2.2.1
-  - export PATH=/home/travis/build/eHarmony/vw-webservice/apache-maven-2.2.1/bin:/usr/local/phantomjs/bin:./node_modules/.bin:/home/travis/.gvm/pkgsets/go1.1.2/global/bin:/home/travis/.gvm/gos/go1.1.2/bin:/home/travis/.gvm/pkgsets/go1.1.2/global/overlay/bin:/home/travis/.gvm/bin:/home/travis/.gvm/bin:/usr/local/gradle/bin:/home/travis/.cabal/bin:/home/travis/.rvm/gems/ruby-1.9.3-p484/bin:/home/travis/.rvm/gems/ruby-1.9.3-p484@global/bin:/home/travis/.rvm/rubies/ruby-1.9.3-p484/bin:/home/travis/.rvm/bin:/usr/local/phantomjs/bin:/home/travis/.nvm/v0.10.22/bin:./node_modules/.bin:/home/travis/.gvm/pkgsets/go1.1.2/global/bin:/home/travis/.gvm/gos/go1.1.2/bin:/home/travis/.gvm/pkgsets/go1.1.2/global/overlay/bin:/home/travis/.gvm/bin:/home/travis/.gvm/bin:/usr/local/gradle/bin:/home/travis/.cabal/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-  - echo "$PATH"
-  - echo "$M2_HOME"
-  - echo "$PWD"
-  - ls -al apache-maven-2.2.1
