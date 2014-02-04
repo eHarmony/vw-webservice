@@ -171,7 +171,7 @@ curl    -H "Content-Type:text/plain" -X POST \
         -v
 ```
 
-If you happen to have a humongous gzipped file containing millions of examples (eg, ner.train.gz, included under src/test/resources, which has ~272K examples), you can do the following:
+If you happen to have a humongous gzipped file containing millions of examples (eg, ner.train.gz, included under vw-webservice-jersey/src/test/resources, which has ~272K examples), you can do the following:
 
 ```
 # assume we are in the vw-webservice directory
