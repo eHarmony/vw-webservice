@@ -14,7 +14,9 @@
   <description>Common components used by client and server side projects.</description>
 
     <build>
-        
+
+ 		<finalName>vw-webservice-common-${project.version}</finalName>
+  
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

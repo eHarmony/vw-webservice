@@ -43,4 +43,8 @@
 	
   </dependencies>
 
+ 	<build>
+ 		<finalName>vw-webservice-core-${project.version}</finalName>
+ 	</build>
+
 </project>
