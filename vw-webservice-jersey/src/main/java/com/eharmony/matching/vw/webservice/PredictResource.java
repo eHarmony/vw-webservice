@@ -55,40 +55,4 @@ public class PredictResource {
 		return new RequestHandler(executorService, exampleProcessorFactory).handleRequest(examplesIterable);
 	}
 
-	@POST
-	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN, ExampleMediaTypes.STRUCTURED_JSON_1_0 })
-	@Produces({ PredictionMediaTypes.PLAINTEXT_1_0 })
-	@Path("/dumpExamples")
-	public String dumpExamples(ExamplesIterable examplesIterable) {
-		if (LOGGER.isTraceEnabled()) for (Example example : examplesIterable)
-			LOGGER.trace(example.getVWStringRepresentation());
-
-		return "Done!";
-	}
-
-	@POST
-	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN })
-	@Produces({ PredictionMediaTypes.PLAINTEXT_1_0 })
-	@Path("/dumpExamplesNew")
-	public String dumpExamplesNew(String content) {
-
-		return content;
-	}
-
-	/**
-	 * Method handling HTTP GET requests. The returned object will be sent to
-	 * the client as "text/plain" media type.
-	 * 
-	 * @return String that will be returned as a text/plain response.
-	 */
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	public String doGet() {
-
-		return "Hello from the VW Predict web service!"; // TODO: spit out usage
-															// instructions
-															// here, perhaps?
-		// TODO: alternatively, return an actual form that lets you
-		// submit/upload examples
-	}
 }
