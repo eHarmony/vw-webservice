@@ -8,7 +8,7 @@ package com.eharmony.matching.vw.webservice.common.prediction;
 */
 public class PredictionMediaTypes {
 
-	public static final String PLAINTEXT_1_0 = "application/vowpal-wabbit-prediction-v1.0+plaintext";
+	public static final String PLAINTEXT_0_1_0 = "application/vowpal-wabbit-prediction-v0.1.0+plaintext";
 
 }
 

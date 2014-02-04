@@ -6,7 +6,7 @@
   	<parent>
      	<groupId>com.eharmony.matching</groupId>
         <artifactId>vw-webservice</artifactId>
-	   	<version>0.0.1-SNAPSHOT</version>
+	   	<version>0.1.0-SNAPSHOT</version>
 	    <relativePath>../../vw-webservice</relativePath>
 	</parent>
 
@@ -70,13 +70,13 @@
     	<dependency>
     		<groupId>com.eharmony.matching</groupId>
     		<artifactId>vw-webservice-core</artifactId>
-    		<version>0.0.1-SNAPSHOT</version>
+    		<version>${project.version}</version>
     	</dependency>
 
     	<dependency>
     		<groupId>com.eharmony.matching</groupId>
     		<artifactId>vw-webservice-common</artifactId>
-    		<version>0.0.1-SNAPSHOT</version>
+    		<version>${project.version}</version>
     	</dependency>
 
         <dependency>

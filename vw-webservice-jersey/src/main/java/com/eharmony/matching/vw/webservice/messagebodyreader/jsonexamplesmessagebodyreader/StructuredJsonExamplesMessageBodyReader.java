@@ -29,7 +29,7 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
  * @author vrahimtoola
  *         Reads structured json examples from a stream.
  */
-@Consumes({ ExampleMediaTypes.STRUCTURED_JSON_1_0 })
+@Consumes({ ExampleMediaTypes.STRUCTURED_JSON_0_1_0 })
 @Provider
 public class StructuredJsonExamplesMessageBodyReader implements MessageBodyReader<ExamplesIterable> {
 
@@ -39,7 +39,7 @@ public class StructuredJsonExamplesMessageBodyReader implements MessageBodyReade
 	public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
 		LOGGER.debug("Called with media type: {} and type: {}", mediaType.toString(), type);
 
-		boolean willReturn = mediaType.toString().equals(ExampleMediaTypes.STRUCTURED_JSON_1_0) && type == ExamplesIterable.class;
+		boolean willReturn = mediaType.toString().equals(ExampleMediaTypes.STRUCTURED_JSON_0_1_0) && type == ExamplesIterable.class;
 
 		LOGGER.debug("Returning: {}", willReturn);
 

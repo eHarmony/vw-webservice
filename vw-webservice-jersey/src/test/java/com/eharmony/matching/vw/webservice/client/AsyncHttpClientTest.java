@@ -78,7 +78,7 @@ public class AsyncHttpClientTest {
 		//note: assumes that a vw-webservice is running on localhost at 8080.
 		//modify the address accordingly if it's running on a different host/port.
 
-		Request request = builder.setUrl("http://localhost:8080/vw-webservice-jersey/predict/main").addHeader("Content-Type", ExampleMediaTypes.PLAINTEXT_1_0).setBody(getPlainTextInputStreamBodyGenerator()).build();
+		Request request = builder.setUrl("http://localhost:8080/vw-webservice-jersey/predict/main").addHeader("Content-Type", ExampleMediaTypes.PLAINTEXT_0_1_0).setBody(getPlainTextInputStreamBodyGenerator()).build();
 
 		doTest(request);
 	}
@@ -95,7 +95,7 @@ public class AsyncHttpClientTest {
 		//note: assumes that a vw-webservice is running on localhost at 8080.
 		//modify the address accordingly if it's running on a different host/port.
 
-		Request request = builder.setUrl("http://localhost:8080/vw-webservice-jersey/predict/main").addHeader("Content-Type", ExampleMediaTypes.STRUCTURED_JSON_1_0).setBody(getJsonInputStreamBodyGenerator()).build();
+		Request request = builder.setUrl("http://localhost:8080/vw-webservice-jersey/predict/main").addHeader("Content-Type", ExampleMediaTypes.STRUCTURED_JSON_0_1_0).setBody(getJsonInputStreamBodyGenerator()).build();
 
 		doTest(request);
 	}

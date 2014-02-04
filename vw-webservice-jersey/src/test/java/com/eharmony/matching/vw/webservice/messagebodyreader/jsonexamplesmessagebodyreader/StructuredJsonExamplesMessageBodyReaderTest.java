@@ -58,7 +58,7 @@ public class StructuredJsonExamplesMessageBodyReaderTest {
 		Assert.assertTrue(toTest.isReadable(ExamplesIterable.class, null, null, new MediaType() {
 			@Override
 			public String toString() {
-				return ExampleMediaTypes.STRUCTURED_JSON_1_0;
+				return ExampleMediaTypes.STRUCTURED_JSON_0_1_0;
 			}
 		}));
 

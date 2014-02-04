@@ -33,7 +33,7 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
  *         A message body reader that can read an Iterable<String> from the
  *         message body of an HTTP request.
  */
-@Consumes({ MediaType.TEXT_PLAIN, ExampleMediaTypes.PLAINTEXT_1_0 })
+@Consumes({ MediaType.TEXT_PLAIN, ExampleMediaTypes.PLAINTEXT_0_1_0 })
 @Provider
 public class PlainTextExamplesMessageBodyReader implements MessageBodyReader<ExamplesIterable> {
 
@@ -48,7 +48,7 @@ public class PlainTextExamplesMessageBodyReader implements MessageBodyReader<Exa
 
 		LOGGER.debug("Called with media type: {} and type: {}", mediaType.toString(), type);
 
-		boolean willReturn = (mediaType.isCompatible(MediaType.TEXT_PLAIN_TYPE) || mediaType.toString().equals(ExampleMediaTypes.PLAINTEXT_1_0)) && type == ExamplesIterable.class;
+		boolean willReturn = (mediaType.isCompatible(MediaType.TEXT_PLAIN_TYPE) || mediaType.toString().equals(ExampleMediaTypes.PLAINTEXT_0_1_0)) && type == ExamplesIterable.class;
 
 		LOGGER.debug("Returning: {}", willReturn);
 

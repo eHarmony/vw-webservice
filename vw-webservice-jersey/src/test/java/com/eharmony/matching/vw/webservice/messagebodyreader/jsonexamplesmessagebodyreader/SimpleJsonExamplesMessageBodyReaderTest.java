@@ -59,7 +59,7 @@ public class SimpleJsonExamplesMessageBodyReaderTest {
 		Assert.assertTrue(toTest.isReadable(ExamplesIterable.class, null, null, new MediaType() {
 			@Override
 			public String toString() {
-				return ExampleMediaTypes.SIMPLE_JSON_1_0;
+				return ExampleMediaTypes.SIMPLE_JSON_0_1_0;
 			}
 		}));
 

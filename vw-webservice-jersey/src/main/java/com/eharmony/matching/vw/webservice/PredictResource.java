@@ -47,8 +47,8 @@ public class PredictResource {
 	}
 
 	@POST
-	@Consumes({ ExampleMediaTypes.PLAINTEXT_1_0, MediaType.TEXT_PLAIN, ExampleMediaTypes.SIMPLE_PROTOBUF_1_0, ExampleMediaTypes.SIMPLE_JSON_1_0, ExampleMediaTypes.STRUCTURED_JSON_1_0 })
-	@Produces({ PredictionMediaTypes.PLAINTEXT_1_0 })
+	@Consumes({ ExampleMediaTypes.PLAINTEXT_0_1_0, MediaType.TEXT_PLAIN, ExampleMediaTypes.SIMPLE_PROTOBUF_0_1_0, ExampleMediaTypes.SIMPLE_JSON_0_1_0, ExampleMediaTypes.STRUCTURED_JSON_0_1_0 })
+	@Produces({ PredictionMediaTypes.PLAINTEXT_0_1_0 })
 	@Path("/main")
 	public ChunkedOutput<String> doPredict(ExamplesIterable examplesIterable) throws IOException {
 

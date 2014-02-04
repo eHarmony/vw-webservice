@@ -29,7 +29,7 @@ import com.eharmony.matching.vw.webservice.core.ExamplesIterableImpl;
  * @author vrahimtoola
  * 
  */
-@Consumes({ ExampleMediaTypes.SIMPLE_JSON_1_0 })
+@Consumes({ ExampleMediaTypes.SIMPLE_JSON_0_1_0 })
 @Provider
 public class SimpleJsonExamplesMessageBodyReader implements MessageBodyReader<ExamplesIterable> {
 
@@ -40,7 +40,7 @@ public class SimpleJsonExamplesMessageBodyReader implements MessageBodyReader<Ex
 
 		LOGGER.debug("Called with media type: {} and type: {}", mediaType.toString(), type);
 
-		boolean willReturn = mediaType.toString().equals(ExampleMediaTypes.SIMPLE_JSON_1_0) && type == ExamplesIterable.class;
+		boolean willReturn = mediaType.toString().equals(ExampleMediaTypes.SIMPLE_JSON_0_1_0) && type == ExamplesIterable.class;
 
 		LOGGER.debug("Returning: {}", willReturn);
 
