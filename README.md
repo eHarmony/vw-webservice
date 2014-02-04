@@ -53,6 +53,9 @@ export PATH=$M2_HOME/bin:$PATH
 mvn -version
 ```
 
+Now let's install Jetty which we'll use as our web container for the web service. Although technically you should be able to use the web container of your choice (Tomcat/Glassfish/etc) bear in mind that so far we've only
+tested the web service using Jetty.
+
 #### Jetty 9.1.10
 
 On the box where you plan on running the web service, install [Jetty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
