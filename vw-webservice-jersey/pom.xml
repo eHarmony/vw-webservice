@@ -28,7 +28,7 @@
     </pluginRepositories>  -->
 
     <build>    
-    	<finalName>vw-webservice-jersey</finalName>
+    	<finalName>vw-webservice-jersey-${project.version}</finalName>
         
         <plugins>
             <plugin>
