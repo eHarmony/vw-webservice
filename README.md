@@ -240,6 +240,8 @@ The percentage hit in terms of median times was only about 2%, which seems accep
 * Document application/x-vw-text.
 * More tests.
 * Pull out integration tests into a separate module and have Maven run them as part of the verify phase. Use the failsafe plugin for this.
+* Incorporate maven enforcer, findbugs and checkstyle plugin invocations
+* Incorporate suggestions made by others during code review
 * Protocol buffer support.
 * Java client.
 * Javascript client.

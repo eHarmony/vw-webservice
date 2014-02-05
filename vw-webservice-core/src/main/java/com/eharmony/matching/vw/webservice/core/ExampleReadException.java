@@ -15,7 +15,7 @@ package com.eharmony.matching.vw.webservice.core;
  *         signature in the implementation.
  */
 public class ExampleReadException extends RuntimeException {
-
+	
 	/**
 	 * The serial version UID.
 	 */
