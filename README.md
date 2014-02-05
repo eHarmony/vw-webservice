@@ -99,6 +99,8 @@ You should now have a vw-webservice directory with some files and 4 directories 
 
 Now that you have the webservice, under the vw-webservice/vowpal_wabbit folder, you should find the C++ source for Vowpal Wabbit. Before you can launch the daemon you will have to build it.
 
+If you're using Linux, then make sure you already have gcc and g++ installed on your system. Note also that Vowpal Wabbit depends on boost program options (on a Mac this can be installed via [homebrew](http://brew.sh): ``brew install boost`` and on Linux you can try ``sudo apt-get install -y -m libboost-program-options-dev``).
+
 ```
 cd vowpal_wabbit
 make clean
@@ -107,8 +109,6 @@ make
 #now launch it in daemon mode (from within the vw-webservice/vowpal_wabbit directory)
 ./vowpalwabbit/vw --daemon [other options you like]
 ```
-
-Note: Vowpal Wabbit depends on boost program options (on a Mac this can be installed via [homebrew](http://brew.sh): ``brew install boost`` and on Linux you can try ``sudo apt-get install -y -m libboost-program-options-dev``).
 
 #### Building VW Web Service
 
