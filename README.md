@@ -162,7 +162,23 @@ uses logback for logging, and the logging configuration can be found under vw-we
 
 You can hit the webservice from the command line using curl, or code up your own client (in any language) to communicate with the web service. Something to keep in mind is that the client you use should support chunked transfer encoding, as this will allow you to stream massive amounts of data to/from the webservice, without buffering it all in memory to calculate the value of the Content-Length request header. A Java client that supports this is the [AsynHttpClient](http://sonatype.github.io/async-http-client/). You can find a test that uses this client in ``vw-webservice-jersey/src/test/java/AsyncHttpClientTest.java``.
 
-You can also submit examples to the web service from the command line using curl. Assuming all your VW examples are sitting in examples.txt, in the directory where you invoke curl:
+Examples should follow the VW format. For more information on the VW input format, refer to the documentation at: https://github.com/JohnLangford/vowpal_wabbit/wiki/Input-format
+
+However, when examples are submitted to the web service by a client, they can be either in plaintext format, or in a more structured format. In either case, once an example is received by the web service, it will convert the example to the proper VW format before submitting it to the VW daemon.
+
+#### Plaintext examples
+
+This means you will be submitting a stream of examples to the web service, with each example being a string in the accepted VW input format. 
+
+For instance:
+
+```
+1 first|user name=Adam gender=male age=34 |movie Snatch
+-1 second|user name=Adam gender=male age=34 |movie Titanic
+1 third|user name=Adam gender=male age=34 |movie Hangover
+```
+
+You can submit such examples to the web service from the command line using curl. Assuming all your plaintext VW examples are sitting in some file called examples.txt, you can do the following:
 
 ```
 curl    -H "Content-Type:text/plain" -X POST \
@@ -171,7 +187,7 @@ curl    -H "Content-Type:text/plain" -X POST \
         -v
 ```
 
-If you happen to have a humongous gzipped file containing millions of examples (eg, ner.train.gz, included under vw-webservice-jersey/src/test/resources, which has ~272K examples), you can do the following:
+If you happen to have a humongous gzipped file containing millions of plaintext examples (eg, ner.train.gz, included under vw-webservice-jersey/src/test/resources, which has ~272K examples), you can do the following:
 
 ```
 # assume we are in the vw-webservice directory
@@ -185,15 +201,21 @@ gzcat vw-webservice-jersey/src/test/resources/ner.train.gz \
 
 The curl '-T' switch performs a file transfer, without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
-Examples should follow the VW format. For more information on the VW input format, refer to the documentation at: https://github.com/JohnLangford/vowpal_wabbit/wiki/Input-format
+Of course, you can also use any HTTP client to submit such a stream of plaintext examples to the web service. Just be sure that each example appears on a line by itself.
 
-For instance:
+#### Structured examples
 
-```
-1 first|user name=Adam gender=male age=34 |movie Snatch 
--1 second|user name=Adam gender=male age=34 |movie Titanic 
-1 third|user name=Adam gender=male age=34 |movie Hangover
-```
+This means you will build up each VW example in a structured way using some API, and this structure will be reflected in the format of the data being sent to the web service.
+
+Currently, there is a class called StructuredExample.java in the package com.eharmony.matching.vw.webservice.common.example in the vw-webservice-common project, that let's you use the Builder pattern to build up an example from it's component parts (a label, a tag, and a set of namespaces, each of which has some number of features). 
+
+To see code that demonstrates this, check out the "simpleExampleBuildingTest" and "simpleExampleBuildingTestWithTag" tests in StructuredExampleTest.java in that same project. These tests demonstrate how to use the API to build up an example piece by piece.
+
+Once you have an instance of a StructuredExample, you can write that out to some stream. Currently, the web service only supports the json format for submitting structured examples. In json, a stream of structured examples must have the schema described in "vw_example_schema.json" found in the same project (vw-webservice-common) under the src/test/resources folder. Note that this is the schema for the entire stream of structured json examples that will be submitted to the web service.
+
+To see code that shows how to write a single StructuredExample in json format, check out the "writeExample" method in JsonTestUtils.java, which can be found in the vw-webservice-jersey project under src/test/java in the com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader package. 
+
+To see code that writes an entire stream of StructuredExamples in json format, check out the 'getJsonInputStreamBodyGenerator' method of AsyncHttpClientTest.java in the com.eharmony.matching.vw.webservice.client package under src/test/java in the vw-webservice-jersey project.
 
 ## Benchmarks
 
