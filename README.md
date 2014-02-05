@@ -60,6 +60,13 @@ tested the web service using Jetty.
 
 On the box where you plan on running the web service, install [Jetty 9.1.0](http://eclipse.org/downloads/download.php?file=/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz&r=1).
 
+On the command line you can use:
+
+```
+wget http://mirrors.ibiblio.org/eclipse/jetty/9.1.0.v20131115/dist/jetty-distribution-9.1.0.v20131115.tar.gz
+tar xzvf jetty-distribution-9.1.0.v20131115.tar.gz
+```
+
 That's it for the prerequisites. Now you can go ahead and set up the VW web service.
 
 ### Building and Deploying the VW Web Service
