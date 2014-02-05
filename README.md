@@ -220,6 +220,48 @@ To see code that demonstrates this, check out the "simpleExampleBuildingTest" an
 
 Once you have an instance of a StructuredExample, you can write that out to some stream. Currently, the web service only supports the json format for submitting structured examples. In json, a stream of structured examples must have the schema described in "vw_example_schema.json" found in the same project (vw-webservice-common) under the src/test/resources folder. Note that this is the schema for the entire stream of structured json examples that will be submitted to the web service.
 
+In json, if you were to serialize a stream of a VW examples, it would look like this:
+
+```json
+[
+{
+    "label": "34",
+    "tag": "someTag",
+    "namespaces": [{
+        "name": "one",
+        "features": [{
+            "name": "a",
+            "value": 12.34
+        }, {
+            "name": "b",
+            "value": 45.1
+        }]
+    }, {
+        "name": "two",
+        "scale": 34.3,
+        "features": [{
+            "name": "bah",
+            "value": 0.038293
+        }, {
+            "name": "another",
+            "value": 3.4
+        }, {
+            "name": "andThis",
+            "value": 2.0
+        }]
+    }]
+}
+,
+{
+.
+...the next json example
+.
+}
+,
+```
+
+The first json example in the above chunk would be converted by the web service to the following before submitting to the VW daemon: "34 someTag|one a:12.34 b:45.1 |two:34.3 bah:0.038293 another:3.4 andThis:2".
+
 To see code that shows how to write a single StructuredExample in json format, check out the "writeExample" method in JsonTestUtils.java, which can be found in the vw-webservice-jersey project under src/test/java in the com.eharmony.matching.vw.webservice.messagebodyreader.jsonexamplesmessagebodyreader package. 
 
 To see code that writes an entire stream of StructuredExamples in json format, check out the 'getJsonInputStreamBodyGenerator' method of AsyncHttpClientTest.java in the com.eharmony.matching.vw.webservice.client package under src/test/java in the vw-webservice-jersey project.

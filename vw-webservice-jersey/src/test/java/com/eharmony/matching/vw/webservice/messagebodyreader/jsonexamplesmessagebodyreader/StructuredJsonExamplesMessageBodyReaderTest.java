@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
+import java.io.StringWriter;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Exchanger;
@@ -65,6 +66,45 @@ public class StructuredJsonExamplesMessageBodyReaderTest {
 		Assert.assertFalse(toTest.isReadable(ExamplesIterable.class, null, null, MediaType.TEXT_PLAIN_TYPE));
 	}
 
+	@Test
+	public void throwAwayTest() throws IOException {
+		StructuredExample.ExampleBuilder exampleBuilder = new StructuredExample.ExampleBuilder();
+		StructuredExample.Namespace.NamespaceBuilder namespaceBuilder = new StructuredExample.Namespace.NamespaceBuilder();
+
+		exampleBuilder.setLabel("34");
+		exampleBuilder.setTag("someTag");
+
+		namespaceBuilder.setName("one");
+		namespaceBuilder.addFeature("a", 12.34f);
+		namespaceBuilder.addFeature("b", 45.1f);
+
+		StructuredExample.Namespace firstNamespace = namespaceBuilder.build();
+
+		namespaceBuilder.clear();
+
+		namespaceBuilder.setName("two");
+		namespaceBuilder.setScalingFactor(34.3f);
+		namespaceBuilder.addFeature("bah", 0.038293f);
+		namespaceBuilder.addFeature("another", 3.4000f);
+		namespaceBuilder.addFeature("andThis", 2.0f);
+
+		StructuredExample.Namespace secondNamespace = namespaceBuilder.build();
+
+		exampleBuilder.addNamespace(firstNamespace);
+		exampleBuilder.addNamespace(secondNamespace);
+
+		StringWriter stringWriter = new StringWriter();
+		
+		JsonWriter jsonWriter = new JsonWriter(stringWriter);
+		
+		JsonTestUtils.writeExample(jsonWriter, exampleBuilder.build());
+		
+		jsonWriter.flush();
+		jsonWriter.close();
+		
+		LOGGER.debug("The JSON is: {}", stringWriter.toString());
+	}
+	
 	/*
 	 * Tests that the readFrom method works as expected.
 	 */
