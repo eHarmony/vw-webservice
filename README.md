@@ -208,7 +208,7 @@ gzcat vw-webservice-jersey/src/test/resources/ner.train.gz \
 
 The curl '-T' switch performs a file transfer, without trying to buffer all the data in memory to compute the Content-Length HTTP request header.
 
-Of course, you can also use any HTTP client to submit such a stream of plaintext examples to the web service. Just be sure that each example appears on a line by itself.
+Of course, you can also use any HTTP client to submit such a stream of plaintext examples to the web service. Just make sure that each example appears on a line by itself.
 
 #### Structured examples
 
@@ -220,9 +220,9 @@ To see code that demonstrates this, check out the "simpleExampleBuildingTest" an
 
 Once you have an instance of a StructuredExample, you can write that out to some stream. Currently, the web service only supports the json format for submitting structured examples. In json, a stream of structured examples must have the schema described in "vw_example_schema.json" found in the same project (vw-webservice-common) under the src/test/resources folder. Note that this is the schema for the entire stream of structured json examples that will be submitted to the web service.
 
-In json, if you were to serialize a stream of a VW examples, it would look like this:
+The serialized stream of json-formatted VW examples would look like this:
 
-```json
+```javascript
 [
 {
     "label": "34",
@@ -253,9 +253,7 @@ In json, if you were to serialize a stream of a VW examples, it would look like 
 }
 ,
 {
-.
-...the next json example
-.
+//the next json example
 }
 ,
 ```
